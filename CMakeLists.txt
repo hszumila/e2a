@@ -9,6 +9,7 @@ find_package(ROOT REQUIRED)
 project (e2a)
 
 # ADD SUBDIRECTORIES
+add_subdirectory(calibration_data)
 
 include_directories(${ROOT_INCLUDE_DIR})
 

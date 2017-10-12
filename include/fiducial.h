@@ -7,12 +7,12 @@
 class Fiducial
 {
  public:
-  Fiducial(std::string E1, int torus_current, int mini_current);
+  Fiducial(int E_beam, int torus_current, int mini_current);
   ~Fiducial();
   bool inFidRegion(TVector3 mom, int charge);
 
  private:
-  std::string E1;
+  int E1;
   int torus_current;
   int mini_current;
 

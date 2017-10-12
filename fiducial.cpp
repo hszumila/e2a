@@ -5,7 +5,7 @@
 #include <cmath>
 #include <iostream>
 
-Fiducial::Fiducial(std::string E_beam, int torus, int mini)
+Fiducial::Fiducial(int E_beam, int torus, int mini)
 {
   // Initialize the key run settings
   E1=E_beam;
@@ -16,7 +16,7 @@ Fiducial::Fiducial(std::string E_beam, int torus, int mini)
 
   // Read in the Fiducial Cut Parameters
   char param_file_name[256];
-  sprintf(param_file_name,"%s/.e2a/FCP_%s_%d.dat",homedir.c_str(),E1.c_str(),torus);
+  sprintf(param_file_name,"%s/.e2a/FCP_%d_%d.dat",homedir.c_str(),E1,torus);
   std::ifstream param_file(param_file_name);
   int param_type, sector;
   double data[6];
@@ -53,7 +53,7 @@ Fiducial::Fiducial(std::string E_beam, int torus, int mini)
   param_file.close();
 
   // Read in the Momentum Correction Parameters
-  sprintf(param_file_name,"%s/.e2a/EMCP_%s_%d.dat",homedir.c_str(),E1.c_str(),torus);
+  sprintf(param_file_name,"%s/.e2a/EMCP_%d_%d.dat",homedir.c_str(),E1,torus);
   param_file.open(param_file_name);
   int cj;
   while (param_file >> param_type)

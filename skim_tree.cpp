@@ -6,12 +6,14 @@
 #include "TH2.h"
 #include "TF1.h"
 
+#include "Fiducial.h"
+#include "constants.h"
+
 using namespace std;
 
 // Range of momentum for which we have good fits for PID
-const double min_el_mom = 1.5; // in GeV
-const double max_el_mom = 3.8;
 const double epratio_sig_cutrange=3.; // +/- sigma for PID cut
+const double pdeltat_sig_cutrange=3.;
 
 // Target position definition
 const double min_Z = -15.; // Extremely wide settings for now. 
@@ -26,13 +28,8 @@ int main(int argc, char ** argv)
       return -1;	
     }
 
-  // We're going to need to read in a bunch of root files with important calibration data
-  char filenameBuffer[256];
-  strcpy(filenameBuffer,getenv("HOME"));
-  strcat(filenameBuffer,"/.e2a/el_Epratio_mom4461.root");
-  TFile * cal_file=new TFile(filenameBuffer);
-  TF1 *el_Ep_ratio_mean=(TF1*)cal_file->Get("f_mean");
-  TF1 *el_Ep_ratio_sig=(TF1*)cal_file->Get("f_sig");    
+  // Create an instance of the Fiducial Class to store important calibration params
+  Fiducial fid_params(4461, 2250, 6000); // Hard-code the beam energy and toroid currents for now.
 
   // Open up the Root file
   TFile * f = new TFile(argv[1]);
@@ -47,9 +44,9 @@ int main(int argc, char ** argv)
   // Open up the tree, and get the important data
   TTree * t = (TTree*)f->Get("data");
   const int nEvents = t->GetEntries();
-  const int maxPart = 30;
+  const int maxPart = 50;
   int gPart, CCPart, DCPart, ECPart, SCPart;
-  int StatCC[maxPart], StatDC[maxPart], StatEC[maxPart], StatSC[maxPart], id_guess[maxPart];
+  int StatDC[maxPart], StatCC[maxPart], StatEC[maxPart], StatSC[maxPart], id_guess[maxPart];
   float Xb, STT, Q2, W, Nu, Yb;
   float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart], SC_Time[maxPart],
     SC_Path[maxPart], charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
@@ -63,7 +60,7 @@ int main(int argc, char ** argv)
   t->SetBranchAddress("StatDC",StatDC); // Drift Chamber status for each particle candidate
   t->SetBranchAddress("StatCC",StatCC); // Cherenkov status for each particle
   t->SetBranchAddress("StatEC",StatEC); // ECal status for each particle
-  t->SetBranchAddress("StatSC",StatSC); // Scintillation counter status for each particle
+  t->SetBranchAddress("StatSC",StatSC); // Scintillation counter status for each particle  
   t->SetBranchAddress("particle",id_guess); // Guess at the particle ID made by the recon software (maybe not reliable)
   t->SetBranchAddress("EC_in",EC_in); // Inner layer of ECal for each particle
   t->SetBranchAddress("EC_out",EC_out); // Outer layer of ECal for each particle
@@ -112,33 +109,22 @@ int main(int argc, char ** argv)
 
       if (gPart <= 0) continue; // Ignore events that have no particle candidates
 
-
       // ************************************************************************
       // Here's where we do electron fiducial cuts
 
       // Define the electron candidate energy in the EC
       double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]);
-      
-      // We enforce bounds on acceptable E/p for electron candidates. 
-      bool el_cand_goodMom = ((mom[0] < max_el_mom) && (mom[0] > min_el_mom));
-      double min_E_over_p = (el_cand_goodMom) ? ( el_Ep_ratio_mean->Eval(mom[0]) - epratio_sig_cutrange*el_Ep_ratio_sig->Eval(mom[0])) :
-	(mom[0] > max_el_mom)? ( el_Ep_ratio_mean->Eval(max_el_mom) - epratio_sig_cutrange*el_Ep_ratio_sig->Eval(max_el_mom)) : 0.;
-      double max_E_over_p = (el_cand_goodMom) ? ( el_Ep_ratio_mean->Eval(mom[0]) + epratio_sig_cutrange*el_Ep_ratio_sig->Eval(mom[0])) :
-	(mom[0] > max_el_mom)? ( el_Ep_ratio_mean->Eval(max_el_mom) + epratio_sig_cutrange*el_Ep_ratio_sig->Eval(max_el_mom)) : 0.;	
 
       // Decide if the electron passes fiducial cuts
-      if (!( (gPart > 0) &&  // at least one particle in the event
-	   (StatEC[0] > 0) && // EC status is good for the electron candidate
-	   (StatCC[0] > 0) && // CC status is good for the electron candidate
-	   (StatSC[0] > 0) && // SC status is good for the electron candidate
-	   (charge[0] < 0) && // Electron candidate curvature direction is negative
-	   (EC_in[0] > 0.055) && // Electron candidate has enough energy deposit in inner layer of EC
-	   (el_cand_EC > 0.33) && // Enough total energy in the EC
-	   (el_cand_EC/mom[0] > min_E_over_p ) && // E/p is in suitable range
-	   (el_cand_EC/mom[0] < max_E_over_p ) &&
-	   (mom[0] > min_el_mom) && // Electron candidate has enough momentum to be within fiducial PID region
-	   (targetZ[0] > min_Z) && // Vertex is within the target region
-	   (targetZ[0] < max_Z)
+      if (!( (StatEC[0] > 0) && // EC status is good for the electron candidate
+	     (StatCC[0] > 0) && // CC status is good for the electron candidate
+	     (StatSC[0] > 0) && // SC status is good for the electron candidate
+	     (charge[0] < 0) && // Electron candidate curvature direction is negative
+	     (EC_in[0] > 0.055) && // Electron candidate has enough energy deposit in inner layer of EC
+	     (el_cand_EC > 0.33) && // Enough total energy in the EC
+	     (fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	     
+	     (targetZ[0] > min_Z) && // Vertex is within the target region
+	     (targetZ[0] < max_Z)
 	     ))
 	{
 	  continue;
@@ -150,10 +136,24 @@ int main(int argc, char ** argv)
       hist_e_xQ2->Fill(Xb,Q2);
 
       // Loop over events looking for protons
+      nProtons=0;      
       for (int i=1 ; i<gPart ; i++)
 	{
-	  // Still to implement
-	  cerr << "Looking to see if particle " << i << " is a proton.\n";
+	  double beta_assuming_proton = mom[i]/sqrt(mom[i]*mom[i] + mP*mP);
+	  double p_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_proton * c_cm_ns);
+	  double e_t0 = SC_Time[0] - SC_Path[0]/c_cm_ns;
+	  double delta_t = p_t0 - e_t0;
+
+	  // Test if proton
+	  if( (StatSC[i] > 0) && 
+	      (Stat[i] > 0 )  &&
+	      (id_guess[i] == 2212 ) &&
+	      (fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange))
+	      )
+	    {
+	      // Then we have a proton
+	      nProtons++;
+	    }
 	}
 
       // Prep the output tree
@@ -161,20 +161,21 @@ int main(int argc, char ** argv)
       e_mom[0] = px[0];
       e_mom[1] = py[0];
       e_mom[2] = pz[0];
-      nProtons=0;
 
       // Fill the output tree
       outtree->Fill();
     }
-
-  // Clean up
-  f->Close();
-  cal_file->Close();
+  cerr << "Finished with the event loop...\n";
 
   // Write the output file
+  outfile->cd();
   outtree->Write();
   hist_e_thetaMom->Write();
   hist_e_xQ2->Write();
+
+  // Clean up
+  f->Close();
   outfile->Close();
+
   return 0;
 }

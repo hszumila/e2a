@@ -30,7 +30,7 @@ int main(int argc, char ** argv)
 
 	// Create an instance of the Fiducial Class to store important calibration params
 	Fiducial fid_params(4461, 2250, 6000); // Hard-code the beam energy and toroid currents for now.
-
+	// --------------------------------------------------------------------------------------------------
 	// Open up the Root file
 	TFile * f = new TFile(argv[1]);
 	if (f)
@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
 		cerr << "Could not open file " << argv[1] << "\n\tExiting...\n";
 		return -2;
 	}
-
+	// --------------------------------------------------------------------------------------------------
 	// Open up the tree, and get the important data
 	TTree * t = (TTree*)f->Get("data");
 	const int nEvents = t->GetEntries();
@@ -51,47 +51,49 @@ int main(int argc, char ** argv)
 	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart], SC_Time[maxPart],
 	      SC_Path[maxPart], charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart];
-	t->SetBranchAddress("gPart",&gPart); // Number of particles observed (globally) in the event
-	t->SetBranchAddress("CCPart",&CCPart); // Number of particles observed in the Cherenkovs
-	t->SetBranchAddress("DCPart",&DCPart); // Number of particles observed in the Drift Chambers
-	t->SetBranchAddress("ECPart",&ECPart); // Number of particles observed in the ECal
-	t->SetBranchAddress("SCPart",&SCPart); // Number of particles observed in the Scintillation Counters (ToFs)
-	t->SetBranchAddress("Stat",Stat); // Global status for each particle candidate
-	t->SetBranchAddress("StatDC",StatDC); // Drift Chamber status for each particle candidate
-	t->SetBranchAddress("StatCC",StatCC); // Cherenkov status for each particle
-	t->SetBranchAddress("StatEC",StatEC); // ECal status for each particle
-	t->SetBranchAddress("StatSC",StatSC); // Scintillation counter status for each particle  
-	t->SetBranchAddress("particle",id_guess); // Guess at the particle ID made by the recon software (maybe not reliable)
-	t->SetBranchAddress("EC_in",EC_in); // Inner layer of ECal for each particle
-	t->SetBranchAddress("EC_out",EC_out); // Outer layer of ECal for each particle
-	t->SetBranchAddress("EC_tot",EC_tot); // Total energy deposit in the ECal for each particle
-	t->SetBranchAddress("Nphe",Nphe); // Number of photo-electrons per hit in the Cherenkov detectors
-	t->SetBranchAddress("SC_Time",SC_Time); // Time in the scintillators per particle
-	t->SetBranchAddress("SC_Path",SC_Path); // Path Length per particle
-	t->SetBranchAddress("Charge",charge); // Charge per particle
-	t->SetBranchAddress("Beta",beta); // Beta per particle
-	t->SetBranchAddress("Mass",mass); // Mass per particle
-	t->SetBranchAddress("Momentum",mom); // Momentum magnitude per particle
-	t->SetBranchAddress("Momentumx",px); // Momentum x component per particle
-	t->SetBranchAddress("Momentumy",py); // Momentum y component per particle
-	t->SetBranchAddress("Momentumz",pz); // Momentum z component per particle
-	t->SetBranchAddress("Theta",theta); // Theta per particle
-	t->SetBranchAddress("Phi",phi); // Phi per particle
-	t->SetBranchAddress("TargetZ",targetZ); // Target Z per particle
-	t->SetBranchAddress("Thetapq",theta_pq); // Angle wrt to q vector per particle
-	t->SetBranchAddress("BjorkenX",&Xb); // Bjorken X
-	t->SetBranchAddress("STT",&STT); // RF-corrected start time.
-	t->SetBranchAddress("Q2",&Q2); // Momentum transfer
-	t->SetBranchAddress("W",&W); // Hadronic mass
-	t->SetBranchAddress("Nu",&Nu); // Energy transfer
-	t->SetBranchAddress("Yb",&Yb); // Y-scaling variable
-
+	t->SetBranchAddress("gPart"    ,&gPart  ); // Number of particles observed (globally) in the event
+	t->SetBranchAddress("CCPart"   ,&CCPart ); // Number of particles observed in the Cherenkovs
+	t->SetBranchAddress("DCPart"   ,&DCPart ); // Number of particles observed in the Drift Chambers
+	t->SetBranchAddress("ECPart"   ,&ECPart ); // Number of particles observed in the ECal
+	t->SetBranchAddress("SCPart"   ,&SCPart ); // Number of particles observed in the Scintillation Counters (ToFs)
+	t->SetBranchAddress("Stat"     ,Stat    ); // Global status for each particle candidate
+	t->SetBranchAddress("StatDC"   ,StatDC  ); // Drift Chamber status for each particle candidate
+	t->SetBranchAddress("StatCC"   ,StatCC  ); // Cherenkov status for each particle
+	t->SetBranchAddress("StatEC"   ,StatEC  ); // ECal status for each particle
+	t->SetBranchAddress("StatSC"   ,StatSC  ); // Scintillation counter status for each particle  
+	t->SetBranchAddress("particle" ,id_guess); // Guess at the particle ID made by the recon software (maybe not reliable)
+	t->SetBranchAddress("EC_in"    ,EC_in   ); // Inner layer of ECal for each particle
+	t->SetBranchAddress("EC_out"   ,EC_out  ); // Outer layer of ECal for each particle
+	t->SetBranchAddress("EC_tot"   ,EC_tot  ); // Total energy deposit in the ECal for each particle
+	t->SetBranchAddress("Nphe"     ,Nphe    ); // Number of photo-electrons per hit in the Cherenkov detectors
+	t->SetBranchAddress("SC_Time"  ,SC_Time ); // Time in the scintillators per particle
+	t->SetBranchAddress("SC_Path"  ,SC_Path ); // Path Length per particle
+	t->SetBranchAddress("Charge"   ,charge  ); // Charge per particle
+	t->SetBranchAddress("Beta"     ,beta    ); // Beta per particle
+	t->SetBranchAddress("Mass"     ,mass    ); // Mass per particle
+	t->SetBranchAddress("Momentum" ,mom     ); // Momentum magnitude per particle
+	t->SetBranchAddress("Momentumx",px      ); // Momentum x component per particle
+	t->SetBranchAddress("Momentumy",py      ); // Momentum y component per particle
+	t->SetBranchAddress("Momentumz",pz      ); // Momentum z component per particle
+	t->SetBranchAddress("Theta"    ,theta   ); // Theta per particle
+	t->SetBranchAddress("Phi"      ,phi     ); // Phi per particle
+	t->SetBranchAddress("TargetZ"  ,targetZ ); // Target Z per particle
+	t->SetBranchAddress("Thetapq"  ,theta_pq); // Angle wrt to q vector per particle
+	t->SetBranchAddress("BjorkenX" ,&Xb     ); // Bjorken X
+	t->SetBranchAddress("STT"      ,&STT    ); // RF-corrected start time.
+	t->SetBranchAddress("Q2"       ,&Q2     ); // Momentum transfer
+	t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
+	t->SetBranchAddress("Nu"       ,&Nu     ); // Energy transfer
+	t->SetBranchAddress("Yb"       ,&Yb     ); // Y-scaling variable
+	// --------------------------------------------------------------------------------------------------
 	// Open up the output file
 	TFile * outfile = new TFile(argv[2],"RECREATE");
-	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom","e- passing fid. cuts;Theta [deg];Mom [GeV];Counts",40,10.,50.,60,0.,6.);
-	TH2D * hist_e_xQ2      = new TH2D("e_xQ2","e- passing fid. cuts;x;Q2 [GeV^2];Counts",40,0.,2.,40,0.,10.);
-	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta","e- passing fid. cuts;Phi [deg];Theta [deg];Counts",60,-100.,380.,60,10.,50.);
-	TH2D * hist_e_momMom   = new TH2D("hist_e_momMom"  ,"e- passing fid. cuts;p from mom [GeV];p from px,py,pz [GeV];Counts",60,0.,6.,60,0.,6.);
+	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom"      ,"e- passing fid. cuts;Theta [deg];Mom [GeV];Counts",40,10.,50.,60,0.,6.);
+	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts",40,0.,2.,40,0.,10.);
+	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts",60,-100.,380.,60,10.,50.);
+	TH2D * hist_e_momMom   = new TH2D("hist_e_momMom"   ,"e- passing fid. cuts;p from mom [GeV];p from px,py,pz [GeV];Counts",60,0.,6.,60,0.,6.);
+	// ---
+	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts",40,0.,7.,40,0.,5.);
 
 	TTree * outtree = new TTree("T","Skimmed tree");
 	double e_vz, e_mom[3];
@@ -129,9 +131,9 @@ int main(int argc, char ** argv)
 					(charge[0] < 0) && 		// Electron candidate curvature direction is negative
 					(EC_in[0] > 0.055) && 		// Electron candidate has enough energy deposit in inner layer of EC
 					(el_cand_EC > 0.33) && 		// Enough total energy in the EC
-					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	     
+					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	// Electron PID (E/p)
 					(180./3.14159*T3_e_mom.Theta()>15.) &&
-					(fid_params.inFidRegion(T3_e_mom,charge[0])) &&
+					(fid_params.inFidRegion(T3_e_mom,charge[0])) &&					// Electron theta-phi cut
 					(targetZ[0] > min_Z) && 	// Vertex is within the target region
 					(targetZ[0] < max_Z)
 		     ))
@@ -159,14 +161,16 @@ int main(int argc, char ** argv)
 			if( (StatSC[i] > 0) && 
 					(Stat[i] > 0 )  &&
 					(id_guess[i] == 2212 ) &&
-					(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange))
+					(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
 			  )
 			{
 				// Then we have a proton
 				nProtons++;
+				hist_p_deltaTmom -> Fill(delta_t,mom[i]);
 			}
 		}
 
+		// --------------------------------------------------------------------------------------------------
 		// Prep the output tree
 		e_vz=targetZ[0];
 		e_mom[0] = px[0];
@@ -182,10 +186,11 @@ int main(int argc, char ** argv)
 	// Write the output file
 	outfile->cd();
 	outtree->Write();
-	hist_e_thetaMom->Write();
-	hist_e_xQ2     ->Write();
-	hist_e_phiTheta->Write();
-	hist_e_momMom  ->Write();
+	hist_e_thetaMom ->Write();
+	hist_e_xQ2      ->Write();
+	hist_e_phiTheta ->Write();
+	hist_e_momMom   ->Write();
+	hist_p_deltaTmom->Write();
 	// Clean up
 	f->Close();
 	outfile->Close();

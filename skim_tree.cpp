@@ -88,21 +88,26 @@ int main(int argc, char ** argv)
 	// --------------------------------------------------------------------------------------------------
 	// Open up the output file
 	TFile * outfile = new TFile(argv[2],"RECREATE");
+
+	// ---------------------------------------
+	// Diagnostic histograms
 	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom"      ,"e- passing fid. cuts;Theta [deg];Mom [GeV];Counts",40,10.,50.,60,0.,6.);
 	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts",40,0.,2.,40,0.,10.);
-	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts",60,-100.,380.,60,10.,50.);
-	TH2D * hist_e_momMom   = new TH2D("hist_e_momMom"   ,"e- passing fid. cuts;p from mom [GeV];p from px,py,pz [GeV];Counts",60,0.,6.,60,0.,6.);
+	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts",100,-100.,380.,100,10.,50.);
+	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected [GeV];Counts",60,0.,6.,60,0.,6.);
 	// ---
+	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts",100,-100.,380.,100,0.,60.);
 	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts",40,0.,7.,40,0.,5.);
-
+	// ---------------------------------------
+	
 	TTree * outtree = new TTree("T","Skimmed tree");
 	double e_vz, e_mom[3];
-	TVector3 T3_e_mom;
+	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
 	int nProtons;
 	outtree->Branch("e_vz",&e_vz,"e_vz/D");
 	outtree->Branch("e_mom",e_mom,"e_mom[3]/D");
 	outtree->Branch("nProtons",&nProtons,"nProtons/I");
-
+	// --------------------------------------------------------------------------------------------------
 	// Loop over events
 	for (int event=0; event < nEvents ; event++)
 	{
@@ -141,17 +146,21 @@ int main(int argc, char ** argv)
 			continue;
 		}
 
+		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
+		if (180./3.14159*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
+
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
-		hist_e_thetaMom->Fill(theta[0],mom[0]);
-		hist_e_xQ2     ->Fill(Xb,Q2);
-		hist_e_phiTheta->Fill(phi[0],theta[0]);
-		hist_e_momMom  ->Fill(mom[0],sqrt(px[0]*px[0]+py[0]*py[0]+pz[0]*pz[0]));
+		hist_e_thetaMom ->Fill(theta[0],mom[0]);
+		hist_e_xQ2      ->Fill(Xb,Q2);
+		hist_e_phiTheta ->Fill(phi[0],theta[0]);
+		hist_e_momMomCor->Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag());
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for protons
 		nProtons=0;      
 		for (int i=1 ; i<gPart ; i++)
 		{
+			T3_p_mom.SetXYZ(px[i],py[i],pz[i]);
 			double beta_assuming_proton = mom[i]/sqrt(mom[i]*mom[i] + mP*mP);
 			double p_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_proton * c_cm_ns);
 			double e_t0 = SC_Time[0] - SC_Path[0]/c_cm_ns;
@@ -161,12 +170,14 @@ int main(int argc, char ** argv)
 			if( (StatSC[i] > 0) && 
 					(Stat[i] > 0 )  &&
 					(id_guess[i] == 2212 ) &&
-					(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
-			  )
+					(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) && // Proton PID (delta T vs p)
+					(fid_params.pFiducialCut(T3_p_mom))
+			)
 			{
 				// Then we have a proton
 				nProtons++;
 				hist_p_deltaTmom -> Fill(delta_t,mom[i]);
+				hist_p_phiTheta  -> Fill(phi[i],theta[i]);
 			}
 		}
 
@@ -186,11 +197,13 @@ int main(int argc, char ** argv)
 	// Write the output file
 	outfile->cd();
 	outtree->Write();
-	hist_e_thetaMom ->Write();
-	hist_e_xQ2      ->Write();
-	hist_e_phiTheta ->Write();
-	hist_e_momMom   ->Write();
-	hist_p_deltaTmom->Write();
+	hist_e_thetaMom       ->Write();
+	hist_e_xQ2            ->Write();
+	hist_e_phiTheta       ->Write();
+	hist_e_momMomCor      ->Write();
+	hist_p_deltaTmom      ->Write();
+	hist_p_phiTheta       ->Write();
+
 	// Clean up
 	f->Close();
 	outfile->Close();

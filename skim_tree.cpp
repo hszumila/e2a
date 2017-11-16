@@ -137,7 +137,7 @@ int main(int argc, char ** argv)
 					(EC_in[0] > 0.055) && 		// Electron candidate has enough energy deposit in inner layer of EC
 					(el_cand_EC > 0.33) && 		// Enough total energy in the EC
 					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	// Electron PID (E/p)
-					(180./3.14159*T3_e_mom.Theta()>15.) &&
+					(180./3.14159*T3_e_mom.Theta()>15.) &&						// Theta > 15 deg
 					(fid_params.inFidRegion(T3_e_mom,charge[0])) &&					// Electron theta-phi cut
 					(targetZ[0] > min_Z) && 	// Vertex is within the target region
 					(targetZ[0] < max_Z)
@@ -167,11 +167,11 @@ int main(int argc, char ** argv)
 			double delta_t = p_t0 - e_t0;
 
 			// Test if proton
-			if( (StatSC[i] > 0) && 
-					(Stat[i] > 0 )  &&
-					(id_guess[i] == 2212 ) &&
+			if( (StatSC[i] > 0) && 				// SC status is good for the proton candidate
+					(Stat[i] > 0 )  &&		// Global status is good for the proton candidate
+					(id_guess[i] == 2212 ) &&	// Guess at the particle ID is good for the proton candidate
 					(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) && // Proton PID (delta T vs p)
-					(fid_params.pFiducialCut(T3_p_mom))
+					(fid_params.pFiducialCut(T3_p_mom)) // proton theta-phi cut
 			)
 			{
 				// Then we have a proton

@@ -17,7 +17,9 @@ class Fiducial
 		bool in_e_EoverP(double EoverP, double mom, double cut_sigma);
 		bool in_p_deltaT(double delta_t, double mom, double cut_sigma);
 		TVector3 eMomentumCorrection(TVector3 V3el);
-		Bool_t pFiducialCut(TVector3 momentum);
+		TVector3 FindUVW(TVector3 xyz);
+		Bool_t   pFiducialCut(TVector3 momentum);
+		Bool_t   CutUVW(TVector3 ecxyz);
 	private:
 		int E1;
 		int torus_current;
@@ -29,6 +31,7 @@ class Fiducial
 		bool read_e_pcor_params();
 		bool read_e_pid_params();
 		bool read_p_pid_params();
+		bool read_vz_cor_params();
 
 		void getElectronPhiLimits(double mom, double theta, int sector, double &phiMin, double &phiMax);
 
@@ -41,6 +44,9 @@ class Fiducial
 		// Momentum Correction Data
 		double fgPar_Phi[6][3];
 		double fgPar_Theta[6][4];
+
+		// Vertex z correction data
+		TF1 *vz_corr_func;		
 
 		// Electron PID data
 		TF1 *el_Ep_ratio_mean;

@@ -1,4 +1,5 @@
 #include "Fiducial.h"
+#include "e2a_constants.h"
 #include <fstream>
 #include <cstdlib>
 #include <cstdio>
@@ -25,10 +26,11 @@ Fiducial::Fiducial(int E_beam, int torus, int mini)
 
 	// Read in the various parameters
 	bool all_ok=true;
-	all_ok &= read_e_fid_params();  // Electron fiducial regions
+	all_ok &= read_e_fid_params (); // Electron fiducial regions
 	all_ok &= read_e_pcor_params(); // Electron momentum corrections
-	all_ok &= read_e_pid_params();  // Electron E/p params
-	all_ok &= read_p_pid_params();  // Proton delta_t vs mom params
+	all_ok &= read_e_pid_params (); // Electron E/p params
+	all_ok &= read_p_pid_params (); // Proton delta_t vs mom params
+	//	all_ok &= read_vz_cor_params(); // vz corrections
 	if (all_ok)
 		std::cerr << "Successfully read in the various parameters...\n";
 	else
@@ -158,6 +160,36 @@ bool Fiducial::read_e_fid_params()
 
 	return true;
 }
+
+// ===================================================================================================================================
+bool Fiducial::read_vz_cor_params()
+{
+
+	char param_file_name[256];
+	sprintf(param_file_name,"%s/.e2a/vz_He_%d.root",homedir.c_str(),E1);
+
+	TFile * old_gfile = gFile;
+	TFile * cal_file = new TFile(param_file_name);
+
+	// If we previously set these, we should clean up their memory
+	if (vz_corr_func)
+		delete vz_corr_func;
+
+
+	// Pull from file
+	vz_corr_func=(TF1*)cal_file->Get("f_vz")->Clone();
+
+	// Put the root global file pointer back to where it was. I hate ROOT. 
+	cal_file->Close();
+	gFile = old_gfile;
+
+	// Test that the histograms were pulled successfully
+	if (!vz_corr_func)
+		return false;
+
+	return true;
+}
+
 // ===================================================================================================================================
 bool Fiducial::read_e_pcor_params()
 {
@@ -292,7 +324,7 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 	TVector3      V3ecor(V3el);
 	Float_t p   = V3el.Mag();
 	Float_t cz  = V3el.CosTheta();
-	Float_t phi = 180*V3el.Phi()/3.14159; 
+	Float_t phi = 180*V3el.Phi()/pi; 
 	if (phi<-30.) phi += 360;
 	Float_t theta =  57.29578*(V3el.Theta()); 
 	Int_t sectInd = (Int_t)(phi+30)/60;
@@ -413,8 +445,8 @@ Bool_t Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 	// ----------------------------------------------------------------------------------------------------------------
 	if (E1>4000 && E1<5000 && torus_current>2240. && torus_current<2260.){
 
-		Float_t theta = momentum.Theta()*180/3.14159;
-		Float_t phi   = momentum.Phi()  *180/3.14159;
+		Float_t theta = momentum.Theta()*180/pi;
+		Float_t phi   = momentum.Phi()  *180/pi;
 		if(phi<-30) phi+=360;
 		Int_t sector = Int_t ((phi+30)/60);
 		if(sector<0) sector=0;
@@ -561,5 +593,65 @@ Bool_t Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 
 }
 
+// ===================================================================================================================================
+/*
+   double vz_corr(double phi,double theta)            //correction function for vertex , takes the arguments in deg.
+   {
+   return ((-vz_corr_func->GetParameter(1)))*cos((phi-(vz_corr_func->GetParameter(2)))*TMath::DegToRad())/tan(theta*TMath::DegToRad()); 
+// vertex correction function obtained for the empty runs 18522, works fine for 3He runs at 4.461[GeV/c] beam energy 
+}
+ */
+// ===================================================================================================================================
+TVector3 Fiducial::FindUVW(TVector3 xyz)
+{       
+	// get the U V W distance to EC edge for the purpose of geometry cut
+	// ported from Stepan's function ec_xyz_duvw. the input is lab coordinates of the EC hit.
 
+	Float_t x = xyz.X();
+	Float_t y = xyz.Y();
+	Float_t z = xyz.Z();
+	Float_t xi,yi,zi,u,v,w;
+	Float_t ec_the = 0.4363323;
+	Float_t ylow   = -182.974 ;
+	Float_t yhi    =  189.956 ;
+	Float_t tgrho  =  1.95325 ;
+	Float_t sinrho = 0.8901256;
+	Float_t cosrho = 0.4557150;
 
+	Float_t phi=xyz.Phi()*180./pi;
+	if(phi<-30) phi+=360;
+
+	Int_t ec_sect = (phi+30)/60.;
+	if(ec_sect<0)ec_sect=0;
+	if(ec_sect>5)ec_sect=5;
+
+	Float_t ec_phi = ec_sect*pi/3.;
+	xi = -x*sin(ec_phi) + y*cos(ec_phi);
+	yi = x*cos(ec_the)*cos(ec_phi) + y*cos(ec_the)*sin(ec_phi) - z*sin(ec_the);
+	zi = x*sin(ec_the)*cos(ec_phi) + y*sin(ec_the)*sin(ec_phi) + z*cos(ec_the);
+	zi -= 510.32; 
+
+	u =  ( yi-ylow)/sinrho;
+	v =  (yhi-ylow)/tgrho - xi + (yhi-yi)/tgrho;
+	w = ((yhi-ylow)/tgrho + xi + (yhi-yi)/tgrho)/2./cosrho;
+
+	TVector3 uvw(u,v,w);
+	return uvw;
+}       
+// ===================================================================================================================================
+Bool_t Fiducial::CutUVW(TVector3 ecxyz)
+{       
+	// Cut the edges of EC according to UVW distance threshold defined by par_EcUVW array.
+	// If it passes the cut, return true, if not return false
+
+	//parameters for EC edge cuts
+	const Float_t par_EcUVW[6][3] = {{60, 360, 400}, {55, 360, 400}, {50, 363, 400}, {52, 365, 396}, {60, 360, 398}, {50, 362, 398}};
+
+	TVector3 ecuvw = FindUVW(ecxyz);
+	Float_t phi=ecxyz.Phi()*180/pi;
+	if(phi<-30) phi+=360;
+	Int_t sector = (phi+30)/60;
+	if(sector<0)sector=0;
+	if(sector>5) sector=5;
+	return (ecuvw.X()>par_EcUVW[sector][0] && ecuvw.Y()<par_EcUVW[sector][1] && ecuvw.Z()<par_EcUVW[sector][2]);
+} 

@@ -91,14 +91,14 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic histograms
-	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom"      ,"e- passing fid. cuts;Theta [deg];Mom [GeV];Counts"       , 40,  10., 50., 60, 0., 6.);
-	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts"                , 40,   0.,  2., 40, 0.,10.);
-	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts"       ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts", 60,   0.,  6., 60,-4., 4.);
-	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz;vz corrected - vz;Counts"        ,100, -20., 20.,100,-1., 1.);
+	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom"      ,"e- passing fid. cuts;Theta [deg];Mom [GeV];Counts"         , 40,  10., 50., 60, 0., 6.);
+	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts"                  , 40,   0.,  2., 40, 0.,10.);
+	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
+	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  , 60,   0.,  6., 60,-.1, .1);
+	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
 	// ---
-	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"       ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"              , 40,   0.,  7., 40, 0., 5.);
+	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
+	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                , 40,   0.,  7., 40, 0., 5.);
 	// ---------------------------------------
 	
 	TTree * outtree = new TTree("T","Skimmed tree");
@@ -153,6 +153,7 @@ int main(int argc, char ** argv)
 
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
 		if (180./M_PI*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
+		else 				    T3_e_mom_cor = T3_e_mom;
 
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
@@ -174,6 +175,7 @@ int main(int argc, char ** argv)
 
 			// Test if proton
 			if( (StatSC[i] > 0) && 				// SC status is good for the proton candidate
+					(StatDC[i] > 0) &&              // DC status is good for the proton candidate
 					(Stat[i] > 0 )  &&		// Global status is good for the proton candidate
 					(id_guess[i] == 2212 ) &&	// Guess at the particle ID is good for the proton candidate
 					(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) && // Proton PID (delta T vs p)

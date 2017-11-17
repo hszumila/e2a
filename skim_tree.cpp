@@ -91,17 +91,18 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic histograms
-	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom"      ,"e- passing fid. cuts;Theta [deg];Mom [GeV];Counts",40,10.,50.,60,0.,6.);
-	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts",40,0.,2.,40,0.,10.);
-	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts",100,-100.,380.,100,10.,50.);
-	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected [GeV];Counts",60,0.,6.,60,0.,6.);
+	TH2D * hist_e_thetaMom = new TH2D("e_thetaMom"      ,"e- passing fid. cuts;Theta [deg];Mom [GeV];Counts"       , 40,  10., 50., 60, 0., 6.);
+	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts"                , 40,   0.,  2., 40, 0.,10.);
+	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing fid. cuts;Phi [deg];Theta [deg];Counts"       ,100,-100.,380.,100,10.,50.);
+	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts", 60,   0.,  6., 60,-4., 4.);
+	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz;vz corrected - vz;Counts"        ,100, -20., 20.,100,-1., 1.);
 	// ---
-	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts",100,-100.,380.,100,0.,60.);
-	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts",40,0.,7.,40,0.,5.);
+	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"       ,100,-100.,380.,100,10.,50.);
+	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"              , 40,   0.,  7., 40, 0., 5.);
 	// ---------------------------------------
 	
 	TTree * outtree = new TTree("T","Skimmed tree");
-	double e_vz, e_mom[3];
+	double e_vz, e_vz_corrected, e_mom[3];
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
 	int nProtons;
 	outtree->Branch("e_vz",&e_vz,"e_vz/D");
@@ -129,32 +130,37 @@ int main(int argc, char ** argv)
 		// Electron momentum expressed in a TVector3
 		T3_e_mom.SetXYZ(px[0],py[0],pz[0]);	
 
+		// Electron vertex (_z) correction
+		e_vz_corrected = targetZ[0]+fid_params.vz_corr(180./M_PI*T3_e_mom.Phi(),180./M_PI*T3_e_mom.Theta());
+
 		// Decide if the electron passes fiducial cuts
 		if (!( (StatEC[0] > 0) && 				// EC status is good for the electron candidate
+					(StatDC[0] > 0) &&              // DC status is good for the electron candidate
 					(StatCC[0] > 0) && 		// CC status is good for the electron candidate
 					(StatSC[0] > 0) && 		// SC status is good for the electron candidate
 					(charge[0] < 0) && 		// Electron candidate curvature direction is negative
 					(EC_in[0] > 0.055) && 		// Electron candidate has enough energy deposit in inner layer of EC
 					(el_cand_EC > 0.33) && 		// Enough total energy in the EC
 					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	// Electron PID (E/p)
-					(180./3.14159*T3_e_mom.Theta()>15.) &&						// Theta > 15 deg
+					(180./M_PI*T3_e_mom.Theta()>15.) &&						// Theta > 15 deg
 					(fid_params.inFidRegion(T3_e_mom,charge[0])) &&					// Electron theta-phi cut
-					(targetZ[0] > min_Z) && 	// Vertex is within the target region
-					(targetZ[0] < max_Z)
+					(e_vz_corrected > min_Z) && 	// Vertex is within the target region
+					(e_vz_corrected < max_Z)
 		     ))
 		{
 			continue;
 		}
 
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
-		if (180./3.14159*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
+		if (180./M_PI*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
 
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
 		hist_e_thetaMom ->Fill(theta[0],mom[0]);
 		hist_e_xQ2      ->Fill(Xb,Q2);
 		hist_e_phiTheta ->Fill(phi[0],theta[0]);
-		hist_e_momMomCor->Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag());
+		hist_e_momMomCor->Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()-T3_e_mom.Mag());
+		hist_e_vzVzCor  ->Fill(targetZ[0],e_vz_corrected-targetZ[0]);
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for protons
 		nProtons=0;      
@@ -183,7 +189,7 @@ int main(int argc, char ** argv)
 
 		// --------------------------------------------------------------------------------------------------
 		// Prep the output tree
-		e_vz=targetZ[0];
+		e_vz     = e_vz_corrected;
 		e_mom[0] = px[0];
 		e_mom[1] = py[0];
 		e_mom[2] = pz[0];
@@ -197,12 +203,13 @@ int main(int argc, char ** argv)
 	// Write the output file
 	outfile->cd();
 	outtree->Write();
-	hist_e_thetaMom       ->Write();
-	hist_e_xQ2            ->Write();
-	hist_e_phiTheta       ->Write();
-	hist_e_momMomCor      ->Write();
-	hist_p_deltaTmom      ->Write();
-	hist_p_phiTheta       ->Write();
+	hist_e_thetaMom     ->Write();
+	hist_e_xQ2          ->Write();
+	hist_e_phiTheta     ->Write();
+	hist_e_momMomCor    ->Write();
+	hist_e_vzVzCor      ->Write();
+	hist_p_deltaTmom    ->Write();
+	hist_p_phiTheta     ->Write();
 
 	// Clean up
 	f->Close();

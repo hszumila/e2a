@@ -16,8 +16,9 @@ class Fiducial
 		bool inFidRegion(TVector3 mom, int charge);
 		bool in_e_EoverP(double EoverP, double mom, double cut_sigma);
 		bool in_p_deltaT(double delta_t, double mom, double cut_sigma);
-		bool   pFiducialCut(TVector3 momentum);
-		bool   CutUVW(TVector3 ecxyz);
+		bool pFiducialCut(TVector3 momentum);
+		bool CutUVW(TVector3 ecxyz);
+		double vz_corr(double phi,double theta);
 		TVector3 eMomentumCorrection(TVector3 V3el);
 		TVector3 FindUVW(TVector3 xyz);
 	private:

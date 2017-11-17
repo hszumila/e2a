@@ -128,27 +128,27 @@ bool Fiducial::read_p_fid_params()
 {
 
 	//Parameters for 4 GeV proton's Fiducial Cut Rustam Niyazov
-        //"http://www.physics.odu.edu/~rust/clas/fidp.html"
+	//"http://www.physics.odu.edu/~rust/clas/fidp.html"
 
 	char param_file_name[256];
-        sprintf(param_file_name,"%s/.e2a/PFID_%d_%d.dat",homedir.c_str(),E1,torus_current);
-        std::ifstream param_file(param_file_name);
-	std::cout << param_file_name << std::endl;
-        for(int i = 0 ; i < 6 ; i++){
-                for(int j = 0 ; j < 6 ; j++){
-                        param_file >> fgPar_Pfidft1l[i][j];
-                        param_file >> fgPar_Pfidft1r[i][j];
-                        param_file >> fgPar_Pfidft2l[i][j];
-                        param_file >> fgPar_Pfidft2r[i][j];
-                        param_file >> fgPar_Pfidbt1l[i][j];
-                        param_file >> fgPar_Pfidbt1r[i][j];
-                        param_file >> fgPar_Pfidbt2l[i][j];
-                        param_file >> fgPar_Pfidbt2r[i][j];
-                        param_file >> fgPar_Pfidbl  [i][j];
-                        param_file >> fgPar_Pfidbr  [i][j];
+	sprintf(param_file_name,"%s/.e2a/PFID_%d_%d.dat",homedir.c_str(),E1,torus_current);
+	std::ifstream param_file(param_file_name);
+
+	for(int i = 0 ; i < 6 ; i++){
+		for(int j = 0 ; j < 6 ; j++){
+			param_file >> fgPar_Pfidft1l[i][j];
+			param_file >> fgPar_Pfidft1r[i][j];
+			param_file >> fgPar_Pfidft2l[i][j];
+			param_file >> fgPar_Pfidft2r[i][j];
+			param_file >> fgPar_Pfidbt1l[i][j];
+			param_file >> fgPar_Pfidbt1r[i][j];
+			param_file >> fgPar_Pfidbt2l[i][j];
+			param_file >> fgPar_Pfidbt2r[i][j];
+			param_file >> fgPar_Pfidbl  [i][j];
+			param_file >> fgPar_Pfidbr  [i][j];
 		}
-        }
-        param_file.close();
+	}
+	param_file.close();
 
 	return true;
 }
@@ -200,7 +200,7 @@ bool Fiducial::read_vz_cor_params()
 {
 
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/vz_He_%d.root",homedir.c_str(),E1);
+	sprintf(param_file_name,"%s/.e2a/vz_He_%d.root",homedir.c_str(),E1);	
 
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);
@@ -358,7 +358,7 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 	TVector3      V3ecor(V3el);
 	Float_t p   = V3el.Mag();
 	Float_t cz  = V3el.CosTheta();
-	Float_t phi = 180*V3el.Phi()/pi; 
+	Float_t phi = 180*V3el.Phi()/M_PI; 
 	if (phi<-30.) phi += 360;
 	Float_t theta =  57.29578*(V3el.Theta()); 
 	Int_t sectInd = (Int_t)(phi+30)/60;
@@ -402,8 +402,8 @@ bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 	// ----------------------------------------------------------------------------------------------------------------
 	if (E1>4000 && E1<5000 && torus_current>2240. && torus_current<2260.){
 
-		Float_t theta = momentum.Theta()*180/pi;
-		Float_t phi   = momentum.Phi()  *180/pi;
+		Float_t theta = momentum.Theta()*180/M_PI;
+		Float_t phi   = momentum.Phi()  *180/M_PI;
 		if(phi<-30) phi+=360;
 		Int_t sector = Int_t ((phi+30)/60);
 		if(sector<0) sector=0;
@@ -551,13 +551,13 @@ bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 }
 
 // ===================================================================================================================================
-/*
-   double vz_corr(double phi,double theta)            //correction function for vertex , takes the arguments in deg.
-   {
-   return ((-vz_corr_func->GetParameter(1)))*cos((phi-(vz_corr_func->GetParameter(2)))*TMath::DegToRad())/tan(theta*TMath::DegToRad()); 
-// vertex correction function obtained for the empty runs 18522, works fine for 3He runs at 4.461[GeV/c] beam energy 
+
+double Fiducial::vz_corr(double phi,double theta)            //correction function for vertex , takes the arguments in deg.
+{
+	return ((-vz_corr_func->GetParameter(1)))*cos((phi-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
+	//vertex correction function obtained for the empty runs 18522, works fine for 3He runs at 4.461[GeV/c] beam energy 
 }
- */
+
 // ===================================================================================================================================
 TVector3 Fiducial::FindUVW(TVector3 xyz)
 {       
@@ -575,14 +575,14 @@ TVector3 Fiducial::FindUVW(TVector3 xyz)
 	Float_t sinrho = 0.8901256;
 	Float_t cosrho = 0.4557150;
 
-	Float_t phi=xyz.Phi()*180./pi;
+	Float_t phi=xyz.Phi()*180./M_PI;
 	if(phi<-30) phi+=360;
 
 	Int_t ec_sect = (phi+30)/60.;
 	if(ec_sect<0)ec_sect=0;
 	if(ec_sect>5)ec_sect=5;
 
-	Float_t ec_phi = ec_sect*pi/3.;
+	Float_t ec_phi = ec_sect*M_PI/3.;
 	xi = -x*sin(ec_phi) + y*cos(ec_phi);
 	yi = x*cos(ec_the)*cos(ec_phi) + y*cos(ec_the)*sin(ec_phi) - z*sin(ec_the);
 	zi = x*sin(ec_the)*cos(ec_phi) + y*sin(ec_the)*sin(ec_phi) + z*cos(ec_the);
@@ -605,7 +605,7 @@ bool Fiducial::CutUVW(TVector3 ecxyz)
 	const Float_t par_EcUVW[6][3] = {{60, 360, 400}, {55, 360, 400}, {50, 363, 400}, {52, 365, 396}, {60, 360, 398}, {50, 362, 398}};
 
 	TVector3 ecuvw = FindUVW(ecxyz);
-	Float_t phi=ecxyz.Phi()*180/pi;
+	Float_t phi=ecxyz.Phi()*180/M_PI;
 	if(phi<-30) phi+=360;
 	Int_t sector = (phi+30)/60;
 	if(sector<0)sector=0;

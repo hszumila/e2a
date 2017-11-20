@@ -65,7 +65,8 @@ int main(int argc, char ** argv)
 	float Xb, STT, Q2, W, Nu, Yb;
 	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart], SC_Time[maxPart],
 	      SC_Path[maxPart], charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
-	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart];
+	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
+		EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart];
 	t->SetBranchAddress("gPart"    ,&gPart  ); // Number of particles observed (globally) in the event
 	t->SetBranchAddress("CCPart"   ,&CCPart ); // Number of particles observed in the Cherenkovs
 	t->SetBranchAddress("DCPart"   ,&DCPart ); // Number of particles observed in the Drift Chambers
@@ -95,6 +96,9 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("TargetZ"  ,targetZ ); // Target Z per particle
 	t->SetBranchAddress("Thetapq"  ,theta_pq); // Angle wrt to q vector per particle
 	t->SetBranchAddress("STT"      ,&STT    ); // RF-corrected start time.
+	t->SetBranchAddress("EC_X"     ,&EC_X   ); // x positions of hit in the calorimeter
+	t->SetBranchAddress("EC_Y"     ,&EC_Y   ); // y positions of hit in the calorimeter
+	t->SetBranchAddress("EC_Z"     ,&EC_Z   ); // z positions of hit in the calorimeter
 	//t->SetBranchAddress("BjorkenX" ,&Xb     ); // Bjorken X
 	//t->SetBranchAddress("Q2"       ,&Q2     ); // Momentum transfer
 	//t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
@@ -112,7 +116,7 @@ int main(int argc, char ** argv)
 	TFile * outfile = new TFile(argv[2],"RECREATE");
 
 	// ---------------------------------------
-	// Diagnostic histograms
+	// Diagnostic electron histograms
 	TH1D * hist_e_Nphe0    = new TH1D("hist_e_Nphe0"    ,"e- before  cuts;# photo-electrons in CC;Counts"       ,100,   0.,200.);
 	TH2D * hist_e_Ein_Eout0= new TH2D("hist_e_Ein_Eout0","e- before  cuts;E_in/p;E_out/p;Counts"                ,100,   0., 0.5,100, 0.,0.5);
 	TH2D * hist_e_p_Etot0  = new TH2D("hist_e_p_Etot0"  ,"e- before  cuts;p [GeV];E_tot/p;Counts"               ,100,   0.,  5.,100, 0.,0.7);
@@ -145,17 +149,29 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts"                  , 40,   0.,  2., 40, 0.,10.);
 	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  , 60,   0.,  6., 60,-.1, .1);
 	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
-	// ---
-	TH1D * hist_p_mass     = new TH1D("hist_p_mass"     ,"+  passing fid. cuts;mass [GeV];Counts"                    ,100,   0.,3.5);
-	TH2D * hist_p_pMass    = new TH2D("hist_p_pMass"    ,"+  passing fid. cuts;p [GeV];mass [GeV];Counts"            ,100,   0., 4.,100,  0.,3.5);
+	
+        // ---------------------------------------
+        // Diagnostic positive particle histograms
+	TH1D * hist_p_mass     = new TH1D("hist_pos_mass"   ,"+  passing fid. cuts;mass [GeV];Counts"                    ,100,   0.,3.5);
+        TH2D * hist_p_pMass    = new TH2D("hist_pos_pMass"  ,"+  passing fid. cuts;p [GeV];mass [GeV];Counts"            ,100,   0., 4.,100,  0.,3.5);
+	TH2D * hist_p_pBeta    = new TH2D("hist_pos_pBeta"  ,"+  passing fid. cuts;p [GeV];#beta;Counts"                 ,100,   0.,  4.,100, 0.,1.3);
+
+	// ---------------------------------------
+        // Diagnostic proton histograms
 	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
 	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                , 40,   0.,  7., 40, 0., 5.);
-	TH2D * hist_p_pBeta    = new TH2D("hist_p_pBeta"    ,"+  passing fid. cuts;p [GeV];#beta;Counts"                 ,100,   0.,  4.,100, 0.,1.3);
+	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,100,   0.,  7.,100,-2., 2.);
+	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p  passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
 	// ---------------------------------------
 
+	// Temporal histograms
+	TH2D * temp1 = new TH2D ("temp1","",100,-300,360,100,-300,660);
+
 	TTree * outtree = new TTree("T","Skimmed tree");
-	double e_vz, e_vz_corrected, e_mom[3];
+	double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
+	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
+	
 	int nProtons;
 	outtree->Branch("e_vz",&e_vz,"e_vz/D");
 	outtree->Branch("e_mom",e_mom,"e_mom[3]/D");
@@ -185,10 +201,10 @@ int main(int argc, char ** argv)
 		double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]);
 
 		// Electron momentum expressed in a TVector3
-		T3_e_mom.SetXYZ(px[0],py[0],pz[0]);	
+		T3_e_mom.SetXYZ(px[0],py[0],pz[0]);		
 
 		// Electron vertex (_z) correction
-		e_vz_corrected = targetZ[0]+fid_params.vz_corr(180./M_PI*T3_e_mom.Phi(),180./M_PI*T3_e_mom.Theta());
+		e_vz_corrected = targetZ[0]+fid_params.vz_corr(T3_e_mom);
 
 		// ---
 		hist_e_Ein_Eout0 -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
@@ -265,7 +281,8 @@ int main(int argc, char ** argv)
 				hist_p_pMass     -> Fill(mom [i],mass[i]);
 				hist_p_pBeta     -> Fill(mom[i],beta [i]);
 
-				// Look specifically for protons (not any positive particle)
+				// --------------------------------------------------------------------
+				// Look specifically for protons
 				if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
 						(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
 				  ){
@@ -273,13 +290,16 @@ int main(int argc, char ** argv)
 					hist_p_deltaTmom -> Fill(delta_t,mom [i]);
 					hist_p_phiTheta  -> Fill(phi[i],theta[i]);
 
-					/*
-					   if(ProtonMomCorrection_He3_4Cell(V4_prot_uncorr,prot_vert_corr) != -1){
-					   prot_mom_corr=ProtonMomCorrection_He3_4Cell(V4_prot_uncorr,prot_vert_corr);}
-					   else
-					   {prot_mom_corr=p[ind_p];}
-					 */
+					// Proton vertex (_z) correction
+			                p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
+					   if(	(run_numi>=18338)&&(run_numi<=18438)&&
+						run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1){
+						p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);}	
+					   else{p_mom_corrected=mom[i];}
+	
+					hist_p_vzVzCor  -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
+					hist_p_p_momCor -> Fill(mom [i],mom [i]-p_mom_corrected);
 				}
 			}
 		}
@@ -332,7 +352,9 @@ int main(int argc, char ** argv)
 	hist_e_thetaVz      ->Write();
 	hist_p_pBeta        ->Write();
 	hist_p_mass         ->Write();
-	hist_p_pMass        ->Write();
+	hist_p_pMass        ->Write();	
+	hist_p_p_momCor     ->Write();
+	hist_p_vzVzCor      ->Write();
 
 	// Clean up
 	f->Close();

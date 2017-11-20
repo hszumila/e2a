@@ -552,9 +552,14 @@ bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 
 // ===================================================================================================================================
 
-double Fiducial::vz_corr(double phi,double theta)            //correction function for vertex , takes the arguments in deg.
+double Fiducial::vz_corr(TVector3 T3_mom)            //correction function for vertex , takes the arguments in deg.
 {
-	return ((-vz_corr_func->GetParameter(1)))*cos((phi-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
+	double theta = 180./M_PI*T3_mom.Theta();
+	double phi   = 180./M_PI*T3_mom.Phi();
+	double phi_mod = phi;
+        if(phi_mod<0) phi_mod+=360;
+
+	return ((-vz_corr_func->GetParameter(1)))*cos((phi_mod-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
 	//vertex correction function obtained for the empty runs 18522, works fine for 3He runs at 4.461[GeV/c] beam energy 
 }
 

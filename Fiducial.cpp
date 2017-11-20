@@ -133,7 +133,7 @@ bool Fiducial::read_p_fid_params()
 	char param_file_name[256];
 	sprintf(param_file_name,"%s/.e2a/PFID_%d_%d.dat",homedir.c_str(),E1,torus_current);
 	std::ifstream param_file(param_file_name);
-
+	std::cout<<param_file_name<<std::endl;	
 	for(int i = 0 ; i < 6 ; i++){
 		for(int j = 0 ; j < 6 ; j++){
 			param_file >> fgPar_Pfidft1l[i][j];
@@ -147,7 +147,7 @@ bool Fiducial::read_p_fid_params()
 			param_file >> fgPar_Pfidbl  [i][j];
 			param_file >> fgPar_Pfidbr  [i][j];
 		}
-	}
+	}	
 	param_file.close();
 
 	return true;

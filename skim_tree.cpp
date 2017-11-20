@@ -94,12 +94,12 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("Phi"      ,phi     ); // Phi per particle
 	t->SetBranchAddress("TargetZ"  ,targetZ ); // Target Z per particle
 	t->SetBranchAddress("Thetapq"  ,theta_pq); // Angle wrt to q vector per particle
-	t->SetBranchAddress("BjorkenX" ,&Xb     ); // Bjorken X
 	t->SetBranchAddress("STT"      ,&STT    ); // RF-corrected start time.
-	t->SetBranchAddress("Q2"       ,&Q2     ); // Momentum transfer
-	t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
-	t->SetBranchAddress("Nu"       ,&Nu     ); // Energy transfer
-	t->SetBranchAddress("Yb"       ,&Yb     ); // Y-scaling variable
+	//t->SetBranchAddress("BjorkenX" ,&Xb     ); // Bjorken X
+	//t->SetBranchAddress("Q2"       ,&Q2     ); // Momentum transfer
+	//t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
+	//t->SetBranchAddress("Nu"       ,&Nu     ); // Energy transfer
+	//t->SetBranchAddress("Yb"       ,&Yb     ); // Y-scaling variable
 
 	/* 
 	   the kinematic variables: Q2, W, Xb, Nu, Yb are calculated incorrectly in the particle_data.root file

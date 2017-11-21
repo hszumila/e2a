@@ -141,7 +141,6 @@ int main(int argc, char ** argv)
 	TH1D * hist_e_vz_sec6  = new TH1D("hist_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts"    ,100, -10., 10.);
 	TH2D * hist_e_phiVz0   = new TH2D("hist_e_phiVz0"   ,"e- passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
 	TH2D * hist_e_phiVz    = new TH2D("hist_e_phiVz"    ,"e- passing cuts,  after vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
-	// ---
 	TH2D * hist_e_thetaVz0 = new TH2D("hist_e_thetaVz0" ,"e- passing cuts, before vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 60.,100,-11,11);
 	TH2D * hist_e_thetaVz  = new TH2D("hist_e_thetaVz"  ,"e- passing cuts,  after vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 60.,100,-11,11);
 	// ---
@@ -149,7 +148,9 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_xQ2      = new TH2D("e_xQ2"           ,"e- passing fid. cuts;x;Q2 [GeV^2];Counts"                  , 40,   0.,  2., 40, 0.,10.);
 	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  , 60,   0.,  6., 60,-.1, .1);
 	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
-	
+	// ---
+	TH2D * hist_e_xyEC_hit0= new TH2D("hist_e_xyEC_hit0","e- passing PID cuts;ECx [cm];ECy [cm];Counts"              ,100,-400.,400.,100,-400.,400.);
+	TH2D * hist_e_xyEC_hit = new TH2D("hist_e_xyEC_hit" ,"e- passing PID + EC cuts;ECx [cm];ECy [cm];Counts"         ,100,-400.,400.,100,-400.,400.);
         // ---------------------------------------
         // Diagnostic positive particle histograms
 	TH1D * hist_p_mass     = new TH1D("hist_pos_mass"   ,"+  passing fid. cuts;mass [GeV];Counts"                    ,100,   0.,3.5);
@@ -162,6 +163,10 @@ int main(int argc, char ** argv)
 	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                , 40,   0.,  7., 40, 0., 5.);
 	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,100,   0.,  7.,100,-2., 2.);
 	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p  passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
+	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p  passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
+        TH2D * hist_p_phiVz    = new TH2D("hist_p_phiVz"    ,"p  passing cuts,  after vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
+        TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p  passing cuts, before vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 80.,100,-11,11);
+        TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p  passing cuts,  after vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 80.,100,-11,11);
 	// ---------------------------------------
 
 	// Temporal histograms
@@ -170,6 +175,7 @@ int main(int argc, char ** argv)
 	TTree * outtree = new TTree("T","Skimmed tree");
 	double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
 	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
+	TVector3 e_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
 	
 	int nProtons;
@@ -231,6 +237,12 @@ int main(int argc, char ** argv)
 			continue;
 		}
 
+		// Cut on edges of calorimeter
+		hist_e_xyEC_hit0 -> Fill(EC_X[0],EC_Y[0]);
+		e_ec_xyz.SetXYZ(EC_X[0],EC_Y[0],EC_Z[0]);
+		if(!fid_params.CutUVW(e_ec_xyz)) continue; //u>60, v<360, w<400;
+		hist_e_xyEC_hit  -> Fill(EC_X[0],EC_Y[0]);
+
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
 		if (180./M_PI*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
 		else 				    T3_e_mom_cor = T3_e_mom;
@@ -249,6 +261,7 @@ int main(int argc, char ** argv)
 		hist_e_phiVz    -> Fill(phi[0],e_vz_corrected);
 		hist_e_thetaVz0 -> Fill(theta[0],targetZ[0]);
 		hist_e_thetaVz  -> Fill(theta[0],e_vz_corrected);
+		
 		if      (e_sect==0) {hist_e_vz_sec10 -> Fill(targetZ[0]);	hist_e_vz_sec1 -> Fill(e_vz_corrected);}
 		else if (e_sect==1) {hist_e_vz_sec20 -> Fill(targetZ[0]);	hist_e_vz_sec2 -> Fill(e_vz_corrected);}
 		else if (e_sect==2) {hist_e_vz_sec30 -> Fill(targetZ[0]);	hist_e_vz_sec3 -> Fill(e_vz_corrected);}
@@ -299,7 +312,11 @@ int main(int argc, char ** argv)
 					   else{p_mom_corrected=mom[i];}
 	
 					hist_p_vzVzCor  -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
-					hist_p_p_momCor -> Fill(mom [i],mom [i]-p_mom_corrected);
+					hist_p_p_momCor -> Fill(mom    [i],mom [i]-p_mom_corrected  );
+					hist_p_phiVz0   -> Fill(phi    [i],targetZ[i]               );
+					hist_p_phiVz    -> Fill(phi    [i],p_vz_corrected           );
+					hist_p_thetaVz0 -> Fill(theta  [i],targetZ[i]               );
+					hist_p_thetaVz  -> Fill(theta  [i],p_vz_corrected           );
 				}
 			}
 		}
@@ -328,6 +345,8 @@ int main(int argc, char ** argv)
 	hist_p_phiTheta     ->Write();
 	hist_e_Ein_Eout0    ->Write();
 	hist_e_Ein_Eout     ->Write();
+	hist_e_xyEC_hit0    ->Write();
+	hist_e_xyEC_hit     ->Write();
 	hist_e_p_Etot0      ->Write();
 	hist_e_p_Etot       ->Write();
 	hist_e_Nphe0        ->Write();
@@ -355,6 +374,10 @@ int main(int argc, char ** argv)
 	hist_p_pMass        ->Write();	
 	hist_p_p_momCor     ->Write();
 	hist_p_vzVzCor      ->Write();
+	hist_p_phiVz0       ->Write(); 
+        hist_p_phiVz        ->Write();
+        hist_p_thetaVz0     ->Write();
+        hist_p_thetaVz      ->Write();
 
 	// Clean up
 	f->Close();

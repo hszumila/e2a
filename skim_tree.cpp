@@ -287,9 +287,13 @@ int main(int argc, char ** argv)
 			if( (StatSC[i] > 0) && 				// SC status is good for the proton candidate
 					(StatDC[i] > 0) &&              // DC status is good for the proton candidate
 					(Stat[i] > 0 )  &&		// Global status is good for the proton candidate
+					(charge[i] > 0) &&		// Charge is positive
 					(fid_params.pFiducialCut(T3_p_mom)) // proton theta-phi cut
 			  )
 			{
+				// Positive particle vertex (_z) correction
+				p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
+				
 				hist_p_mass      -> Fill(mass[i]);
 				hist_p_pMass     -> Fill(mom [i],mass[i]);
 				hist_p_pBeta     -> Fill(mom[i],beta [i]);
@@ -302,9 +306,6 @@ int main(int argc, char ** argv)
 					nProtons++;	
 					hist_p_deltaTmom -> Fill(delta_t,mom [i]);
 					hist_p_phiTheta  -> Fill(phi[i],theta[i]);
-
-					// Proton vertex (_z) correction
-			                p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
 					   if(	(run_numi>=18338)&&(run_numi<=18438)&&
 						run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1){

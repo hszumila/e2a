@@ -552,7 +552,7 @@ bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 
 // ===================================================================================================================================
 
-double Fiducial::vz_corr(TVector3 T3_mom)            //correction function for vertex , takes the arguments in deg.
+double Fiducial::vz_corr(TVector3 T3_mom) 
 {
 	double theta = 180./M_PI*T3_mom.Theta();
 	double phi   = 180./M_PI*T3_mom.Phi();

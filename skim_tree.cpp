@@ -46,27 +46,18 @@ int main(int argc, char ** argv)
 		return -2;
 	}
 	// --------------------------------------------------------------------------------------------------
-	// Getting run number from filename
-	char run_numc[10];
-	strncpy(run_numc, argv[1]+22, 5);
-	run_numc[5] = '\0';
-	int run_numi = atoi(run_numc);
-	cout << "Run number: " << run_numi  << endl;	
-
-	// Create an instance of the Run_dependent Class to store important calibration params
-	Run_dependent run_dependent_corrections(run_numi); // Hard-code the run-number from now
-	// --------------------------------------------------------------------------------------------------
 	// Open up the tree, and get the important data
 	TTree * t = (TTree*)f->Get("data");
 	const int nEvents = t->GetEntries();
 	const int maxPart = 50;
-	int gPart, CCPart, DCPart, ECPart, SCPart;
+	int gPart, CCPart, DCPart, ECPart, SCPart, NRun;
 	int StatDC[maxPart], StatCC[maxPart], StatEC[maxPart], StatSC[maxPart], id_guess[maxPart];
 	float Xb, STT, Q2, W, Nu, Yb;
 	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart], SC_Time[maxPart],
 	      SC_Path[maxPart], charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
 		EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart];
+	t->SetBranchAddress("NRun"     ,&NRun   ); // Run number
 	t->SetBranchAddress("gPart"    ,&gPart  ); // Number of particles observed (globally) in the event
 	t->SetBranchAddress("CCPart"   ,&CCPart ); // Number of particles observed in the Cherenkovs
 	t->SetBranchAddress("DCPart"   ,&DCPart ); // Number of particles observed in the Drift Chambers
@@ -182,6 +173,13 @@ int main(int argc, char ** argv)
 	outtree->Branch("e_vz",&e_vz,"e_vz/D");
 	outtree->Branch("e_mom",e_mom,"e_mom[3]/D");
 	outtree->Branch("nProtons",&nProtons,"nProtons/I");
+	// --------------------------------------------------------------------------------------------------
+	// Obtaining run number and creating a run dependent object
+	t->GetEvent(0);
+	cout << "Analyzing run " << NRun << endl;
+        // Create an instance of the Run_dependent Class to store important calibration params
+        Run_dependent run_dependent_corrections(NRun); // Hard-code the run-number from now
+	
 	// --------------------------------------------------------------------------------------------------
 	// Loop over events
 	for (int event=0; event < nEvents ; event++)
@@ -307,7 +305,7 @@ int main(int argc, char ** argv)
 					hist_p_deltaTmom -> Fill(delta_t,mom [i]);
 					hist_p_phiTheta  -> Fill(phi[i],theta[i]);
 
-					   if(	(run_numi>=18338)&&(run_numi<=18438)&&
+					   if(	(NRun>=18338)&&(NRun<=18438)&&
 						run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1){
 						p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);}	
 					   else{p_mom_corrected=mom[i];}

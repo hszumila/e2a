@@ -152,7 +152,7 @@ int main(int argc, char ** argv)
 	// ---------------------------------------
 	// Diagnostic proton histograms
 	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                , 40,   0.,  7., 40, 0., 5.);
+	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                ,100,  -7.,  7.,100, 0., 5.);
 	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,100,   0.,  7.,100,-2., 2.);
 	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p  passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
 	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p  passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
@@ -163,8 +163,8 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic pi+ histograms
-	TH2D * hist_pip_pBeta  = new TH2D("hist_pip_pBeta"  ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"                ,100,   0.,  4.,100, 0.,1.3);
-
+	TH2D * hist_pip_pBeta    = new TH2D("hist_pip_pBeta"    ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"                ,100,   0.,  4.,500, 0.,1.3);
+	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"               ,100,  -7.,  7.,100, 0., 5.);
 	// ---------------------------------------
 	// Temporal histograms
 	TH2D * temp1 = new TH2D ("temp1","",100,-300,360,100,-300,660);
@@ -190,10 +190,7 @@ int main(int argc, char ** argv)
 	// Loop over events
 	for (int event=0; event < nEvents ; event++)
 	{
-		if (event % 100000 == 0)
-		{
-			cerr << "Working on event " << event << " out of " << nEvents << "\n";
-		}
+		if (event % 100000 == 0){cerr << "Working on event " << event << " out of " << nEvents << "\n";}
 
 		t->GetEvent(event);
 
@@ -223,29 +220,34 @@ int main(int argc, char ** argv)
 		hist_e_phiTheta0 -> Fill(phi[0],theta[0]);
 		// ---
 
-		// Decide if the electron passes fiducial cuts
+		// ---------------------------------------------------------------------------------------
+		// Electron particle Identification
 		if (!( (StatEC[0] > 0) && 				// EC status is good for the electron candidate
 					(StatDC[0] > 0) &&              // DC status is good for the electron candidate
 					(StatCC[0] > 0) && 		// CC status is good for the electron candidate
 					(StatSC[0] > 0) && 		// SC status is good for the electron candidate
 					(charge[0] < 0) && 		// Electron candidate curvature direction is negative
-					(EC_in[0] > 0.055) && 		// Electron candidate has enough energy deposit in inner layer of EC
+					(EC_in [0] > 0.055) && 		// Electron candidate has enough energy deposit in inner layer of EC 
+									// (Helps separate electrons from MIPs such as pions)
 					(el_cand_EC > 0.33) && 		// Enough total energy in the EC
+					(180./M_PI*T3_e_mom.Theta()>15.) &&                    // Theta > 15 deg
 					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	// Electron PID (E/p)
-					(180./M_PI*T3_e_mom.Theta()>15.) &&						// Theta > 15 deg
-					(fid_params.inFidRegion(T3_e_mom,charge[0])) &&					// Electron theta-phi cut
 					(e_vz_corrected > min_Z) && 	// Vertex is within the target region
 					(e_vz_corrected < max_Z)
 		     ))
 		{
 			continue;
 		}
+		// ---------------------------------------------------------------------------------------
+		// Electron Fiducial cuts
+		if (!(fid_params.inFidRegion(T3_e_mom,charge[0]))) continue; // Electron theta-phi cut
 
 		// Cut on edges of calorimeter
 		hist_e_xyEC_hit0 -> Fill(EC_X[0],EC_Y[0]);
 		e_ec_xyz.SetXYZ(EC_X[0],EC_Y[0],EC_Z[0]);
 		if(!fid_params.CutUVW(e_ec_xyz)) continue; //u>60, v<360, w<400;
 		hist_e_xyEC_hit  -> Fill(EC_X[0],EC_Y[0]);
+		// ---------------------------------------------------------------------------------------
 
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
 		if (180./M_PI*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
@@ -325,17 +327,17 @@ int main(int argc, char ** argv)
 					hist_p_pBeta    -> Fill(mom    [i],beta [i]                 );
 				}
 				// --------------------------------------------------------------------
-                                // Look specifically for pions
-                                double beta_assuming_pion = mom[i]/sqrt(mom[i]*mom[i] + mpc*mpc);
-                                double pic_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_pion * c_cm_ns);
-                                double pic_delta_t = pic_t0 - e_t0;
-                                if((id_guess[i] == 211 ) &&       // Guess at the particle ID is good for the pion candidate
-                                                (fid_params.in_p_deltaT(pic_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID (delta T vs p)
-                                  ){
-                                  	hist_pip_pBeta   -> Fill(mom[i],beta [i]);
-                                 
+				// Look specifically for pions
+				double beta_assuming_pion = mom[i]/sqrt(mom[i]*mom[i] + mpc*mpc);
+				double pic_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_pion * c_cm_ns);
+				double pic_delta_t = pic_t0 - e_t0;
+				if((id_guess[i] == 211 ) &&       // Guess at the particle ID is good for the pion candidate
+						(fid_params.in_p_deltaT(pic_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID (delta T vs p)
+				  ){
+					hist_pip_pBeta     -> Fill(mom[i]     ,beta [i]);
+					hist_pip_deltaTmom -> Fill(pic_delta_t,mom  [i]);
 
-                                }
+				}
 				// --------------------------------------------------------------------
 			}
 		}
@@ -360,8 +362,6 @@ int main(int argc, char ** argv)
 	hist_e_xQ2          ->Write();
 	hist_e_momMomCor    ->Write();
 	hist_e_vzVzCor      ->Write();
-	hist_p_deltaTmom    ->Write();
-	hist_p_phiTheta     ->Write();
 	hist_e_Ein_Eout0    ->Write();
 	hist_e_Ein_Eout     ->Write();
 	hist_e_xyEC_hit0    ->Write();
@@ -401,6 +401,10 @@ int main(int argc, char ** argv)
 	hist_p_phiVz        ->Write();
 	hist_p_thetaVz0     ->Write();
 	hist_p_thetaVz      ->Write();
+	hist_p_deltaTmom    ->Write();
+        hist_p_phiTheta     ->Write();
+	// ---
+	hist_pip_deltaTmom  ->Write();
 
 	// Clean up
 	f->Close();

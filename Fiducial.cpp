@@ -340,7 +340,7 @@ bool Fiducial::in_e_EoverP(double EoverP, double mom, double cut_sigma)
 		return false;
 	if (mom > max_el_mom)
 		mom = max_el_mom;
-
+	
 	double min_EoverP = el_Ep_ratio_mean->Eval(mom) - cut_sigma * el_Ep_ratio_sig->Eval(mom);
 	double max_EoverP = el_Ep_ratio_mean->Eval(mom) + cut_sigma * el_Ep_ratio_sig->Eval(mom);
 
@@ -364,8 +364,11 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 	Int_t sectInd = (Int_t)(phi+30)/60;
 	if(sectInd>5) sectInd = 5;
 	if(sectInd<0) sectInd = 0;
+
 	// -----------------------------------------------------------------------
-	// Correction for Ebeam = 2.2GeV and 2250A data
+	// Correction for Ebeam = 2.2GeV and 2250A data. For more info see:
+	// B. Zhang "Electron momentum correction" https://www.jlab.org/Hall-B/secure/e2/bzh/momcorrection.html, 2003.
+	// R. Niyazov "Measurement of Correlated Pair Momentum Distributions on 3He(e,e'pp)n with CLAS. PhD thesis, ODU, 2003.
 	if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
 		phi -= 60.*sectInd;
 		p = p*(fgPar_Phi[sectInd][0] + fgPar_Phi[sectInd][1]*phi + fgPar_Phi[sectInd][2]*phi*phi);
@@ -378,7 +381,9 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 		}
 	}
 	// -----------------------------------------------------------------------
-	// Correction for Ebeam = 4.4GeV and 2250A data (corrections valid only for theta > 16)
+	// Correction for Ebeam = 4.4GeV and 2250A data (corrections valid only for theta > 16). For more info see:
+	// D. Protopopescu "Electron momentum corrections for CLAS at 4.4 GeV" CLAS-NOTE 2001-008 JLAB, 2001.
+	// D. Protopopescu "Measurements of a'_{LT} assymetries in (e,e'p) reactions on 4He and 12C," CLAS Analysis Paper, 2003.
 	else if( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
 		p *= ((fgPar_Phi[sectInd][0] + fgPar_Phi[sectInd][1]*phi                    
 					+ fgPar_Phi[sectInd][2]*phi*phi)*(fgPar_Theta[sectInd][3]
@@ -551,7 +556,7 @@ bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 }
 
 // ===================================================================================================================================
-
+// V_z correction
 double Fiducial::vz_corr(TVector3 T3_mom) 
 {
 	double theta = 180./M_PI*T3_mom.Theta();

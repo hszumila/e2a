@@ -113,11 +113,12 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_Ein_Eout0= new TH2D("hist_e_Ein_Eout0","e- before  cuts;E_in/p;E_out/p;Counts"                ,100,   0., 0.5,100, 0.,0.5);
 	TH2D * hist_e_p_Etot0  = new TH2D("hist_e_p_Etot0"  ,"e- before  cuts;p [GeV];E_tot/p;Counts"               ,100,   0.,  5.,100, 0.,0.7);
 	TH2D * hist_e_phiTheta0= new TH2D("hist_e_phiTheta0","e- before  cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
-	// --
 	TH1D * hist_e_Nphe     = new TH1D("hist_e_Nphe"     ,"e- passing cuts;# photo-electrons in CC;Counts"       ,100,   0.,200.);
 	TH2D * hist_e_Ein_Eout = new TH2D("hist_e_Ein_Eout" ,"e- passing cuts;E_in/p;E_out/p;Counts"                ,100,   0., 0.5,100, 0.,0.5);
 	TH2D * hist_e_p_Etot   = new TH2D("hist_e_p_Etot"   ,"e- passing cuts;p [GeV];E_tot/p;Counts"               ,100,   0.,  5.,100, 0.,0.7);
 	TH2D * hist_e_phiTheta = new TH2D("hist_e_phiTheta" ,"e- passing cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
+	TH2D * hist_e_p_E0     = new TH2D("hist_e_p_E0"     ,"e- before  cuts;p [GeV];E;Counts"                     ,100,   0.,  5.,100, 0.,2.);
+	TH2D * hist_e_p_E      = new TH2D("hist_e_p_E"      ,"e- passing cuts;p [GeV];E;Counts"                     ,100,   0.,  5.,100, 0.,2.);
 	// ---
 	TH1D * hist_e_vz_sec10 = new TH1D("hist_e_vz_sec10" ,"e- passing cuts, before vtx corr, sector 1;electron vz [cm]; Counts"    ,100, -10., 10.);
 	TH1D * hist_e_vz_sec1  = new TH1D("hist_e_vz_sec1"  ,"e- passing cuts,  after vtx corr, sector 1;electron vz [cm]; Counts"    ,100, -10., 10.);
@@ -216,6 +217,7 @@ int main(int argc, char ** argv)
 		// ---
 		hist_e_Ein_Eout0 -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
 		hist_e_p_Etot0   -> Fill(mom[0],EC_tot[0]/mom[0]);
+		hist_e_p_E0      -> Fill(mom[0],el_cand_EC);
 		hist_e_Nphe0     -> Fill(Nphe[0]);
 		hist_e_phiTheta0 -> Fill(phi[0],theta[0]);
 		// ---
@@ -238,6 +240,7 @@ int main(int argc, char ** argv)
 		{
 			continue;
 		}
+
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
 		if (!(fid_params.inFidRegion(T3_e_mom,charge[0]))) continue; // Electron theta-phi cut
@@ -261,6 +264,7 @@ int main(int argc, char ** argv)
 		hist_e_vzVzCor  -> Fill(targetZ[0],e_vz_corrected-targetZ[0]);
 		hist_e_Ein_Eout -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
 		hist_e_p_Etot   -> Fill(mom[0],EC_tot[0]/mom[0]);
+		hist_e_p_E      -> Fill(mom[0],el_cand_EC);
 		hist_e_Nphe     -> Fill(Nphe[0]);
 		hist_e_phiTheta -> Fill(phi[0],theta[0]);
 		hist_e_phiVz0   -> Fill(phi[0],targetZ[0]);
@@ -368,6 +372,8 @@ int main(int argc, char ** argv)
 	hist_e_xyEC_hit     ->Write();
 	hist_e_p_Etot0      ->Write();
 	hist_e_p_Etot       ->Write();
+	hist_e_p_E0         ->Write();
+	hist_e_p_E          ->Write();
 	hist_e_Nphe0        ->Write();
 	hist_e_Nphe         ->Write();
 	hist_e_phiTheta0    ->Write();

@@ -9,7 +9,7 @@ class TF1;
 class Fiducial
 {
 	public:
-		Fiducial(int E_beam, int torus_current, int mini_current);
+		Fiducial(int E_beam, int torus_current, int mini_current, std::string target);
 		~Fiducial();
 
 		// Functions to test fiducial and pid bounds
@@ -26,6 +26,7 @@ class Fiducial
 		int torus_current;
 		int mini_current;
 		std::string homedir;
+		std::string tar;
 
 		// Helper functions
 		bool read_e_fid_params ();

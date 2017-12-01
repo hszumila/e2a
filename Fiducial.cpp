@@ -9,7 +9,7 @@
 #include "TF1.h"
 #include "TFile.h"
 // ===================================================================================================================================
-Fiducial::Fiducial(int E_beam, int torus, int mini)
+Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 {
 	// Initialize some variables
 	el_Ep_ratio_mean = NULL;
@@ -22,6 +22,7 @@ Fiducial::Fiducial(int E_beam, int torus, int mini)
 	E1=E_beam;
 	torus_current = torus;
 	mini_current = mini;
+	tar = target;
 
 	homedir = std::string(getenv("HOME"));
 
@@ -200,10 +201,15 @@ bool Fiducial::read_vz_cor_params()
 {
 
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/vz_%d_4He.root",homedir.c_str(),E1);	
+	sprintf(param_file_name,"%s/.e2a/vz_%d_%s.root",homedir.c_str(),E1,tar.c_str());	
 
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);
+
+	if(cal_file->IsZombie()){
+		std::cerr << "File " << param_file_name << " called by Fiducial::read_vz_cor_params() does not exist. Check it and fix it!\n";
+                exit(-2);
+	}
 
 	// If we previously set these, we should clean up their memory
 	if (vz_corr_func)

@@ -204,8 +204,8 @@ int main(int argc, char ** argv)
 	cout << "Mini   = " << tab_mini  << endl;
 	cout << "Target = " << tab_targ  << endl;
 	
-        Fiducial fid_params(tab_E1,2250,tab_mini);     // Create an instance of the Fiducial Class
-        Run_dependent run_dependent_corrections(NRun); // Create an instance of the Run_dependent Class
+        Fiducial fid_params(tab_E1,2250,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
+        Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
 	// --------------------------------------------------------------------------------------------------
 	// Loop over events
 	for (int event=0; event < nEvents ; event++)

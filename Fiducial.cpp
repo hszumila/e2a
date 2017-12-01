@@ -200,7 +200,7 @@ bool Fiducial::read_vz_cor_params()
 {
 
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/vz_He_%d.root",homedir.c_str(),E1);	
+	sprintf(param_file_name,"%s/.e2a/vz_%d_4He.root",homedir.c_str(),E1);	
 
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);
@@ -564,8 +564,11 @@ double Fiducial::vz_corr(TVector3 T3_mom)
 	double phi_mod = phi;
         if(phi_mod<0) phi_mod+=360;
 
-	return ((-vz_corr_func->GetParameter(1)))*cos((phi_mod-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
-	//vertex correction function obtained for the empty runs 18522, works fine for 3He runs at 4.461[GeV/c] beam energy 
+	return (-(vz_corr_func->GetParameter(1)))*cos((phi_mod-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
+	
+	//Vertex Correction Parameters:
+	//E1 = 2.2GeV: obtained from empty run 18283, for 4He
+	//E1 = 4.4GeV: obtained from empty run 18522, for 4He (works fine for 3He)
 }
 
 // ===================================================================================================================================

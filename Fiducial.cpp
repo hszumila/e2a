@@ -352,7 +352,7 @@ bool Fiducial::in_e_EoverP(double EoverP, double mom, double cut_sigma)
 // ===================================================================================================================================
 TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 {
-	// Electron Momentum correction, Pass the electron 4 vector, return corrected 4 Vector pointer.
+	// Electron Momentum correction, Pass the electron 3 vector, return corrected 3 vector pointer.
 	// Check out "http://nuclear.unh.edu/~maurik/Personal/E2Root/html/TE2AnaTool.html"
 
 	TVector3      V3ecor(V3el);

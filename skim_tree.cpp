@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <cmath>
 
@@ -34,8 +35,6 @@ int main(int argc, char ** argv)
 		return -1;	
 	}
 
-	// Create an instance of the Fiducial Class to store important calibration params
-	Fiducial fid_params(4461, 2250, 6000); // Hard-code the beam energy and toroid currents for now.
 	// --------------------------------------------------------------------------------------------------
 	// Open up the Root file
 	TFile * f = new TFile(argv[1]);
@@ -181,12 +180,32 @@ int main(int argc, char ** argv)
 	outtree->Branch("e_mom",e_mom,"e_mom[3]/D");
 	outtree->Branch("nProtons",&nProtons,"nProtons/I");
 	// --------------------------------------------------------------------------------------------------
-	// Obtaining run number and creating a run dependent object
+	// Obtaining run number and other important parameters
 	t->GetEvent(0);
-	cout << "Analyzing run " << NRun << endl;
-	// Create an instance of the Run_dependent Class to store important calibration params
-	Run_dependent run_dependent_corrections(NRun); // Hard-code the run-number from now
+	int tab_run, tab_E1, tab_torus, tab_mini;
+	string tab_targ;
 
+	char param_file_name[256];
+	string homedir = string(getenv("HOME"));
+        sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
+	ifstream run_table;
+	run_table.open(param_file_name);
+	do{
+		run_table >> tab_run  ;
+		run_table >> tab_E1   ;
+		run_table >> tab_torus;
+		run_table >> tab_mini ;
+		run_table >> tab_targ ;
+	}
+	while(tab_run != NRun);
+	cout << "Run    = " << tab_run   << endl;
+	cout << "Ebeam  = " << tab_E1    << endl;
+	cout << "Torus  = " << tab_torus << endl;
+	cout << "Mini   = " << tab_mini  << endl;
+	cout << "Target = " << tab_targ  << endl;
+	
+        Fiducial fid_params(tab_E1,2250,tab_mini);     // Create an instance of the Fiducial Class
+        Run_dependent run_dependent_corrections(NRun); // Create an instance of the Run_dependent Class
 	// --------------------------------------------------------------------------------------------------
 	// Loop over events
 	for (int event=0; event < nEvents ; event++)

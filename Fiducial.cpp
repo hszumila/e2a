@@ -200,8 +200,12 @@ bool Fiducial::read_e_fid_params()
 bool Fiducial::read_vz_cor_params()
 {
 
+	std::string effective_tar;
+	if ((E1==4461)&&(tar=="3He")) effective_tar = "4He";
+	else effective_tar = tar;
+
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/vz_%d_%s.root",homedir.c_str(),E1,tar.c_str());	
+	sprintf(param_file_name,"%s/.e2a/vz_%d_%s.root",homedir.c_str(),E1,effective_tar.c_str());	
 
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);

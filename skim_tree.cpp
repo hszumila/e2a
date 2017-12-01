@@ -262,7 +262,7 @@ int main(int argc, char ** argv)
 
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
-		if (!(fid_params.inFidRegion(T3_e_mom,charge[0]))) continue; // Electron theta-phi cut
+		if (!(fid_params.e_inFidRegion(T3_e_mom))) continue; // Electron theta-phi cut
 
 		// Cut on edges of calorimeter
 		hist_e_xyEC_hit0 -> Fill(EC_X[0],EC_Y[0]);

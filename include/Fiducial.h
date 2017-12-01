@@ -13,7 +13,7 @@ class Fiducial
 		~Fiducial();
 
 		// Functions to test fiducial and pid bounds
-		bool inFidRegion(TVector3 mom, int charge);
+		bool e_inFidRegion(TVector3 mom);
 		bool in_e_EoverP(double EoverP, double mom, double cut_sigma);
 		bool in_p_deltaT(double delta_t, double mom, double cut_sigma);
 		bool pFiducialCut(TVector3 momentum);
@@ -34,9 +34,7 @@ class Fiducial
 		bool read_e_pid_params ();
 		bool read_p_fid_params ();
 		bool read_p_pid_params ();
-		bool read_vz_cor_params();	
-
-		void getElectronPhiLimits(double mom, double theta, int sector, double &phiMin, double &phiMax);
+		bool read_vz_cor_params();
 
 		// Fiducial Cut Data
 		double fgPar_Efid_t0_p[6][2];

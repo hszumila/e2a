@@ -59,70 +59,144 @@ Fiducial::~Fiducial()
 		delete vz_corr_func;
 }
 // ===================================================================================================================================
-void Fiducial::getElectronPhiLimits(double mom,double theta, int sector, double &phiMin, double &phiMax)
-{
-	if ((sector < 0) || (sector > 5))
-	{
-		std::cerr << "Sector " << sector << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
-		exit(-3);
-	}
-
-	// Sanitize theta
-	double theta_deg = theta * 180./M_PI;
-	if (theta_deg < 15.)
-	{
-		std::cerr << "Theta " << theta_deg << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
-		exit(-3);
-	}
-
-	// Sanitize momentum
-	if (mom > 3.7) mom=3.7;
-	if (mom < 0.9)
-	{
-		std::cerr << "Momentum " << mom << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
-		exit(-3);
-	}
-
-	// Assemble the polynomials
-	double t0 = fgPar_Efid_t0_p[sector][0]/pow(mom, fgPar_Efid_t0_p[sector][1]);
-	double t1 = 0.; 
-	double b[2]={0.,0.};
-	double a[2]={0.,0.};
-	for(int k=0; k<6; k++)
-	{
-		double mom_to_the_k = pow(mom,k);
-		t1 += fgPar_Efid_t1_p[sector][k]*mom_to_the_k;
-		for(int l=0; l<2; l++)
-		{
-			a[l] += fgPar_Efid_a_p[sector][l][k]*mom_to_the_k;
-			b[l] += fgPar_Efid_b_p[sector][l][k]*mom_to_the_k;
-		}
-	}
-
-	// Calculate the limits
-	phiMin=sector*M_PI/3.; // Default is the center line of each sector
-	phiMax=sector*M_PI/3.;
-	if(t1 < 45.) t1 = 45.;
-	if((t0 < theta_deg) && (theta_deg < t1))
-	{
-		phiMin -= M_PI/180.*b[0]*(1. - 1/((theta_deg - t0)/(b[0]/a[0]) + 1.));
-		phiMax += M_PI/180.*b[1]*(1. - 1/((theta_deg - t0)/(b[1]/a[1]) + 1.));
-	}
-}
-// ===================================================================================================================================
-bool Fiducial::inFidRegion(TVector3 mom, int charge)
+bool Fiducial::e_inFidRegion(TVector3 mom)
 {
 	// Establish the sector;
-	double phi = mom.Phi();
-	if (phi < -M_PI/6.)
-		phi+= 2.*M_PI;
-	int sector = (phi+M_PI/6.)/(M_PI/3.);
+        double phi = mom.Phi();
+        if (phi < -M_PI/6.) phi+= 2.*M_PI;
+        int sector = (phi+M_PI/6.)/(M_PI/3.);
 
-	// Get the boundaries of phi
-	double phiMin, phiMax;
-	getElectronPhiLimits(mom.Mag(),mom.Theta(),sector, phiMin,phiMax);
+	double theta = mom.Theta();
+	double mom_e = mom.Mag();
 
-	return ((phi < phiMax) && (phi>phiMin));
+	if ((sector < 0) || (sector > 5))
+        {
+                        std::cerr << "Sector " << sector << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
+                        exit(-3);
+        }
+
+	// ---------------------------------------------------------------------------
+	// Correction for Ebeam = 4.4GeV and 2250A data.
+	if ( E1 > 3000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
+
+		double phiMin, phiMax;
+		// Sanitize theta
+		double theta_deg = theta * 180./M_PI;
+		if (theta_deg < 15.)
+		{
+			std::cerr << "Theta " << theta_deg << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
+			exit(-3);
+		}
+
+		// Sanitize momentum
+		if (mom_e > 3.7) mom_e = 3.7;
+		if (mom_e < 0.9)
+		{
+			std::cerr << "Momentum " << mom_e << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
+			exit(-3);
+		}
+
+		// Assemble the polynomials
+		double t0 = fgPar_Efid_t0_p[sector][0]/pow(mom_e, fgPar_Efid_t0_p[sector][1]);
+		double t1 = 0.; 
+		double b[2]={0.,0.};
+		double a[2]={0.,0.};
+		for(int k=0; k<6; k++)
+		{
+			double mom_to_the_k = pow(mom_e,k);
+			t1 += fgPar_Efid_t1_p[sector][k]*mom_to_the_k;
+			for(int l=0; l<2; l++)
+			{
+				a[l] += fgPar_Efid_a_p[sector][l][k]*mom_to_the_k;
+				b[l] += fgPar_Efid_b_p[sector][l][k]*mom_to_the_k;
+			}
+		}
+
+		// Calculate the limits
+		phiMin=sector*M_PI/3.; // Default is the center line of each sector
+		phiMax=sector*M_PI/3.;
+		if(t1 < 45.) t1 = 45.;
+		if((t0 < theta_deg) && (theta_deg < t1))
+		{
+			phiMin -= M_PI/180.*b[0]*(1. - 1/((theta_deg - t0)/(b[0]/a[0]) + 1.));
+			phiMax += M_PI/180.*b[1]*(1. - 1/((theta_deg - t0)/(b[1]/a[1]) + 1.));
+		}
+
+		return ((phi < phiMax) && (phi>phiMin));
+	}
+	// ---------------------------------------------------------------------------
+	// Correction for Ebeam = 2.2GeV and 2250A data.
+	
+	/*
+	// Electron fiducial cut, return kTRUE if pass or kFALSE if not
+	Bool_t status = kTRUE;
+	if ( en_beam>2. &&  en_beam<3. && fTorusCurrent>2240. && fTorusCurrent<2260.){
+
+		phi -= sector*60;
+		Float_t theta = momentum.Theta()*180./TMath::Pi();
+		Float_t mom = momentum.Mag();
+		Float_t par[6];               // six parameters to determine the outline of Theta vs Phi
+		for (Int_t i=0; i<6; i++){
+			par[i] = 0;
+			// calculate the parameters using pol8
+			for (Int_t d=8; d>=0; d--){par[i] = par[i]*mom + fgPar_2GeV_2250_Efid[sector][i][d];}
+		}
+		if (phi < 0) {
+			Float_t tmptheta = par[0] - par[3]/par[2] + par[3]/(par[2]+phi);
+			status = (theta>tmptheta && tmptheta>=par[0] && theta<par[1]);
+		}
+		else {
+			Float_t tmptheta = par[0] - par[5]/par[4] + par[5]/(par[4]-phi);
+			status = (theta>tmptheta && tmptheta>=par[0] && theta<par[1]);
+		}
+		// by now, we have checked if the electron is within the outline of theta vs phi plot
+		if (SCpdcut){  // if the kESCpdCut bit is set, take off the bad SC paddle by strictly cutting off a theta gap.
+			if (status){
+				Int_t tsector = sector + 1;
+				// sector 3 has two bad paddles
+				if (tsector == 3){
+					Float_t badpar3[4];            // 4 parameters to determine the positions of the two theta gaps
+					for (Int_t i=0; i<4; i++){
+						badpar3[i] = 0;
+						// calculate the parameters using pol7
+						for (Int_t d=7; d>=0; d--){badpar3[i] = badpar3[i]*mom + fgPar_2GeV_2250_EfidTheta_S3[i][d];}
+					}
+					for(Int_t ipar=0;ipar<2;ipar++)
+						status = status && !(theta>badpar3[2*ipar] && theta<badpar3[2*ipar+1]);
+				}
+				// sector 4 has one bad paddle
+				else if (tsector == 4){
+					Float_t badpar4[2];     // 2 parameters to determine the position of the theta gap
+					for (Int_t i=0; i<2; i++){
+						badpar4[i] = 0;
+						// calculate the parameters using pol7
+						for (Int_t d=7; d>=0; d--){badpar4[i] = badpar4[i]*mom + fgPar_2GeV_2250_EfidTheta_S4[i][d];}
+					}
+					status = !(theta>badpar4[0] && theta<badpar4[1]);
+				}
+				// sector 5 has four bad paddles
+				else if (tsector == 5){ 
+					Float_t badpar5[8];           // 8 parameters to determine the positions of the four theta gaps
+					for (Int_t i=0; i<8; i++){
+						badpar5[i] = 0;
+						// calculate the parameters using pol7
+						for (Int_t d=7; d>=0; d--){badpar5[i] = badpar5[i]*mom + fgPar_2GeV_2250_EfidTheta_S5[i][d];}
+					}
+					if (mom<1.25) badpar5[0] = 23.4;
+					if (mom<1.27) badpar5[1] = 24.0; // some dummy constants. see fiducial cuts webpage.
+					for(Int_t ipar=0;ipar<4;ipar++)
+						status = status && !(theta>badpar5[2*ipar] && theta<badpar5[2*ipar+1]);
+				}
+			}
+		}
+	}
+	return status;
+	*/
+	// ---------------------------------------------------------------------------
+	else {
+		std::cerr << "getElectronPhiLimits doesn't have correction parameters for the given input. Check it and fix it!\n";
+		exit(-3);
+	}
 }
 // ===================================================================================================================================
 bool Fiducial::read_p_fid_params()
@@ -212,7 +286,7 @@ bool Fiducial::read_vz_cor_params()
 
 	if(cal_file->IsZombie()){
 		std::cerr << "File " << param_file_name << " called by Fiducial::read_vz_cor_params() does not exist. Check it and fix it!\n";
-                exit(-2);
+		exit(-2);
 	}
 
 	// If we previously set these, we should clean up their memory
@@ -311,7 +385,7 @@ bool Fiducial::read_p_pid_params()
 		delete prot_deltat_mean;
 
 	// Pull from file
-	prot_deltat_sig=(TF1*)file_in1->Get("sig_pol9")->Clone();
+	prot_deltat_sig =(TF1*)file_in1->Get("sig_pol9" )->Clone();
 	prot_deltat_mean=(TF1*)file_in1->Get("mean_pol9")->Clone();
 
 	// Put the root global file pointer back to where it was. I hate ROOT. 
@@ -350,7 +424,7 @@ bool Fiducial::in_e_EoverP(double EoverP, double mom, double cut_sigma)
 		return false;
 	if (mom > max_el_mom)
 		mom = max_el_mom;
-	
+
 	double min_EoverP = el_Ep_ratio_mean->Eval(mom) - cut_sigma * el_Ep_ratio_sig->Eval(mom);
 	double max_EoverP = el_Ep_ratio_mean->Eval(mom) + cut_sigma * el_Ep_ratio_sig->Eval(mom);
 
@@ -572,10 +646,10 @@ double Fiducial::vz_corr(TVector3 T3_mom)
 	double theta = 180./M_PI*T3_mom.Theta();
 	double phi   = 180./M_PI*T3_mom.Phi();
 	double phi_mod = phi;
-        if(phi_mod<0) phi_mod+=360;
+	if(phi_mod<0) phi_mod+=360;
 
 	return (-(vz_corr_func->GetParameter(1)))*cos((phi_mod-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
-	
+
 	//Vertex Correction Parameters:
 	//E1 = 2.2GeV: obtained from empty run 18283, for 4He
 	//E1 = 4.4GeV: obtained from empty run 18522, for 4He (works fine for 3He)

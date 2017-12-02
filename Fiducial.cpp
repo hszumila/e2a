@@ -65,8 +65,10 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
         double phi = mom.Phi();
         if (phi < -M_PI/6.) phi+= 2.*M_PI;
         int sector = (phi+M_PI/6.)/(M_PI/3.);
+	double phi_deg = phi * 180./M_PI;
 
 	double theta = mom.Theta();
+	double theta_deg = theta * 180./M_PI;
 	double mom_e = mom.Mag();
 
 	if ((sector < 0) || (sector > 5))
@@ -81,7 +83,6 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 
 		double phiMin, phiMax;
 		// Sanitize theta
-		double theta_deg = theta * 180./M_PI;
 		if (theta_deg < 15.)
 		{
 			std::cerr << "Theta " << theta_deg << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
@@ -130,24 +131,22 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	/*
 	// Electron fiducial cut, return kTRUE if pass or kFALSE if not
 	Bool_t status = kTRUE;
-	if ( en_beam>2. &&  en_beam<3. && fTorusCurrent>2240. && fTorusCurrent<2260.){
+	if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
 
-		phi -= sector*60;
-		Float_t theta = momentum.Theta()*180./TMath::Pi();
-		Float_t mom = momentum.Mag();
+		phi_deg -= sector*60;
 		Float_t par[6];               // six parameters to determine the outline of Theta vs Phi
 		for (Int_t i=0; i<6; i++){
 			par[i] = 0;
 			// calculate the parameters using pol8
 			for (Int_t d=8; d>=0; d--){par[i] = par[i]*mom + fgPar_2GeV_2250_Efid[sector][i][d];}
 		}
-		if (phi < 0) {
-			Float_t tmptheta = par[0] - par[3]/par[2] + par[3]/(par[2]+phi);
-			status = (theta>tmptheta && tmptheta>=par[0] && theta<par[1]);
+		if (phi_deg < 0) {
+			Float_t tmptheta = par[0] - par[3]/par[2] + par[3]/(par[2]+phi_deg);
+			status = (theta_deg>tmptheta && tmptheta>=par[0] && theta_deg<par[1]);
 		}
 		else {
-			Float_t tmptheta = par[0] - par[5]/par[4] + par[5]/(par[4]-phi);
-			status = (theta>tmptheta && tmptheta>=par[0] && theta<par[1]);
+			Float_t tmptheta = par[0] - par[5]/par[4] + par[5]/(par[4]-phi_deg);
+			status = (theta_deg>tmptheta && tmptheta>=par[0] && theta_deg<par[1]);
 		}
 		// by now, we have checked if the electron is within the outline of theta vs phi plot
 		if (SCpdcut){  // if the kESCpdCut bit is set, take off the bad SC paddle by strictly cutting off a theta gap.
@@ -162,7 +161,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 						for (Int_t d=7; d>=0; d--){badpar3[i] = badpar3[i]*mom + fgPar_2GeV_2250_EfidTheta_S3[i][d];}
 					}
 					for(Int_t ipar=0;ipar<2;ipar++)
-						status = status && !(theta>badpar3[2*ipar] && theta<badpar3[2*ipar+1]);
+						status = status && !(theta_deg>badpar3[2*ipar] && theta_deg<badpar3[2*ipar+1]);
 				}
 				// sector 4 has one bad paddle
 				else if (tsector == 4){
@@ -172,7 +171,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 						// calculate the parameters using pol7
 						for (Int_t d=7; d>=0; d--){badpar4[i] = badpar4[i]*mom + fgPar_2GeV_2250_EfidTheta_S4[i][d];}
 					}
-					status = !(theta>badpar4[0] && theta<badpar4[1]);
+					status = !(theta_deg>badpar4[0] && theta_deg<badpar4[1]);
 				}
 				// sector 5 has four bad paddles
 				else if (tsector == 5){ 
@@ -185,7 +184,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 					if (mom<1.25) badpar5[0] = 23.4;
 					if (mom<1.27) badpar5[1] = 24.0; // some dummy constants. see fiducial cuts webpage.
 					for(Int_t ipar=0;ipar<4;ipar++)
-						status = status && !(theta>badpar5[2*ipar] && theta<badpar5[2*ipar+1]);
+						status = status && !(theta_deg>badpar5[2*ipar] && theta_deg<badpar5[2*ipar+1]);
 				}
 			}
 		}
@@ -344,7 +343,7 @@ bool Fiducial::read_e_pcor_params()
 bool Fiducial::read_e_pid_params()
 {
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d_%d.root",homedir.c_str(),E1,torus_current);
+	sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d.root",homedir.c_str(),E1);
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);
 
@@ -417,13 +416,24 @@ bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 // ===================================================================================================================================
 bool Fiducial::in_e_EoverP(double EoverP, double mom, double cut_sigma)
 {
-	const double min_el_mom = 1.5;
-	const double max_el_mom = 3.8;
+	double min_el_mom;
+	double max_el_mom;
 
-	if (mom < min_el_mom)
-		return false;
-	if (mom > max_el_mom)
-		mom = max_el_mom;
+	if     (E1==4461){
+		min_el_mom = 1.10; //GeV
+		max_el_mom = 3.70; //GeV
+	}
+	else if(E1==2261){
+		min_el_mom = 0.55; //GeV
+        	max_el_mom = 2.10; //GeV
+	}
+	else{
+		std::cerr << "Fiducial::in_e_EoverP does not have parameters for this beam energy. Check it and fix it!\n";
+                exit(-2);
+	}
+
+	if (mom < min_el_mom)	return false;
+	if (mom > max_el_mom)	mom = max_el_mom;
 
 	double min_EoverP = el_Ep_ratio_mean->Eval(mom) - cut_sigma * el_Ep_ratio_sig->Eval(mom);
 	double max_EoverP = el_Ep_ratio_mean->Eval(mom) + cut_sigma * el_Ep_ratio_sig->Eval(mom);

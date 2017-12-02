@@ -83,11 +83,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 
 		double phiMin, phiMax;
 		// Sanitize theta
-		if (theta_deg < 15.)
-		{
-			std::cerr << "Theta " << theta_deg << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
-			exit(-3);
-		}
+		if (theta_deg < 16.)return false;
 
 		// Sanitize momentum
 		if (mom_e > 3.7) mom_e = 3.7;
@@ -296,7 +292,7 @@ bool Fiducial::read_vz_cor_params()
 	// Pull from file
 	vz_corr_func=(TF1*)cal_file->Get("f_vz")->Clone();
 
-	// Put the root global file pointer back to where it was. I hate ROOT. 
+	// Put the root global file pointer back to where it was. I hate ROOT. (me too) 
 	cal_file->Close();
 	gFile = old_gfile;
 

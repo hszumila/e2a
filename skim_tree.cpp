@@ -166,12 +166,11 @@ int main(int argc, char ** argv)
 	TH2D * hist_pip_pBeta    = new TH2D("hist_pip_pBeta"    ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"                ,100,   0.,  4.,500, 0.,1.3);
 	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"               ,100,  -7.,  7.,100, 0., 5.);
 	// ---------------------------------------
-	// Temporal histograms
-	TH2D * temp1 = new TH2D ("temp1","",100,-300,360,100,-300,660);
-
 	TTree * outtree = new TTree("T","Skimmed tree");
 	double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
 	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
+	double EC_in_cut, el_EC_cut;
+
 	TVector3 e_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
 
@@ -206,6 +205,20 @@ int main(int argc, char ** argv)
 	
         Fiducial fid_params(tab_E1,2250,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
         Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
+	
+	// Values for some cuts
+	if      (tab_E1 == 4461){
+		EC_in_cut = 0.055; //GeV (Values for Energy deposited in EC inner layer cut)
+		el_EC_cut = 0.330; //GeV (Values for Enough total energy in the EC cut)
+	}
+	else if (tab_E1 == 2261){
+		EC_in_cut = 0.060; //GeV (Values for Energy deposited in EC inner layer cut)
+		el_EC_cut = -999.; // No cut in this case (Values for Enough total energy in the EC cut)
+	}
+	else {
+		cout << "Error: Check skim_tree and add parameters for Ebeam = " << tab_E1 << endl;
+		exit(-2);
+	}
 	// --------------------------------------------------------------------------------------------------
 	// Loop over events
 	for (int event=0; event < nEvents ; event++)
@@ -248,10 +261,9 @@ int main(int argc, char ** argv)
 					(StatCC[0] > 0) && 		// CC status is good for the electron candidate
 					(StatSC[0] > 0) && 		// SC status is good for the electron candidate
 					(charge[0] < 0) && 		// Electron candidate curvature direction is negative
-					(EC_in [0] > 0.055) && 		// Electron candidate has enough energy deposit in inner layer of EC 
+					(EC_in [0] > EC_in_cut) && 	// Electron candidate has enough energy deposit in inner layer of EC 
 									// (Helps separate electrons from MIPs such as pions)
-					(el_cand_EC > 0.33) && 		// Enough total energy in the EC
-					(180./M_PI*T3_e_mom.Theta()>15.) &&                    // Theta > 15 deg
+					(el_cand_EC > el_EC_cut) && 	// Enough total energy in the EC
 					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	// Electron PID (E/p)
 					(e_vz_corrected > min_Z) && 	// Vertex is within the target region
 					(e_vz_corrected < max_Z)

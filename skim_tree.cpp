@@ -151,6 +151,7 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic proton histograms
+	TH2D * hist_p_phiTheta0= new TH2D("hist_p_phiTheta0","p  before  fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
 	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
 	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                ,100,  -7.,  7.,100, 0., 5.);
 	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,100,   0.,  7.,100,-2., 2.);
@@ -203,7 +204,7 @@ int main(int argc, char ** argv)
 	cout << "Mini   = " << tab_mini  << endl;
 	cout << "Target = " << tab_targ  << endl;
 	
-        Fiducial fid_params(tab_E1,2250,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
+        Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
         Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
 	
 	// Values for some cuts
@@ -312,7 +313,6 @@ int main(int argc, char ** argv)
 		else {cout << "Something is wrong with the definition of sectors" << endl;}
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for positive particles
-		/*
 		nProtons=0;      
 		for (int i=1 ; i<gPart ; i++)
 		{
@@ -326,10 +326,13 @@ int main(int argc, char ** argv)
 			if( (StatSC[i] > 0) && 				// SC status is good for the proton candidate
 					(StatDC[i] > 0) &&              // DC status is good for the proton candidate
 					(Stat[i] > 0 )  &&		// Global status is good for the proton candidate
-					(charge[i] > 0) &&		// Charge is positive
-					(fid_params.pFiducialCut(T3_p_mom)) // proton theta-phi cut
+					(charge[i] > 0) 		// Charge is positive
 			  )
 			{
+				hist_p_phiTheta0 -> Fill(phi[i],theta[i]);
+				
+				// Passing positive hadron fiducial cuts
+				if(fid_params.pFiducialCut(T3_p_mom)){
 				// Positive particle vertex (_z) correction
 				p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
@@ -375,9 +378,9 @@ int main(int argc, char ** argv)
 
 				}
 				// --------------------------------------------------------------------
+				}
 			}
 		}
-		*/
 
 		// --------------------------------------------------------------------------------------------------
 		// Prep the output tree
@@ -441,6 +444,7 @@ int main(int argc, char ** argv)
 	hist_p_thetaVz0     ->Write();
 	hist_p_thetaVz      ->Write();
 	hist_p_deltaTmom    ->Write();
+	hist_p_phiTheta0    ->Write();
         hist_p_phiTheta     ->Write();
 	// ---
 	hist_pip_deltaTmom  ->Write();

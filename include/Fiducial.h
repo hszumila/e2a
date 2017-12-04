@@ -60,7 +60,12 @@ class Fiducial
 		double fgPar_Pfidbt2r[6][6];
 		double fgPar_Pfidbl  [6][6];
 		double fgPar_Pfidbr  [6][6];
-
+		double fgPar_Pfid_For[6][4][7];
+		double fgPar_Pfid_Bak[6][4][7];
+		double fgPar_Pfid_ScpdS2[2][6];
+		double fgPar_Pfid_ScpdS3[8][6];
+		double fgPar_Pfid_ScpdS4[4][6];
+		double fgPar_Pfid_ScpdS5[8][6];
 		// Vertex z correction data
 		TF1 *vz_corr_func;		
 

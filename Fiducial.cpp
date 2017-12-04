@@ -204,22 +204,66 @@ bool Fiducial::read_p_fid_params()
 	sprintf(param_file_name,"%s/.e2a/PFID_%d_%d.dat",homedir.c_str(),E1,torus_current);
 	std::ifstream param_file(param_file_name);
 	std::cout<<param_file_name<<std::endl;	
-	for(int i = 0 ; i < 6 ; i++){
-		for(int j = 0 ; j < 6 ; j++){
-			param_file >> fgPar_Pfidft1l[i][j];
-			param_file >> fgPar_Pfidft1r[i][j];
-			param_file >> fgPar_Pfidft2l[i][j];
-			param_file >> fgPar_Pfidft2r[i][j];
-			param_file >> fgPar_Pfidbt1l[i][j];
-			param_file >> fgPar_Pfidbt1r[i][j];
-			param_file >> fgPar_Pfidbt2l[i][j];
-			param_file >> fgPar_Pfidbt2r[i][j];
-			param_file >> fgPar_Pfidbl  [i][j];
-			param_file >> fgPar_Pfidbr  [i][j];
+	if ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
+		for(int i = 0 ; i < 6 ; i++){
+			for(int j = 0 ; j < 6 ; j++){
+				param_file >> fgPar_Pfidft1l[i][j];
+				param_file >> fgPar_Pfidft1r[i][j];
+				param_file >> fgPar_Pfidft2l[i][j];
+				param_file >> fgPar_Pfidft2r[i][j];
+				param_file >> fgPar_Pfidbt1l[i][j];
+				param_file >> fgPar_Pfidbt1r[i][j];
+				param_file >> fgPar_Pfidbt2l[i][j];
+				param_file >> fgPar_Pfidbt2r[i][j];
+				param_file >> fgPar_Pfidbl  [i][j];
+				param_file >> fgPar_Pfidbr  [i][j];
+			}
+		}	
+	}
+	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
+		for(int i = 0 ; i < 6 ; i++){
+			for(int j = 0 ; j < 4 ; j++){
+				for(int k = 0 ; k < 7 ; k++){
+					param_file >> fgPar_Pfid_For[i][j][k];
+				}
+			}
 		}
-	}	
-	param_file.close();
+		for(int i = 0 ; i < 6 ; i++){
+			for(int j = 0 ; j < 4 ; j++){
+				for(int k = 0 ; k < 7 ; k++){
+					param_file >> fgPar_Pfid_Bak[i][j][k];
+				}
+			}
+		}
 
+		for(int i = 0 ; i < 2 ; i++){
+			for(int j = 0 ; j < 6 ; j++){
+				param_file >> fgPar_Pfid_ScpdS2[i][j];
+			}
+		}
+		for(int i = 0 ; i < 8 ; i++){
+			for(int j = 0 ; j < 6 ; j++){
+				param_file >> fgPar_Pfid_ScpdS3[i][j];
+			}
+		}
+		for(int i = 0 ; i < 4 ; i++){
+			for(int j = 0 ; j < 6 ; j++){
+				param_file >> fgPar_Pfid_ScpdS4[i][j];
+			}
+		}
+		for(int i = 0 ; i < 8 ; i++){
+			for(int j = 0 ; j < 6 ; j++){
+				param_file >> fgPar_Pfid_ScpdS5[i][j];
+			}
+		}
+	}
+	else {
+		std::cerr << "read_p_fid_params doesn't have correction parameters for the given input. Check it and fix it!\n";
+                exit(-3);
+	}
+	
+
+	param_file.close();
 	return true;
 }
 // ===================================================================================================================================
@@ -369,7 +413,7 @@ bool Fiducial::read_e_pcor_params()
 		}
 	} // Done reading in momentum correction parameters
 	param_file.close();
-
+	// NOTE: corrections for electron momentum obtained with e1c 2.5Gev 2250A data set (Run 16719 and 16720)
 	return true;
 }
 // ===================================================================================================================================
@@ -502,10 +546,6 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 		if     (cz>0.800 && cz<0.885){p=p*(fgPar_Theta[0][0]*sin(fgPar_Theta[0][1]*(cz+fgPar_Theta[0][2])) + fgPar_Theta[0][3]);}
 		else if(cz>0.885 && cz<0.935){p=p*(fgPar_Theta[1][0] + fgPar_Theta[1][1]*cz + fgPar_Theta[1][2]*cz*cz);}
 		else if(cz>0.935 && cz<0.970){p=p*(fgPar_Theta[2][0] + fgPar_Theta[2][1]*cz + fgPar_Theta[2][2]*cz*cz);}
-		else {
-			std::cerr << "eMomentumCorrection doesn't have correction parameters for the given input. Check it and fix it!\n";
-			exit(-3);
-		}
 	}
 	// -----------------------------------------------------------------------
 	// Correction for Ebeam = 4.4GeV and 2250A data (corrections valid only for theta > 16). For more info see:
@@ -527,21 +567,22 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 	return V3ecor;
 }
 // ===================================================================================================================================
-bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
+bool Fiducial::pFiducialCut(TVector3 momentum){
+	//Positive Hadron Fiducial Cut
 	//Check out "http://www.jlab.org/Hall-B/secure/e2/bzh/pfiducialcut.html"
 	Bool_t status = kTRUE;
 
+	Float_t theta = momentum.Theta()*180/M_PI;
+	Float_t phi   = momentum.Phi()  *180/M_PI;
+	if(phi<-30) phi+=360;
+	Int_t sector = Int_t ((phi+30)/60);
+	if(sector<0) sector=0;
+	if(sector>5) sector=5;
+	phi -= sector*60;
+	Float_t p = momentum.Mag();
+
 	// ----------------------------------------------------------------------------------------------------------------
 	if (E1>4000 && E1<5000 && torus_current>2240. && torus_current<2260.){
-
-		Float_t theta = momentum.Theta()*180/M_PI;
-		Float_t phi   = momentum.Phi()  *180/M_PI;
-		if(phi<-30) phi+=360;
-		Int_t sector = Int_t ((phi+30)/60);
-		if(sector<0) sector=0;
-		if(sector>5) sector=5;
-		phi -= sector*60;
-		Float_t p = momentum.Mag();
 
 		Float_t parfidl [3];    for(Int_t i=0; i<3; i++){parfidl [i]=0;}
 		Float_t parfidr [3];    for(Int_t i=0; i<3; i++){parfidr [i]=0;}
@@ -672,6 +713,94 @@ bool Fiducial::pFiducialCut(TVector3 momentum){ //Positive Hadron Fiducial Cut
 		bool s6   =(theta<11.4&& sector==5);
 		if( p>=0.6 && p<1.5 && (s1s4||s5||s6) ) status=kFALSE;
 	}
+	// ----------------------------------------------------------------------------------------------------------------
+	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
+
+		bool SCpdcut = true;
+
+		Float_t mom_for = p;              // momentum for forward constraints
+		if (mom_for<0.3) mom_for = 0.3;   // momentum smaller than 300 MeV/c, use 300 MeV/c
+		if (mom_for>1.6) mom_for = 1.6;   // momentum greater than 1.6 GeV/c, use 1.6 GeV/c
+		Float_t mom_bak = p;              // momentum for backward constraints
+		if (mom_bak<0.2) mom_bak = 0.2;   // momentum smaller than 200 MeV/c, use 200 MeV/c
+		if (mom_bak>1.0) mom_bak = 1.0;   // momentum greater than 1.0 GeV/c, use 1.0 GeV/c
+		Float_t theta0 = 8.5;
+		Float_t phi_lower = -24.0;
+		Float_t phi_upper =  24.0;
+		Float_t par_for[4], par_bak[4];
+		for (Int_t i=0; i<4; i++){
+			par_for[i] = 0; par_bak[i] = 0;
+			for (Int_t d=6; d>=0; d--){
+				par_for[i] = par_for[i]*mom_for + fgPar_Pfid_For[sector][i][d];
+				par_bak[i] = par_bak[i]*mom_bak + fgPar_Pfid_Bak[sector][i][d];
+			}
+		}
+		if (phi < 0) {
+			Float_t tmptheta = theta0 - par_for[1]/par_for[0] + par_for[1]/(par_for[0]+phi);
+			status = (theta>tmptheta && tmptheta>=theta0 && phi>=phi_lower);
+		}
+		else {
+			Float_t tmptheta = theta0 - par_for[3]/par_for[2] + par_for[3]/(par_for[2]-phi);
+			status = (theta>tmptheta && tmptheta>=theta0 && phi<=phi_upper);
+		}                     // now the forward constrains are checked
+		if ( status ) {       // now check the backward constrains
+			if(theta>par_bak[0]) status = kFALSE;
+			else if(theta>par_bak[1]) status = (phi-phi_lower)/(theta-par_bak[1])>=(par_bak[2]-phi_lower)/(par_bak[0]-par_bak[1]) && 
+				(phi-phi_upper)/(theta-par_bak[1])<=(par_bak[3]-phi_upper)/(par_bak[0]-par_bak[1]);
+		}
+
+		if(status && SCpdcut){ // cut bad scintillator paddles
+			Int_t tsector = sector + 1;
+			Float_t mom_scpd = p;          // momentum for bad sc paddles cuts
+			if (mom_scpd<0.2)mom_scpd=0.2; // momentum smaller than 200 MeV/c, use 200 MeV/c
+			if(tsector==2){      // sector 2 has one bad paddle
+				Float_t badpar2[2];// 2 parameters to determine the position of the theta gap
+				for (Int_t i=0; i<2; i++){
+					badpar2[i] = 0;
+					for (Int_t d=5; d>=0; d--){
+						badpar2[i] = badpar2[i]*mom_scpd + fgPar_Pfid_ScpdS2[i][d];
+					}                // calculate the parameters using pol5
+				}
+				status = status && !(theta>badpar2[0]&&theta<badpar2[1]);
+			}
+			else if(tsector==3){ // sector 3 has four bad paddles
+				Float_t badpar3[8];// 8 parameters to determine the positions of the theta gaps
+				for (Int_t i=0; i<8; i++){
+					badpar3[i] = 0;
+					for (Int_t d=5; d>=0; d--){
+						badpar3[i] = badpar3[i]*mom_scpd + fgPar_Pfid_ScpdS3[i][d];
+					}                // calculate the parameters using pol5
+				}
+				for (Int_t ipar=0;ipar<4;ipar++){
+					status = status && !(theta>badpar3[2*ipar] && theta<badpar3[2*ipar+1]);
+				}
+			}
+			else if(tsector==4){ // sector 4 has two bad paddles
+				Float_t badpar4[4];// 4 parameters to determine the positions of the theta gaps
+				for (Int_t i=0; i<4; i++){
+					badpar4[i] = 0;
+					for (Int_t d=5; d>=0; d--){
+						badpar4[i] = badpar4[i]*mom_scpd + fgPar_Pfid_ScpdS4[i][d];
+					}                // calculate the parameters using pol5
+				}
+				for (Int_t ipar=0;ipar<2;ipar++){
+					status = status && !(theta>badpar4[2*ipar] && theta<badpar4[2*ipar+1]);
+				}
+			}
+			else if(tsector==5){ // sector 5 has four bad paddles
+				Float_t badpar5[8];// 8 parameters to determine the positions of the theta gaps
+				for (Int_t i=0; i<8; i++){
+					badpar5[i] = 0;
+					for (Int_t d=5; d>=0; d--){
+						badpar5[i] = badpar5[i]*mom_scpd + fgPar_Pfid_ScpdS5[i][d];
+					}                // calculate the parameters using pol5
+				}
+				for (Int_t ipar=0;ipar<4;ipar++){
+					status = status && !(theta>badpar5[2*ipar] && theta<badpar5[2*ipar+1]);
+				}
+			}
+		}
+	}	
 	// ----------------------------------------------------------------------------------------------------------------
 	else{
 		std::cerr << "pFiducialCut doesn't have correction parameters for the given input. Check it and fix it!\n";

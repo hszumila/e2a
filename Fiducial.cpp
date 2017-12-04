@@ -62,9 +62,9 @@ Fiducial::~Fiducial()
 bool Fiducial::e_inFidRegion(TVector3 mom)
 {
 	// Establish the sector;
-        double phi = mom.Phi();
-        if (phi < -M_PI/6.) phi+= 2.*M_PI;
-        int sector = (phi+M_PI/6.)/(M_PI/3.);
+	double phi = mom.Phi();
+	if (phi < -M_PI/6.) phi+= 2.*M_PI;
+	int sector = (phi+M_PI/6.)/(M_PI/3.);
 	double phi_deg = phi * 180./M_PI;
 
 	double theta = mom.Theta();
@@ -72,10 +72,10 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	double mom_e = mom.Mag();
 
 	if ((sector < 0) || (sector > 5))
-        {
-                        std::cerr << "Sector " << sector << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
-                        exit(-3);
-        }
+	{
+		std::cerr << "Sector " << sector << " passed to e_inFidRegion and is out of range. Check it and fix it!\n";
+		exit(-3);
+	}
 
 	// ---------------------------------------------------------------------------
 	// Correction for Ebeam = 4.4GeV and 2250A data.
@@ -89,7 +89,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 		if (mom_e > 3.7) mom_e = 3.7;
 		if (mom_e < 0.9)
 		{
-			std::cerr << "Momentum " << mom_e << " passed to getElectronPhiLimits and is out of range. Check it and fix it!\n";
+			std::cerr << "Momentum " << mom_e << " passed to e_inFidRegion and is out of range. Check it and fix it!\n";
 			exit(-3);
 		}
 
@@ -123,49 +123,48 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	}
 	// ---------------------------------------------------------------------------
 	// Correction for Ebeam = 2.2GeV and 2250A data.
-	
-	/*
-	// Electron fiducial cut, return kTRUE if pass or kFALSE if not
-	Bool_t status = kTRUE;
-	if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
 
+	if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
+		bool status = true;
 		phi_deg -= sector*60;
 		Float_t par[6];               // six parameters to determine the outline of Theta vs Phi
-		for (Int_t i=0; i<6; i++){
+		for (int i=0; i<6; i++){
 			par[i] = 0;
 			// calculate the parameters using pol8
-			for (Int_t d=8; d>=0; d--){par[i] = par[i]*mom + fgPar_2GeV_2250_Efid[sector][i][d];}
+			for (int d=8; d>=0; d--){par[i] = par[i]*mom_e + fgPar_Efid[sector][i][d];}
 		}
 		if (phi_deg < 0) {
-			Float_t tmptheta = par[0] - par[3]/par[2] + par[3]/(par[2]+phi_deg);
+			float tmptheta = par[0] - par[3]/par[2] + par[3]/(par[2]+phi_deg);
 			status = (theta_deg>tmptheta && tmptheta>=par[0] && theta_deg<par[1]);
 		}
 		else {
-			Float_t tmptheta = par[0] - par[5]/par[4] + par[5]/(par[4]-phi_deg);
+			float tmptheta = par[0] - par[5]/par[4] + par[5]/(par[4]-phi_deg);
 			status = (theta_deg>tmptheta && tmptheta>=par[0] && theta_deg<par[1]);
 		}
+		// --------
 		// by now, we have checked if the electron is within the outline of theta vs phi plot
-		if (SCpdcut){  // if the kESCpdCut bit is set, take off the bad SC paddle by strictly cutting off a theta gap.
+		bool SCpdcut = true;
+		if (SCpdcut){  // if the SCpdCut bit is set, take off the bad SC paddle by strictly cutting off a theta gap.
 			if (status){
-				Int_t tsector = sector + 1;
+				int tsector = sector + 1;
 				// sector 3 has two bad paddles
 				if (tsector == 3){
-					Float_t badpar3[4];            // 4 parameters to determine the positions of the two theta gaps
-					for (Int_t i=0; i<4; i++){
+					float badpar3[4];            // 4 parameters to determine the positions of the two theta gaps
+					for (int i=0; i<4; i++){
 						badpar3[i] = 0;
 						// calculate the parameters using pol7
-						for (Int_t d=7; d>=0; d--){badpar3[i] = badpar3[i]*mom + fgPar_2GeV_2250_EfidTheta_S3[i][d];}
+						for (int d=7; d>=0; d--){badpar3[i] = badpar3[i]*mom_e + fgPar_Efid_Theta_S3[i][d];}
 					}
-					for(Int_t ipar=0;ipar<2;ipar++)
+					for(int ipar=0;ipar<2;ipar++)
 						status = status && !(theta_deg>badpar3[2*ipar] && theta_deg<badpar3[2*ipar+1]);
 				}
 				// sector 4 has one bad paddle
 				else if (tsector == 4){
-					Float_t badpar4[2];     // 2 parameters to determine the position of the theta gap
-					for (Int_t i=0; i<2; i++){
+					float badpar4[2];     // 2 parameters to determine the position of the theta gap
+					for (int i=0; i<2; i++){
 						badpar4[i] = 0;
 						// calculate the parameters using pol7
-						for (Int_t d=7; d>=0; d--){badpar4[i] = badpar4[i]*mom + fgPar_2GeV_2250_EfidTheta_S4[i][d];}
+						for (int d=7; d>=0; d--){badpar4[i] = badpar4[i]*mom_e + fgPar_Efid_Theta_S4[i][d];}
 					}
 					status = !(theta_deg>badpar4[0] && theta_deg<badpar4[1]);
 				}
@@ -175,21 +174,22 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 					for (Int_t i=0; i<8; i++){
 						badpar5[i] = 0;
 						// calculate the parameters using pol7
-						for (Int_t d=7; d>=0; d--){badpar5[i] = badpar5[i]*mom + fgPar_2GeV_2250_EfidTheta_S5[i][d];}
+						for (Int_t d=7; d>=0; d--){badpar5[i] = badpar5[i]*mom_e + fgPar_Efid_Theta_S5[i][d];}
 					}
-					if (mom<1.25) badpar5[0] = 23.4;
-					if (mom<1.27) badpar5[1] = 24.0; // some dummy constants. see fiducial cuts webpage.
+					if (mom_e<1.25) badpar5[0] = 23.4;
+					if (mom_e<1.27) badpar5[1] = 24.0; // some dummy constants. see fiducial cuts webpage.
 					for(Int_t ipar=0;ipar<4;ipar++)
 						status = status && !(theta_deg>badpar5[2*ipar] && theta_deg<badpar5[2*ipar+1]);
 				}
 			}
 		}
+
+		return status;
 	}
-	return status;
-	*/
+
 	// ---------------------------------------------------------------------------
 	else {
-		std::cerr << "getElectronPhiLimits doesn't have correction parameters for the given input. Check it and fix it!\n";
+		std::cerr << "e_inFidRegion doesn't have correction parameters for the given input. Check it and fix it!\n";
 		exit(-3);
 	}
 }
@@ -228,38 +228,75 @@ bool Fiducial::read_e_fid_params()
 	char param_file_name[256];
 	sprintf(param_file_name,"%s/.e2a/FCP_%d_%d.dat",homedir.c_str(),E1,torus_current);
 	std::ifstream param_file(param_file_name);
-	int param_type, sector;
-	double data[6];
-	while ( param_file >> param_type )
-	{
-		param_file >> sector >> data[0] >> data[1] >> data[2] >> data[3] >> data[4] >> data[5];
 
-		// Test the type of parameter and assign it to the proper data array
-		switch (param_type)
+	if (E1==4461){
+		int param_type, sector;
+		double data[6];
+		while ( param_file >> param_type )
 		{
-			case  0:
-				for(int k=0; k<2; k++) fgPar_Efid_t0_p[sector-1][k] = data[k];
-				break;
-			case  1:
-				for(int k=0; k<6; k++) fgPar_Efid_t1_p[sector-1][k] = data[k];
-				break;
-			case 10:
-				for(int k=0; k<6; k++) fgPar_Efid_b_p[sector-1][0][k] = data[k];
-				break;
-			case 11:
-				for(int k=0; k<6; k++) fgPar_Efid_b_p[sector-1][1][k] = data[k];
-				break;
-			case 20:
-				for(int k=0; k<6; k++) fgPar_Efid_a_p[sector-1][0][k] = data[k];
-				break;
-			case 21:
-				for(int k=0; k<6; k++) fgPar_Efid_a_p[sector-1][1][k] = data[k];
-				break;
-			default:
-				printf("Error in Efid parameter file!\nReceived parameter type %d, which is not found.\nAborting!\n\n\n",param_type);
-				exit(-1);
+			param_file >> sector >> data[0] >> data[1] >> data[2] >> data[3] >> data[4] >> data[5];
+
+			// Test the type of parameter and assign it to the proper data array
+			switch (param_type)
+			{
+				case  0:
+					for(int k=0; k<2; k++) fgPar_Efid_t0_p[sector-1][k] = data[k];
+					break;
+				case  1:
+					for(int k=0; k<6; k++) fgPar_Efid_t1_p[sector-1][k] = data[k];
+					break;
+				case 10:
+					for(int k=0; k<6; k++) fgPar_Efid_b_p[sector-1][0][k] = data[k];
+					break;
+				case 11:
+					for(int k=0; k<6; k++) fgPar_Efid_b_p[sector-1][1][k] = data[k];
+					break;
+				case 20:
+					for(int k=0; k<6; k++) fgPar_Efid_a_p[sector-1][0][k] = data[k];
+					break;
+				case 21:
+					for(int k=0; k<6; k++) fgPar_Efid_a_p[sector-1][1][k] = data[k];
+					break;
+				default:
+					printf("Error in Efid parameter file!\nReceived parameter type %d, which is not found.\nAborting!\n\n\n",param_type);
+					exit(-1);
+			}
+		} // Done reading in Fiducial Region Parameters
+	}
+	// -----------------------------------------------------
+	else if (E1==2261){
+		for(int i = 0 ; i < 6 ; i++){
+			for(int j = 0 ; j < 6 ; j++){
+				for(int k = 0 ; k < 9 ; k++){
+					param_file >> fgPar_Efid[i][j][k];
+				}
+			}
 		}
-	} // Done reading in Fiducial Region Parameters
+		// ---
+		for(int i = 0 ; i < 4 ; i++){
+			for(int j = 0 ; j < 8 ; j++){
+				param_file >> fgPar_Efid_Theta_S3[i][j];
+			}
+		}
+		// ---
+		for(int i = 0 ; i < 2 ; i++){
+			for(int j = 0 ; j < 8 ; j++){
+				param_file >> fgPar_Efid_Theta_S4[i][j];
+			}
+		}
+		// ---
+		for(int i = 0 ; i < 8 ; i++){
+			for(int j = 0 ; j < 8 ; j++){
+				param_file >> fgPar_Efid_Theta_S5[i][j];
+			}
+		}
+	}	
+	// -----------------------------------------------------
+	else{
+		std::cerr << "File " << param_file_name << " called by Fiducial::read_e_fid_params() does not exist. Check it and fix it!\n";
+		exit(-2);
+	}
+
 	param_file.close();
 
 	return true;
@@ -421,11 +458,11 @@ bool Fiducial::in_e_EoverP(double EoverP, double mom, double cut_sigma)
 	}
 	else if(E1==2261){
 		min_el_mom = 0.55; //GeV
-        	max_el_mom = 2.10; //GeV
+		max_el_mom = 2.10; //GeV
 	}
 	else{
 		std::cerr << "Fiducial::in_e_EoverP does not have parameters for this beam energy. Check it and fix it!\n";
-                exit(-2);
+		exit(-2);
 	}
 
 	if (mom < min_el_mom)	return false;

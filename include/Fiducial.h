@@ -37,11 +37,14 @@ class Fiducial
 		bool read_vz_cor_params();
 
 		// Fiducial Cut Data
-		double fgPar_Efid_t0_p[6][2];
-		double fgPar_Efid_t1_p[6][6];
-		double fgPar_Efid_b_p[6][2][6];
-		double fgPar_Efid_a_p[6][2][6];
-
+		double fgPar_Efid_t0_p [6][2];
+		double fgPar_Efid_t1_p [6][6];
+		double fgPar_Efid_b_p  [6][2][6];
+		double fgPar_Efid_a_p  [6][2][6];
+		double fgPar_Efid      [6][6][9];
+		double fgPar_Efid_Theta_S3[4][8];
+		double fgPar_Efid_Theta_S4[2][8];
+		double fgPar_Efid_Theta_S5[8][8];
 		// Momentum Correction Data
 		double fgPar_Phi[6][3];
 		double fgPar_Theta[6][4];

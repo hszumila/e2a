@@ -312,6 +312,7 @@ int main(int argc, char ** argv)
 		else {cout << "Something is wrong with the definition of sectors" << endl;}
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for positive particles
+		/*
 		nProtons=0;      
 		for (int i=1 ; i<gPart ; i++)
 		{
@@ -376,6 +377,7 @@ int main(int argc, char ** argv)
 				// --------------------------------------------------------------------
 			}
 		}
+		*/
 
 		// --------------------------------------------------------------------------------------------------
 		// Prep the output tree

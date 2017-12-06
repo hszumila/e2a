@@ -26,6 +26,9 @@ const double max_Z =  15.;
 const double pos_z_cut_min = -2;
 const double pos_z_cut_max =  2;
 
+// Parameters for 2GeV data cuts
+const double sc_cc_dt_cut_sect[6]={-2,-5,-8,-8,-2,2};
+
 int main(int argc, char ** argv)
 {
 	if (argc != 3)
@@ -119,18 +122,20 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_p_E0     = new TH2D("hist_e_p_E0"     ,"e- before  cuts;p [GeV];E;Counts"                     ,100,   0.,  5.,100, 0.,2.);
 	TH2D * hist_e_p_E      = new TH2D("hist_e_p_E"      ,"e- passing cuts;p [GeV];E;Counts"                     ,100,   0.,  5.,100, 0.,2.);
 	// ---
-	TH1D * hist_e_vz_sec10 = new TH1D("hist_e_vz_sec10" ,"e- passing cuts, before vtx corr, sector 1;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec1  = new TH1D("hist_e_vz_sec1"  ,"e- passing cuts,  after vtx corr, sector 1;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec20 = new TH1D("hist_e_vz_sec20" ,"e- passing cuts, before vtx corr, sector 2;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec2  = new TH1D("hist_e_vz_sec2"  ,"e- passing cuts,  after vtx corr, sector 2;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec30 = new TH1D("hist_e_vz_sec30" ,"e- passing cuts, before vtx corr, sector 3;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec3  = new TH1D("hist_e_vz_sec3"  ,"e- passing cuts,  after vtx corr, sector 3;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec40 = new TH1D("hist_e_vz_sec40" ,"e- passing cuts, before vtx corr, sector 4;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec4  = new TH1D("hist_e_vz_sec4"  ,"e- passing cuts,  after vtx corr, sector 4;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec50 = new TH1D("hist_e_vz_sec50" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec5  = new TH1D("hist_e_vz_sec5"  ,"e- passing cuts,  after vtx corr, sector 5;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec60 = new TH1D("hist_e_vz_sec60" ,"e- passing cuts, before vtx corr, sector 6;electron vz [cm]; Counts"    ,100, -10., 10.);
-	TH1D * hist_e_vz_sec6  = new TH1D("hist_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts"    ,100, -10., 10.);
+	TH1D * hist_e_vz_sec10 = new TH1D("hist_e_vz_sec10" ,"e- passing cuts, before vtx corr, sector 1;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec1  = new TH1D("hist_e_vz_sec1"  ,"e- passing cuts,  after vtx corr, sector 1;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec20 = new TH1D("hist_e_vz_sec20" ,"e- passing cuts, before vtx corr, sector 2;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec2  = new TH1D("hist_e_vz_sec2"  ,"e- passing cuts,  after vtx corr, sector 2;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec30 = new TH1D("hist_e_vz_sec30" ,"e- passing cuts, before vtx corr, sector 3;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec3  = new TH1D("hist_e_vz_sec3"  ,"e- passing cuts,  after vtx corr, sector 3;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec40 = new TH1D("hist_e_vz_sec40" ,"e- passing cuts, before vtx corr, sector 4;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec4  = new TH1D("hist_e_vz_sec4"  ,"e- passing cuts,  after vtx corr, sector 4;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec50 = new TH1D("hist_e_vz_sec50" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec5  = new TH1D("hist_e_vz_sec5"  ,"e- passing cuts,  after vtx corr, sector 5;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec60 = new TH1D("hist_e_vz_sec60" ,"e- passing cuts, before vtx corr, sector 6;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz_sec6  = new TH1D("hist_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts" ,100, -10., 10.);
+	TH1D * hist_e_vz0      = new TH1D("hist_e_vz0"      ,"e- passing cuts, before vtx corr;electron vz [cm]; Counts"           ,100, -10., 10.);
+	TH1D * hist_e_vz       = new TH1D("hist_e_vz"       ,"e- passing cuts,  after vtx corr;electron vz [cm]; Counts"           ,100, -10., 10.);
 	TH2D * hist_e_phiVz0   = new TH2D("hist_e_phiVz0"   ,"e- passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
 	TH2D * hist_e_phiVz    = new TH2D("hist_e_phiVz"    ,"e- passing cuts,  after vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
 	TH2D * hist_e_thetaVz0 = new TH2D("hist_e_thetaVz0" ,"e- passing cuts, before vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 60.,100,-11,11);
@@ -167,6 +172,7 @@ int main(int argc, char ** argv)
 	TH2D * hist_pip_pBeta    = new TH2D("hist_pip_pBeta"    ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"                ,100,   0.,  4.,500, 0.,1.3);
 	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"               ,100,  -7.,  7.,100, 0., 5.);
 	// ---------------------------------------
+	// Setting up output tree and branches
 	TTree * outtree = new TTree("T","Skimmed tree");
 	double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
 	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
@@ -175,10 +181,25 @@ int main(int argc, char ** argv)
 	TVector3 e_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
 
+	int nParticles;
 	int nProtons;
-	outtree->Branch("e_vz",&e_vz,"e_vz/D");
-	outtree->Branch("e_mom",e_mom,"e_mom[3]/D");
-	outtree->Branch("nProtons",&nProtons,"nProtons/I");
+	int Part_type   [20];
+	double vtx_z_unc[20];
+	double vtx_z    [20];
+	double mom_x    [20];
+	double mom_y    [20];
+	double mom_z    [20];
+
+	outtree->Branch("nParticles", &nParticles, "nParticles/I"           );
+	outtree->Branch("nProtons"  , &nProtons  , "nProtons/I"             );
+	outtree->Branch("Part_type" , &Part_type , "Part_type[nParticles]/I"); // 0 = electron, 1 = proton
+	outtree->Branch("e_vz"      , &e_vz      , "e_vz/D"                 );
+	outtree->Branch("vtx_z_unc" , &vtx_z_unc , "vtx_z_unc[nParticles]/D");
+	outtree->Branch("vtx_z"     , &vtx_z     , "vtx_z[nParticles]/D"    );
+	//outtree->Branch("e_mom"     , e_mom      , "e_mom[3]/D"             );
+	outtree->Branch("mom_x"     , &mom_x     , "mom_x[nParticles]/D"    );
+	outtree->Branch("mom_y"     , &mom_y     , "mom_y[nParticles]/D"    );
+	outtree->Branch("mom_z"     , &mom_z     , "mom_z[nParticles]/D"    );
 	// --------------------------------------------------------------------------------------------------
 	// Obtaining run number and other important parameters
 	t->GetEvent(0);
@@ -187,7 +208,7 @@ int main(int argc, char ** argv)
 
 	char param_file_name[256];
 	string homedir = string(getenv("HOME"));
-        sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
+	sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
 	ifstream run_table;
 	run_table.open(param_file_name);
 	do{
@@ -203,10 +224,10 @@ int main(int argc, char ** argv)
 	cout << "Torus  = " << tab_torus << endl;
 	cout << "Mini   = " << tab_mini  << endl;
 	cout << "Target = " << tab_targ  << endl;
-	
-        Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
-        Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
-	
+
+	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
+	Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
+
 	// Values for some cuts
 	if      (tab_E1 == 4461){
 		EC_in_cut = 0.055; //GeV (Values for Energy deposited in EC inner layer cut)
@@ -229,6 +250,8 @@ int main(int argc, char ** argv)
 		t->GetEvent(event);
 
 		if (gPart <= 0) continue; // Ignore events that have no particle candidates
+		
+		nParticles = 0;
 
 		// --------------------------------------------------------------------------------------------------
 		// Sector index for electrons
@@ -262,16 +285,23 @@ int main(int argc, char ** argv)
 					(StatCC[0] > 0) && 		// CC status is good for the electron candidate
 					(StatSC[0] > 0) && 		// SC status is good for the electron candidate
 					(charge[0] < 0) && 		// Electron candidate curvature direction is negative
-					(EC_in [0] > EC_in_cut) && 	// Electron candidate has enough energy deposit in inner layer of EC 
-									// (Helps separate electrons from MIPs such as pions)
+					(EC_in [0] > EC_in_cut) && 	// Electron candidate has enough energy deposit in inner layer of EC 	
 					(el_cand_EC > el_EC_cut) && 	// Enough total energy in the EC
 					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) &&	// Electron PID (E/p)
 					(e_vz_corrected > min_Z) && 	// Vertex is within the target region
 					(e_vz_corrected < max_Z)
 		     ))
-		{
-			continue;
-		}
+		{continue;}
+
+		// ---------------------------------------------------------------------------------------
+		// Additional cut for 2GeV data:
+		//double el_sccc_dt = SC_Time[0] - CC_Time[0] - (sc_r[0] - cc_r[0])/(c*ns_to_s);
+		if((tab_E1==2261)&&(
+					//cc_c2[0]>=0.1 ||
+					//el_sccc_dt < sc_cc_dt_cut_sect[e_sect]  ||
+					sqrt(mom[0]*mom[0]+me*me)>tab_E1/1000.
+				   ))
+		{continue;}		
 
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
@@ -283,10 +313,19 @@ int main(int argc, char ** argv)
 		if(!fid_params.CutUVW(e_ec_xyz)) continue; //u>60, v<360, w<400;
 		hist_e_xyEC_hit  -> Fill(EC_X[0],EC_Y[0]);
 		// ---------------------------------------------------------------------------------------
+		// If the event made it here, the electron passed all fiducial and PID cuts
+		nParticles++;
+		Part_type[0] = 0;
 
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
 		if (180./M_PI*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
 		else 				    T3_e_mom_cor = T3_e_mom;
+
+		mom_x    [0] = T3_e_mom_cor.X();
+		mom_y    [0] = T3_e_mom_cor.Y();
+		mom_z    [0] = T3_e_mom_cor.Z();
+		vtx_z_unc[0] = targetZ[0];
+		vtx_z    [0] = e_vz_corrected;
 
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
@@ -298,12 +337,13 @@ int main(int argc, char ** argv)
 		hist_e_p_Etot   -> Fill(mom[0],EC_tot[0]/mom[0]);
 		hist_e_p_E      -> Fill(mom[0],el_cand_EC);
 		hist_e_Nphe     -> Fill(Nphe[0]);
-		hist_e_phiTheta -> Fill(phi[0],theta[0]);
-		hist_e_phiVz0   -> Fill(phi[0],targetZ[0]);
-		hist_e_phiVz    -> Fill(phi[0],e_vz_corrected);
-		hist_e_thetaVz0 -> Fill(theta[0],targetZ[0]);
-		hist_e_thetaVz  -> Fill(theta[0],e_vz_corrected);
-
+		hist_e_phiTheta -> Fill(phi    [0],theta  [0]     );
+		hist_e_phiVz0   -> Fill(phi    [0],targetZ[0]     );
+		hist_e_phiVz    -> Fill(phi    [0],e_vz_corrected );
+		hist_e_thetaVz0 -> Fill(theta  [0],targetZ[0]     );
+		hist_e_thetaVz  -> Fill(theta  [0],e_vz_corrected );
+		hist_e_vz0      -> Fill(targetZ[0]                );
+		hist_e_vz       -> Fill(e_vz_corrected            );
 		if      (e_sect==0) {hist_e_vz_sec10 -> Fill(targetZ[0]);	hist_e_vz_sec1 -> Fill(e_vz_corrected);}
 		else if (e_sect==1) {hist_e_vz_sec20 -> Fill(targetZ[0]);	hist_e_vz_sec2 -> Fill(e_vz_corrected);}
 		else if (e_sect==2) {hist_e_vz_sec30 -> Fill(targetZ[0]);	hist_e_vz_sec3 -> Fill(e_vz_corrected);}
@@ -323,61 +363,72 @@ int main(int argc, char ** argv)
 			// And then need to cut based on the vtx difference with respect to electron vtx
 
 			// Test if positive particle
-			if( (StatSC[i] > 0) && 				// SC status is good for the proton candidate
+			if(             (StatSC[i] > 0) && 		// SC status is good for the proton candidate
 					(StatDC[i] > 0) &&              // DC status is good for the proton candidate
-					(Stat[i] > 0 )  &&		// Global status is good for the proton candidate
+					(Stat  [i] > 0) &&		// Global status is good for the proton candidate
 					(charge[i] > 0) 		// Charge is positive
 			  )
 			{
 				hist_p_phiTheta0 -> Fill(phi[i],theta[i]);
-				
+
 				// Passing positive hadron fiducial cuts
 				if(fid_params.pFiducialCut(T3_p_mom)){
-				// Positive particle vertex (_z) correction
-				p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
+					// Positive particle vertex (_z) correction
+					p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
-				hist_p_mass      -> Fill(mass[i]);
-				hist_p_pMass     -> Fill(mom [i],mass[i]);
-				hist_pos_pBeta     -> Fill(mom[i],beta [i]);
+					hist_p_mass      -> Fill(mass[i]);
+					hist_p_pMass     -> Fill(mom [i],mass[i]);
+					hist_pos_pBeta   -> Fill(mom[i],beta [i]);
 
-				// --------------------------------------------------------------------
-				// Look specifically for protons
-				double beta_assuming_proton = mom[i]/sqrt(mom[i]*mom[i] + mP*mP);
-				double p_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_proton * c_cm_ns);
-				double delta_t = p_t0 - e_t0;
-				if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
-						(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
-				  ){
-					nProtons++;	
-					hist_p_deltaTmom -> Fill(delta_t,mom [i]);
-					hist_p_phiTheta  -> Fill(phi[i],theta[i]);
+					// --------------------------------------------------------------------
+					// Look specifically for protons
+					double beta_assuming_proton = mom[i]/sqrt(mom[i]*mom[i] + mP*mP);
+					double p_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_proton * c_cm_ns);
+					double delta_t = p_t0 - e_t0;
+					if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
+							(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
+					  ){
+						nParticles++;
+						nProtons++;	
+						Part_type[i] = 1;
+	
+						hist_p_deltaTmom -> Fill(delta_t,mom [i]);
+						hist_p_phiTheta  -> Fill(phi[i],theta[i]);
+					
+						if(	(NRun>=18338)&&(NRun<=18438)&&
+								run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
+						{
+							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
+						}	
+						else{p_mom_corrected=mom[i];}
+						
+						mom_x    [i] = T3_p_mom.X();
+                				mom_y    [i] = T3_p_mom.Y();
+                				mom_z    [i] = T3_p_mom.Z();
+						vtx_z_unc[i] = targetZ  [i];	
 
-					if(	(NRun>=18338)&&(NRun<=18438)&&
-							run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1){
-						p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);}	
-					else{p_mom_corrected=mom[i];}
+						hist_p_vzVzCor  -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
+						hist_p_p_momCor -> Fill(mom    [i],mom [i]-p_mom_corrected  );
+						hist_p_phiVz0   -> Fill(phi    [i],targetZ[i]               );
+						hist_p_phiVz    -> Fill(phi    [i],p_vz_corrected           );
+						hist_p_thetaVz0 -> Fill(theta  [i],targetZ[i]               );
+						hist_p_thetaVz  -> Fill(theta  [i],p_vz_corrected           );
+						hist_p_pBeta    -> Fill(mom    [i],beta [i]                 );
+					}
+					// --------------------------------------------------------------------
+					// Look specifically for pions +
+					double beta_assuming_pion = mom[i]/sqrt(mom[i]*mom[i] + mpc*mpc);
+					double pic_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_pion * c_cm_ns);
+					double pic_delta_t = pic_t0 - e_t0;
+					if((id_guess[i] == 211 ) &&       // Guess at the particle ID is good for the pion candidate
+							(fid_params.in_p_deltaT(pic_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID (delta T vs p)
+					  ){
+						hist_pip_pBeta     -> Fill(mom[i]     ,beta [i]);
+						hist_pip_deltaTmom -> Fill(pic_delta_t,mom  [i]);
 
-					hist_p_vzVzCor  -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
-					hist_p_p_momCor -> Fill(mom    [i],mom [i]-p_mom_corrected  );
-					hist_p_phiVz0   -> Fill(phi    [i],targetZ[i]               );
-					hist_p_phiVz    -> Fill(phi    [i],p_vz_corrected           );
-					hist_p_thetaVz0 -> Fill(theta  [i],targetZ[i]               );
-					hist_p_thetaVz  -> Fill(theta  [i],p_vz_corrected           );
-					hist_p_pBeta    -> Fill(mom    [i],beta [i]                 );
-				}
-				// --------------------------------------------------------------------
-				// Look specifically for pions
-				double beta_assuming_pion = mom[i]/sqrt(mom[i]*mom[i] + mpc*mpc);
-				double pic_t0 = SC_Time[i] - SC_Path[i]/(beta_assuming_pion * c_cm_ns);
-				double pic_delta_t = pic_t0 - e_t0;
-				if((id_guess[i] == 211 ) &&       // Guess at the particle ID is good for the pion candidate
-						(fid_params.in_p_deltaT(pic_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID (delta T vs p)
-				  ){
-					hist_pip_pBeta     -> Fill(mom[i]     ,beta [i]);
-					hist_pip_deltaTmom -> Fill(pic_delta_t,mom  [i]);
+					}
 
-				}
-				// --------------------------------------------------------------------
+					// --------------------------------------------------------------------
 				}
 			}
 		}
@@ -414,6 +465,8 @@ int main(int argc, char ** argv)
 	hist_e_Nphe         ->Write();
 	hist_e_phiTheta0    ->Write();
 	hist_e_phiTheta     ->Write();
+	hist_e_vz0          ->Write();
+	hist_e_vz           ->Write();
 	hist_e_vz_sec10     ->Write();
 	hist_e_vz_sec1      ->Write();
 	hist_e_vz_sec20     ->Write();
@@ -445,7 +498,7 @@ int main(int argc, char ** argv)
 	hist_p_thetaVz      ->Write();
 	hist_p_deltaTmom    ->Write();
 	hist_p_phiTheta0    ->Write();
-        hist_p_phiTheta     ->Write();
+	hist_p_phiTheta     ->Write();
 	// ---
 	hist_pip_deltaTmom  ->Write();
 

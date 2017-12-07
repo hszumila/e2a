@@ -6,6 +6,7 @@ const double mP = 0.938272;
 const double mpc= 0.139570;
 const double mp0= 0.134977;
 const double c_cm_ns = 29.9792458;
+const double c_m_s   = 2.99792E+10;
 const double ns_to_s = 1.0E-09;
 
 #endif

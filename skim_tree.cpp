@@ -56,10 +56,11 @@ int main(int argc, char ** argv)
 	int gPart, CCPart, DCPart, ECPart, SCPart, NRun;
 	int StatDC[maxPart], StatCC[maxPart], StatEC[maxPart], StatSC[maxPart], id_guess[maxPart];
 	float Xb, STT, Q2, W, Nu, Yb;
-	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart], SC_Time[maxPart],
-	      SC_Path[maxPart], charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
+	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart],
+	      SC_Time[maxPart], SC_Path[maxPart], CC_Time[maxPart], CC_Path[maxPart],
+	      charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
-	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart];
+	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart], CC_Chi2[maxPart];
 	t->SetBranchAddress("NRun"     ,&NRun   ); // Run number
 	t->SetBranchAddress("gPart"    ,&gPart  ); // Number of particles observed (globally) in the event
 	t->SetBranchAddress("CCPart"   ,&CCPart ); // Number of particles observed in the Cherenkovs
@@ -78,6 +79,8 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("Nphe"     ,Nphe    ); // Number of photo-electrons per hit in the Cherenkov detectors
 	t->SetBranchAddress("SC_Time"  ,SC_Time ); // Time in the scintillators per particle
 	t->SetBranchAddress("SC_Path"  ,SC_Path ); // Path Length per particle
+	t->SetBranchAddress("CC_Time"  ,CC_Time ); // Time in the cherenkov per particle
+        t->SetBranchAddress("CC_Path"  ,CC_Path ); // Path Length per particle
 	t->SetBranchAddress("Charge"   ,charge  ); // Charge per particle
 	t->SetBranchAddress("Beta"     ,beta    ); // Beta per particle
 	t->SetBranchAddress("Mass"     ,mass    ); // Mass per particle
@@ -93,6 +96,7 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("EC_X"     ,&EC_X   ); // x positions of hit in the calorimeter
 	t->SetBranchAddress("EC_Y"     ,&EC_Y   ); // y positions of hit in the calorimeter
 	t->SetBranchAddress("EC_Z"     ,&EC_Z   ); // z positions of hit in the calorimeter
+	t->SetBranchAddress("CC_Chi2"  ,&CC_Chi2); // angle between CC hit and nearest SC hit (in rad)
 	//t->SetBranchAddress("BjorkenX" ,&Xb     ); // Bjorken X
 	//t->SetBranchAddress("Q2"       ,&Q2     ); // Momentum transfer
 	//t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
@@ -250,7 +254,7 @@ int main(int argc, char ** argv)
 		t->GetEvent(event);
 
 		if (gPart <= 0) continue; // Ignore events that have no particle candidates
-		
+
 		nParticles = 0;
 
 		// --------------------------------------------------------------------------------------------------
@@ -295,10 +299,10 @@ int main(int argc, char ** argv)
 
 		// ---------------------------------------------------------------------------------------
 		// Additional cut for 2GeV data:
-		//double el_sccc_dt = SC_Time[0] - CC_Time[0] - (sc_r[0] - cc_r[0])/(c*ns_to_s);
+		double el_sccc_dt = SC_Time[0] - CC_Time[0] - (SC_Path[0] - CC_Path[0])/(c_m_s*ns_to_s*100.);
 		if((tab_E1==2261)&&(
-					//cc_c2[0]>=0.1 ||
-					//el_sccc_dt < sc_cc_dt_cut_sect[e_sect]  ||
+					CC_Chi2[0]>=0.1 ||
+					el_sccc_dt < sc_cc_dt_cut_sect[e_sect]  ||
 					sqrt(mom[0]*mom[0]+me*me)>tab_E1/1000.
 				   ))
 		{continue;}		
@@ -329,21 +333,21 @@ int main(int argc, char ** argv)
 
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
+		hist_e_Nphe     -> Fill(Nphe[0]);
 		hist_e_thetaMom -> Fill(theta[0],mom[0]);
 		hist_e_xQ2      -> Fill(Xb,Q2);
 		hist_e_momMomCor-> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()-T3_e_mom.Mag());
 		hist_e_vzVzCor  -> Fill(targetZ[0],e_vz_corrected-targetZ[0]);
 		hist_e_Ein_Eout -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
-		hist_e_p_Etot   -> Fill(mom[0],EC_tot[0]/mom[0]);
-		hist_e_p_E      -> Fill(mom[0],el_cand_EC);
-		hist_e_Nphe     -> Fill(Nphe[0]);
-		hist_e_phiTheta -> Fill(phi    [0],theta  [0]     );
-		hist_e_phiVz0   -> Fill(phi    [0],targetZ[0]     );
-		hist_e_phiVz    -> Fill(phi    [0],e_vz_corrected );
-		hist_e_thetaVz0 -> Fill(theta  [0],targetZ[0]     );
-		hist_e_thetaVz  -> Fill(theta  [0],e_vz_corrected );
-		hist_e_vz0      -> Fill(targetZ[0]                );
-		hist_e_vz       -> Fill(e_vz_corrected            );
+		hist_e_p_Etot   -> Fill(mom    [0],EC_tot[0]/mom[0]);
+		hist_e_p_E      -> Fill(mom    [0],el_cand_EC      );
+		hist_e_phiTheta -> Fill(phi    [0],theta  [0]      );
+		hist_e_phiVz0   -> Fill(phi    [0],targetZ[0]      );
+		hist_e_phiVz    -> Fill(phi    [0],e_vz_corrected  );
+		hist_e_thetaVz0 -> Fill(theta  [0],targetZ[0]      );
+		hist_e_thetaVz  -> Fill(theta  [0],e_vz_corrected  );
+		hist_e_vz0      -> Fill(targetZ[0]                 );
+		hist_e_vz       -> Fill(e_vz_corrected             );
 		if      (e_sect==0) {hist_e_vz_sec10 -> Fill(targetZ[0]);	hist_e_vz_sec1 -> Fill(e_vz_corrected);}
 		else if (e_sect==1) {hist_e_vz_sec20 -> Fill(targetZ[0]);	hist_e_vz_sec2 -> Fill(e_vz_corrected);}
 		else if (e_sect==2) {hist_e_vz_sec30 -> Fill(targetZ[0]);	hist_e_vz_sec3 -> Fill(e_vz_corrected);}
@@ -363,9 +367,9 @@ int main(int argc, char ** argv)
 			// And then need to cut based on the vtx difference with respect to electron vtx
 
 			// Test if positive particle
-			if(             (StatSC[i] > 0) && 		// SC status is good for the proton candidate
-					(StatDC[i] > 0) &&              // DC status is good for the proton candidate
-					(Stat  [i] > 0) &&		// Global status is good for the proton candidate
+			if(             (StatSC[i] > 0) && 		// SC status is good for the positive candidate
+					(StatDC[i] > 0) &&              // DC status is good for the positive candidate
+					(Stat  [i] > 0) &&		// Global status is good for the positive candidate
 					(charge[i] > 0) 		// Charge is positive
 			  )
 			{
@@ -391,20 +395,21 @@ int main(int argc, char ** argv)
 						nParticles++;
 						nProtons++;	
 						Part_type[i] = 1;
-	
+
 						hist_p_deltaTmom -> Fill(delta_t,mom [i]);
 						hist_p_phiTheta  -> Fill(phi[i],theta[i]);
-					
-						if(	(NRun>=18338)&&(NRun<=18438)&&
+
+						if(	        (NRun>=18338)&&(NRun<=18438)&&			// Relevant run numbers
+								((tab_targ=="4He")||(tab_targ=="3He")) &&	// Relevant targets
 								run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
 						{
 							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
 						}	
 						else{p_mom_corrected=mom[i];}
-						
+
 						mom_x    [i] = T3_p_mom.X();
-                				mom_y    [i] = T3_p_mom.Y();
-                				mom_z    [i] = T3_p_mom.Z();
+						mom_y    [i] = T3_p_mom.Y();
+						mom_z    [i] = T3_p_mom.Z();
 						vtx_z_unc[i] = targetZ  [i];	
 
 						hist_p_vzVzCor  -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);

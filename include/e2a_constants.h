@@ -1,6 +1,7 @@
 #ifndef __E2A_CONSTANTS_H__
 #define __E2A_CONSTANTS_H__
 
+const double c_m_s   = 2.99792E+10;
 const double me = 0.000510998;
 const double mP = 0.938272;
 const double mpc= 0.139570;

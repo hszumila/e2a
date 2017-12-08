@@ -46,7 +46,7 @@ class Fiducial
 		double fgPar_Efid_Theta_S4[2][8];
 		double fgPar_Efid_Theta_S5[8][8];
 		// Momentum Correction Data
-		double fgPar_Phi[6][3];
+		double fgPar_Phi  [6][3];
 		double fgPar_Theta[6][4];
 
 		// Hadron Correction Data

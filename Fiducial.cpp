@@ -374,7 +374,7 @@ bool Fiducial::read_vz_cor_params()
 
 	// Put the root global file pointer back to where it was. I hate ROOT. (me too) 
 	cal_file->Close();
-	gFile = old_gfile;
+	gFile = old_gfile;	
 
 	// Test that the histograms were pulled successfully
 	if (!vz_corr_func)
@@ -389,7 +389,7 @@ bool Fiducial::read_e_pcor_params()
 	char param_file_name[256];
 	sprintf(param_file_name,"%s/.e2a/EMCP_%d_%d.dat",homedir.c_str(),E1,torus_current);
 	std::ifstream param_file(param_file_name);
-	param_file.open(param_file_name);
+
 	int param_type, sector;
 	double data[6];
 	int cj;
@@ -412,6 +412,7 @@ bool Fiducial::read_e_pcor_params()
 		}
 	} // Done reading in momentum correction parameters
 	param_file.close();
+
 	// NOTE: corrections for electron momentum obtained with e1c 2.5Gev 2250A data set (Run 16719 and 16720)
 	return true;
 }

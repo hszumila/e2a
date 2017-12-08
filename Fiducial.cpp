@@ -83,7 +83,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 
 		double phiMin, phiMax;
 		// Sanitize theta
-		if (theta_deg < 16.)return false;
+		if (theta_deg < 15.)return false;
 
 		// Sanitize momentum
 		if (mom_e > 3.7) mom_e = 3.7;
@@ -524,7 +524,6 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 {
 	// Electron Momentum correction, Pass the electron 3 vector, return corrected 3 vector pointer.
 	// Check out "http://nuclear.unh.edu/~maurik/Personal/E2Root/html/TE2AnaTool.html"
-
 	TVector3      V3ecor(V3el);
 	Float_t p   = V3el.Mag();
 	Float_t cz  = V3el.CosTheta();
@@ -563,6 +562,7 @@ TVector3 Fiducial::eMomentumCorrection(TVector3 V3el)
 	}
 	// -----------------------------------------------------------------------
 	if(p!=0.) V3el.SetMag(p);
+	V3ecor = V3el;
 	return V3ecor;
 }
 // ===================================================================================================================================

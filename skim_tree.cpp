@@ -299,74 +299,73 @@ int main(int argc, char ** argv)
 		int e_sect = (int)(phi[0]+30)/60;
 		if (e_sect>5) e_sect = 5;
 		if (e_sect<0) e_sect = 0;
+
 		// --------------------------------------------------------------------------------------------------
-		// Here's where we do electron fiducial cuts
-
-		// Define the electron candidate energy in the EC
-		double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]);
-
-		// Electron momentum expressed in a TVector3
-		T3_e_mom.SetXYZ(px[0],py[0],pz[0]);		
-
+		double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]); // Define the electron candidate energy in the EC
+		T3_e_mom.SetXYZ(px[0],py[0],pz[0]); // Electron momentum expressed in a TVector3
 		e_vz_corrected = targetZ[0]+fid_params.vz_corr(T3_e_mom);
 		e_ec_xyz.SetXYZ(EC_X[0],EC_Y[0],EC_Z[0]);
 
-		// ---
-		hist_e_Ein_Eout0 -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
-		hist_e_p_Etot0   -> Fill(mom[0],EC_tot[0]/mom[0]);
-		hist_e_p_E0      -> Fill(mom[0],el_cand_EC);
-		hist_e_Nphe0     -> Fill(Nphe[0]);
-		hist_e_EC_in0    -> Fill(EC_in[0] );
-		hist_e_EC_out0   -> Fill(EC_out[0]);
-		hist_e_EC_tot0   -> Fill(EC_tot[0]);
-		hist_e_phiTheta0 -> Fill(phi[0],theta[0]);
-		hist_e_xyEC_hit0 -> Fill(EC_X[0],EC_Y[0]);
-		hist_e_thetaMom0 -> Fill(theta[0],mom[0]);
-		// ---
-
 		// ---------------------------------------------------------------------------------------
-		// Electron particle Identification
-		if (!(			(StatEC[0] > 0) && 		// EC status is good for the electron candidate
-					(StatDC[0] > 0) &&              // DC status is good for the electron candidate
-					(StatCC[0] > 0) && 		// CC status is good for the electron candidate
-					(StatSC[0] > 0) && 		// SC status is good for the electron candidate
-					(charge[0] < 0) && 		// Electron candidate curvature direction is negative
-					(EC_in [0] > EC_in_cut) && 	// Electron candidate has enough energy deposit in inner layer of EC 	
-					(el_cand_EC > el_EC_cut) && 	// Enough total energy in the EC
-					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange))	// Electron PID (E/p)
+		// Electron general cuts
+		if (!(			(StatEC[0] > 0) && // EC status is good for the electron candidate
+					(StatDC[0] > 0) && // DC status is good for the electron candidate
+					(StatCC[0] > 0) && // CC status is good for the electron candidate
+					(StatSC[0] > 0) && // SC status is good for the electron candidate
+					(charge[0] < 0)    // Electron candidate curvature direction is negative
 		     ))
 		{continue;}
+		// ---------------------------------------------------------------------------------------
+
+		hist_e_Nphe0     -> Fill( Nphe        [0]  );
+                hist_e_EC_in0    -> Fill( EC_in       [0]  );
+                hist_e_EC_out0   -> Fill( EC_out      [0]  );
+                hist_e_EC_tot0   -> Fill( EC_tot      [0]  );
+                hist_e_phiTheta0 -> Fill( phi         [0], theta        [0]);
+                hist_e_Ein_Eout0 -> Fill( EC_in[0]/mom[0], EC_out[0]/mom[0]);
+                hist_e_p_Etot0   -> Fill( mom         [0], EC_tot[0]/mom[0]);
+                hist_e_xyEC_hit0 -> Fill( EC_X        [0], EC_Y         [0]);
+                hist_e_p_E0      -> Fill( mom         [0], el_cand_EC      );
+                hist_e_thetaMom0 -> Fill( theta       [0], mom          [0]);
 
 		// ---------------------------------------------------------------------------------------
+		//Electron particle Identification
+		if (!(                  (EC_in [0] > EC_in_cut) &&      // Electron candidate has enough energy deposit in inner layer of EC    
+                                        (el_cand_EC > el_EC_cut) &&     // Enough total energy in the EC
+                                        (fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) // Electron PID (E/p)
+                     ))
+                {continue;}
+
+		// ---------------------------------------
 		// Additional cut for 2GeV data:
 		double el_sccc_dt = SC_Time[0] - CC_Time[0] - (SC_Path[0] - CC_Path[0])/(c_m_s*ns_to_s*100.);
 		
-		if((tab_E1==2261)&&(
+		if(			(tab_E1==2261)&&(	
 					CC_Chi2[0]>=0.1 ||
-					el_sccc_dt < sc_cc_dt_cut_sect[e_sect]  ||
+					el_sccc_dt < sc_cc_dt_cut_sect[e_sect] ||
 					sqrt(mom[0]*mom[0]+me*me)>tab_E1/1000.
 				   ))
 		{continue;}	
 		
 		// ---------------------------------------------------------------------------------------
                 // If the event made it here, the electron candidate passed all PID cuts
-		hist_e_Nphe1     -> Fill(Nphe[0]                    );
-		hist_e_EC_in1    -> Fill(EC_in[0]                   );
-		hist_e_EC_out1   -> Fill(EC_out[0]);
-                hist_e_EC_tot1   -> Fill(EC_tot[0]);
-		hist_e_phiTheta1 -> Fill(phi    [0],theta  [0]      );
-		hist_e_Ein_Eout1 -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
-		hist_e_p_Etot1   -> Fill(mom    [0],EC_tot[0]/mom[0]);
-		hist_e_xyEC_hit1 -> Fill(EC_X[0]   ,EC_Y[0]         );
-		hist_e_p_E1      -> Fill(mom    [0],el_cand_EC      );
-		hist_e_thetaMom1 -> Fill(theta[0]  ,mom[0]          );
+		hist_e_Nphe1     -> Fill( Nphe        [0]  );
+		hist_e_EC_in1    -> Fill( EC_in       [0]  );
+		hist_e_EC_out1   -> Fill( EC_out      [0]  );
+                hist_e_EC_tot1   -> Fill( EC_tot      [0]  );
+		hist_e_phiTheta1 -> Fill( phi         [0], theta        [0]);
+		hist_e_Ein_Eout1 -> Fill( EC_in[0]/mom[0], EC_out[0]/mom[0]);
+		hist_e_p_Etot1   -> Fill( mom         [0], EC_tot[0]/mom[0]);
+		hist_e_xyEC_hit1 -> Fill( EC_X        [0], EC_Y         [0]);
+		hist_e_p_E1      -> Fill( mom         [0], el_cand_EC      );
+		hist_e_thetaMom1 -> Fill( theta       [0], mom          [0]);
 
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
 		if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
 		if (!fid_params.CutUVW(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+		
 		// ---------------------------------------------------------------------------------------
-		// If the event made it here, the electron passed all fiducial and PID cuts
 		nParticles++;
 		Part_type[0] = -11;
 
@@ -408,6 +407,7 @@ int main(int argc, char ** argv)
 		else if (e_sect==4) {hist_e_vz_sec50 -> Fill(targetZ[0]);	hist_e_vz_sec5 -> Fill(e_vz_corrected);}
 		else if (e_sect==5) {hist_e_vz_sec60 -> Fill(targetZ[0]);	hist_e_vz_sec6 -> Fill(e_vz_corrected);}
 		else {cout << "Something is wrong with the definition of sectors" << endl;}
+
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for positive particles
 		nProtons=0;      
@@ -415,9 +415,6 @@ int main(int argc, char ** argv)
 		{
 			T3_p_mom.SetXYZ(px[i],py[i],pz[i]);
 			double e_t0 = SC_Time[0] - SC_Path[0]/c_cm_ns;
-
-			// Need to do proton vertex correction here
-			// And then need to cut based on the vtx difference with respect to electron vtx
 
 			// Test if positive particle
 			if(             (StatSC[i] > 0) && 		// SC status is good for the positive candidate

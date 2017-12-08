@@ -113,94 +113,96 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic electron histograms
-	TH1D * hist_e_Nphe0    = new TH1D("hist_e_Nphe0"    ,"e- before cuts;# photo-electrons in CC;Counts"     ,100,   0.,200.);
-	TH1D * hist_e_Nphe1    = new TH1D("hist_e_Nphe1"    ,"e- passing PID;# photo-electrons in CC;Counts"     ,100,   0.,200.);
-	TH1D * hist_e_Nphe2    = new TH1D("hist_e_Nphe2"    ,"e- passing PID+fid;# photo-electrons in CC;Counts" ,100,   0.,200.);
+	TH1D * hist_e_Nphe0    = new TH1D("hist_e_Nphe0"    ,"e- before cuts;# photo-electrons in CC;Counts"     ,200,   0.,200.);
+	TH1D * hist_e_Nphe1    = new TH1D("hist_e_Nphe1"    ,"e- passing PID;# photo-electrons in CC;Counts"     ,200,   0.,200.);
+	TH1D * hist_e_Nphe2    = new TH1D("hist_e_Nphe2"    ,"e- passing PID+fid;# photo-electrons in CC;Counts" ,200,   0.,200.);
 
-	TH1D * hist_e_EC_in0   = new TH1D("hist_e_EC_in0"   ,"e- before cuts;E_in [GeV];Counts"                  ,100,   0.,  1.);
-	TH1D * hist_e_EC_in1   = new TH1D("hist_e_EC_in1"   ,"e- passing PID;E_in [GeV];Counts"                  ,100,   0.,  1.);
-	TH1D * hist_e_EC_in2   = new TH1D("hist_e_EC_in2"   ,"e- passing PID+fid;E_in [GeV];Counts"              ,100,   0.,  1.);
+	TH1D * hist_e_EC_in0   = new TH1D("hist_e_EC_in0"   ,"e- before cuts;E_in [GeV];Counts"                  ,300,   0.,  1.);
+	TH1D * hist_e_EC_in1   = new TH1D("hist_e_EC_in1"   ,"e- passing PID;E_in [GeV];Counts"                  ,300,   0.,  1.);
+	TH1D * hist_e_EC_in2   = new TH1D("hist_e_EC_in2"   ,"e- passing PID+fid;E_in [GeV];Counts"              ,300,   0.,  1.);
 
-	TH1D * hist_e_EC_out0  = new TH1D("hist_e_EC_out0"  ,"e- before cuts;E_in [GeV];Counts"                  ,100,   0.,  1.);
-        TH1D * hist_e_EC_out1  = new TH1D("hist_e_EC_out1"  ,"e- passing PID;E_in [GeV];Counts"                  ,100,   0.,  1.);
-        TH1D * hist_e_EC_out2  = new TH1D("hist_e_EC_out2"  ,"e- passing PID+fid;E_in [GeV];Counts"              ,100,   0.,  1.);
+	TH1D * hist_e_EC_out0  = new TH1D("hist_e_EC_out0"  ,"e- before cuts;E_out [GeV];Counts"                 ,300,   0.,  1.);
+        TH1D * hist_e_EC_out1  = new TH1D("hist_e_EC_out1"  ,"e- passing PID;E_out [GeV];Counts"                 ,300,   0.,  1.);
+        TH1D * hist_e_EC_out2  = new TH1D("hist_e_EC_out2"  ,"e- passing PID+fid;E_out [GeV];Counts"             ,300,   0.,  1.);
 	
-	TH1D * hist_e_EC_tot0   = new TH1D("hist_e_EC_tot0"  ,"e- before cuts;E_in [GeV];Counts"                  ,100,   0.,  1.);
-        TH1D * hist_e_EC_tot1   = new TH1D("hist_e_EC_tot1"  ,"e- passing PID;E_in [GeV];Counts"                  ,100,   0.,  1.);
-        TH1D * hist_e_EC_tot2   = new TH1D("hist_e_EC_tot2"  ,"e- passing PID+fid;E_in [GeV];Counts"              ,100,   0.,  1.);
+	TH1D * hist_e_EC_tot0   = new TH1D("hist_e_EC_tot0"  ,"e- before cuts;E_tot [GeV];Counts"                ,300,   0.,  1.);
+        TH1D * hist_e_EC_tot1   = new TH1D("hist_e_EC_tot1"  ,"e- passing PID;E_tot [GeV];Counts"                ,300,   0.,  1.);
+        TH1D * hist_e_EC_tot2   = new TH1D("hist_e_EC_tot2"  ,"e- passing PID+fid;E_tot [GeV];Counts"            ,300,   0.,  1.);
 
-	TH2D * hist_e_phiTheta0= new TH2D("hist_e_phiTheta0","e- before  cuts;Phi [deg];Theta [deg];Counts"      ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_e_phiTheta1= new TH2D("hist_e_phiTheta1","e- passing PID;Phi [deg];Theta [deg];Counts"       ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_e_phiTheta2= new TH2D("hist_e_phiTheta2","e- passing PID+fid;Phi [deg];Theta [deg];Counts"   ,100,-100.,380.,100,10.,50.);
+	TH2D * hist_e_phiTheta0= new TH2D("hist_e_phiTheta0","e- before  cuts;Phi [deg];Theta [deg];Counts"      ,300,-100.,380.,300,10.,50.);
+	TH2D * hist_e_phiTheta1= new TH2D("hist_e_phiTheta1","e- passing PID;Phi [deg];Theta [deg];Counts"       ,300,-100.,380.,300,10.,50.);
+	TH2D * hist_e_phiTheta2= new TH2D("hist_e_phiTheta2","e- passing PID+fid;Phi [deg];Theta [deg];Counts"   ,300,-100.,380.,300,10.,50.);
 
-	TH2D * hist_e_Ein_Eout0= new TH2D("hist_e_Ein_Eout0","e- before cuts;E_in/p;E_out/p;Counts"              ,100,   0., 0.5,100, 0.,0.5);
-	TH2D * hist_e_Ein_Eout1= new TH2D("hist_e_Ein_Eout1","e- passing PID;E_in/p;E_out/p;Counts"              ,100,   0., 0.5,100, 0.,0.5);
-	TH2D * hist_e_Ein_Eout2= new TH2D("hist_e_Ein_Eout2","e- passing PID+fid;E_in/p;E_out/p;Counts"          ,100,   0., 0.5,100, 0.,0.5);
+	TH2D * hist_e_Ein_Eout0= new TH2D("hist_e_Ein_Eout0","e- before cuts;E_in/p;E_out/p;Counts"              ,300,   0., 0.5,300, 0.,0.5);
+	TH2D * hist_e_Ein_Eout1= new TH2D("hist_e_Ein_Eout1","e- passing PID;E_in/p;E_out/p;Counts"              ,300,   0., 0.5,300, 0.,0.5);
+	TH2D * hist_e_Ein_Eout2= new TH2D("hist_e_Ein_Eout2","e- passing PID+fid;E_in/p;E_out/p;Counts"          ,300,   0., 0.5,300, 0.,0.5);
 
-	TH2D * hist_e_xyEC_hit0= new TH2D("hist_e_xyEC_hit0","e- before cuts;ECx [cm];ECy [cm];Counts"           ,100,-400.,400.,100,-400.,400.);
-        TH2D * hist_e_xyEC_hit1= new TH2D("hist_e_xyEC_hit1","e- passing PID;ECx [cm];ECy [cm];Counts"           ,100,-400.,400.,100,-400.,400.);
-	TH2D * hist_e_xyEC_hit2= new TH2D("hist_e_xyEC_hit2","e- passing PID+fid;ECx [cm];ECy [cm];Counts"       ,100,-400.,400.,100,-400.,400.);
+	TH2D * hist_e_xyEC_hit0= new TH2D("hist_e_xyEC_hit0","e- before cuts;ECx [cm];ECy [cm];Counts"           ,300,-400.,400.,300,-400.,400.);
+        TH2D * hist_e_xyEC_hit1= new TH2D("hist_e_xyEC_hit1","e- passing PID;ECx [cm];ECy [cm];Counts"           ,300,-400.,400.,300,-400.,400.);
+	TH2D * hist_e_xyEC_hit2= new TH2D("hist_e_xyEC_hit2","e- passing PID+fid;ECx [cm];ECy [cm];Counts"       ,300,-400.,400.,300,-400.,400.);
 
-	TH2D * hist_e_p_Etot0  = new TH2D("hist_e_p_Etot0"  ,"e- before cuts;p [GeV];E_tot/p;Counts"             ,100,   0.,  5.,100, 0.,0.7);
-	TH2D * hist_e_p_Etot1  = new TH2D("hist_e_p_Etot1"  ,"e- passing PID;p [GeV];E_tot/p;Counts"             ,100,   0.,  5.,100, 0.,0.7);
-	TH2D * hist_e_p_Etot2  = new TH2D("hist_e_p_Etot2"  ,"e- passing PID+fid;p [GeV];E_tot/p;Counts"         ,100,   0.,  5.,100, 0.,0.7);
+	TH2D * hist_e_p_Etot0  = new TH2D("hist_e_p_Etot0"  ,"e- before cuts;p [GeV];E_tot/p;Counts"             ,300,   0.,  5.,300, 0.,0.7);
+	TH2D * hist_e_p_Etot1  = new TH2D("hist_e_p_Etot1"  ,"e- passing PID;p [GeV];E_tot/p;Counts"             ,300,   0.,  5.,300, 0.,0.7);
+	TH2D * hist_e_p_Etot2  = new TH2D("hist_e_p_Etot2"  ,"e- passing PID+fid;p [GeV];E_tot/p;Counts"         ,300,   0.,  5.,300, 0.,0.7);
 
-	TH2D * hist_e_p_E0     = new TH2D("hist_e_p_E0"     ,"e- before cuts;p [GeV];E;Counts"                   ,100,   0.,  5.,100, 0.,2.);
-	TH2D * hist_e_p_E1     = new TH2D("hist_e_p_E1"     ,"e- passing PID;p [GeV];E;Counts"                   ,100,   0.,  5.,100, 0.,2.);
-	TH2D * hist_e_p_E2     = new TH2D("hist_e_p_E2"     ,"e- before PIF+fid;p [GeV];E;Counts"                ,100,   0.,  5.,100, 0.,2.);
+	TH2D * hist_e_p_E0     = new TH2D("hist_e_p_E0"     ,"e- before cuts;p [GeV];E;Counts"                   ,300,   0.,  5.,300, 0.,2.);
+	TH2D * hist_e_p_E1     = new TH2D("hist_e_p_E1"     ,"e- passing PID;p [GeV];E;Counts"                   ,300,   0.,  5.,300, 0.,2.);
+	TH2D * hist_e_p_E2     = new TH2D("hist_e_p_E2"     ,"e- before PIF+fid;p [GeV];E;Counts"                ,300,   0.,  5.,300, 0.,2.);
 
-	TH2D * hist_e_thetaMom0= new TH2D("e_thetaMom0"     ,"e- before cuts;Theta [deg];Mom [GeV];Counts"       , 40,  10., 50., 60, 0., 6.);
-	TH2D * hist_e_thetaMom1= new TH2D("e_thetaMom1"     ,"e- passing PID;Theta [deg];Mom [GeV];Counts"       , 40,  10., 50., 60, 0., 6.);
-	TH2D * hist_e_thetaMom2= new TH2D("e_thetaMom2"     ,"e- passing PID+fid;Theta [deg];Mom [GeV];Counts"   , 40,  10., 50., 60, 0., 6.);
+	TH2D * hist_e_thetaMom0= new TH2D("e_thetaMom0"     ,"e- before cuts;Theta [deg];Mom [GeV];Counts"       ,300,  10., 50.,300, 0., 6.);
+	TH2D * hist_e_thetaMom1= new TH2D("e_thetaMom1"     ,"e- passing PID;Theta [deg];Mom [GeV];Counts"       ,300,  10., 50.,300, 0., 6.);
+	TH2D * hist_e_thetaMom2= new TH2D("e_thetaMom2"     ,"e- passing PID+fid;Theta [deg];Mom [GeV];Counts"   ,300,  10., 50.,300, 0., 6.);
 
 	// ---
-	TH1D * hist_e_vz_sec10 = new TH1D("hist_e_vz_sec10" ,"e- passing cuts, before vtx corr, sector 1;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec1  = new TH1D("hist_e_vz_sec1"  ,"e- passing cuts,  after vtx corr, sector 1;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec20 = new TH1D("hist_e_vz_sec20" ,"e- passing cuts, before vtx corr, sector 2;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec2  = new TH1D("hist_e_vz_sec2"  ,"e- passing cuts,  after vtx corr, sector 2;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec30 = new TH1D("hist_e_vz_sec30" ,"e- passing cuts, before vtx corr, sector 3;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec3  = new TH1D("hist_e_vz_sec3"  ,"e- passing cuts,  after vtx corr, sector 3;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec40 = new TH1D("hist_e_vz_sec40" ,"e- passing cuts, before vtx corr, sector 4;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec4  = new TH1D("hist_e_vz_sec4"  ,"e- passing cuts,  after vtx corr, sector 4;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec50 = new TH1D("hist_e_vz_sec50" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec5  = new TH1D("hist_e_vz_sec5"  ,"e- passing cuts,  after vtx corr, sector 5;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec60 = new TH1D("hist_e_vz_sec60" ,"e- passing cuts, before vtx corr, sector 6;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz_sec6  = new TH1D("hist_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts" ,100, -10., 10.);
-	TH1D * hist_e_vz0      = new TH1D("hist_e_vz0"      ,"e- passing cuts, before vtx corr;electron vz [cm]; Counts"           ,100, -10., 10.);
-	TH1D * hist_e_vz       = new TH1D("hist_e_vz"       ,"e- passing cuts,  after vtx corr;electron vz [cm]; Counts"           ,100, -10., 10.);
-	TH2D * hist_e_phiVz0   = new TH2D("hist_e_phiVz0"   ,"e- passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10);
-	TH2D * hist_e_phiVz    = new TH2D("hist_e_phiVz"    ,"e- passing cuts,  after vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10);
-	TH2D * hist_e_thetaVz0 = new TH2D("hist_e_thetaVz0" ,"e- passing cuts, before vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 60.,100,-11,11);
-	TH2D * hist_e_thetaVz  = new TH2D("hist_e_thetaVz"  ,"e- passing cuts,  after vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 60.,100,-11,11);
+	TH1D * hist_e_vz_sec10 = new TH1D("hist_e_vz_sec10" ,"e- passing cuts, before vtx corr, sector 1;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec1  = new TH1D("hist_e_vz_sec1"  ,"e- passing cuts,  after vtx corr, sector 1;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec20 = new TH1D("hist_e_vz_sec20" ,"e- passing cuts, before vtx corr, sector 2;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec2  = new TH1D("hist_e_vz_sec2"  ,"e- passing cuts,  after vtx corr, sector 2;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec30 = new TH1D("hist_e_vz_sec30" ,"e- passing cuts, before vtx corr, sector 3;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec3  = new TH1D("hist_e_vz_sec3"  ,"e- passing cuts,  after vtx corr, sector 3;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec40 = new TH1D("hist_e_vz_sec40" ,"e- passing cuts, before vtx corr, sector 4;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec4  = new TH1D("hist_e_vz_sec4"  ,"e- passing cuts,  after vtx corr, sector 4;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec50 = new TH1D("hist_e_vz_sec50" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec5  = new TH1D("hist_e_vz_sec5"  ,"e- passing cuts,  after vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec60 = new TH1D("hist_e_vz_sec60" ,"e- passing cuts, before vtx corr, sector 6;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz_sec6  = new TH1D("hist_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * hist_e_vz0      = new TH1D("hist_e_vz0"      ,"e- passing cuts, before vtx corr;electron vz [cm]; Counts"           ,300, -10., 10.);
+	TH1D * hist_e_vz       = new TH1D("hist_e_vz"       ,"e- passing cuts,  after vtx corr;electron vz [cm]; Counts"           ,300, -10., 10.);
+	TH2D * hist_e_phiVz0   = new TH2D("hist_e_phiVz0"   ,"e- passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,300,-100.,380.,300,-10,10);
+	TH2D * hist_e_phiVz    = new TH2D("hist_e_phiVz"    ,"e- passing cuts,  after vtx corr; phi [deg];vz [cm];Counts"   ,300,-100.,380.,300,-10,10);
+	TH2D * hist_e_thetaVz0 = new TH2D("hist_e_thetaVz0" ,"e- passing cuts, before vtx corr; theta [deg];vz [cm];Counts" ,300, -10., 60.,300,-11,11);
+	TH2D * hist_e_thetaVz  = new TH2D("hist_e_thetaVz"  ,"e- passing cuts,  after vtx corr; theta [deg];vz [cm];Counts" ,300, -10., 60.,300,-11,11);
 	// ---
 
-	TH1D * hist_e_momCor   = new TH1D("hist_e_momCor"   ,"e- passing fid. cuts;p corrected - p[GeV];Counts",100,-.1,.04);
-	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts", 60,   0.,  6., 60,-.0006,.0006);
-	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
+	TH1D * hist_e_momCor   = new TH1D("hist_e_momCor"   ,"e- passing fid. cuts;p corrected - p[GeV];Counts"          ,300, -.1,.04);
+	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  ,300,  0.,  6.,300,-.1,.04);
+	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300,-20., 20.,300,-1., 1.);
 
 	// ---------------------------------------
 	// Diagnostic positive particle histograms
-	TH1D * hist_p_mass     = new TH1D("hist_pos_mass"   ,"+  passing fid. cuts;mass [GeV];Counts"                    ,100,   0.,3.5);
-	TH2D * hist_p_pMass    = new TH2D("hist_pos_pMass"  ,"+  passing fid. cuts;p [GeV];mass [GeV];Counts"            ,100,   0., 4.,100,  0.,3.5);
-	TH2D * hist_pos_pBeta  = new TH2D("hist_pos_pBeta"  ,"+  passing fid. cuts;p [GeV];#beta;Counts"                 ,100,   0.,  4.,100, 0.,1.3);
+	TH1D * hist_p_mass     = new TH1D("hist_pos_mass"   ,"+  passing fid. cuts;mass [GeV];Counts"                    ,300,  0.,3.5);
+	TH2D * hist_p_pMass    = new TH2D("hist_pos_pMass"  ,"+  passing fid. cuts;p [GeV];mass [GeV];Counts"            ,300,  0., 4.,300, 0.,3.5);
+	TH2D * hist_pos_pBeta  = new TH2D("hist_pos_pBeta"  ,"+  passing fid. cuts;p [GeV];#beta;Counts"                 ,300,  0., 4.,300, 0.,1.3);
 
 	// ---------------------------------------
 	// Diagnostic proton histograms
-	TH2D * hist_p_phiTheta0= new TH2D("hist_p_phiTheta0","p  before  fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_p_phiTheta = new TH2D("hist_p_phiTheta" ,"p  passing fid. cuts;Phi [deg];Theta [deg];Counts"         ,100,-100.,380.,100,10.,50.);
-	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                ,100,  -7.,  7.,100, 0., 5.);
-	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,100,   0.,  7.,100,-2., 2.);
-	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p  passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",100, -20., 20.,100,-1., 1.);
-	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p  passing cuts, before vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
-	TH2D * hist_p_phiVz    = new TH2D("hist_p_phiVz"    ,"p  passing cuts,  after vtx corr; phi [deg];vz [cm];Counts"   ,100,-100.,380.,100,-10,10.);
-	TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p  passing cuts, before vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 80.,100,-11,11);
-	TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p  passing cuts,  after vtx corr; theta [deg];vz [cm];Counts" ,100, -10., 80.,100,-11,11);
-	TH2D * hist_p_pBeta    = new TH2D("hist_p_pBeta"    ,"p  passing fid. cuts;p [GeV];#beta;Counts"                 ,100,   0.,  4.,100, 0.,1.3);
+	TH2D * hist_p_phiTheta0= new TH2D("hist_p_phiTheta0","p before cuts;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,10.,50.);
+	TH2D * hist_p_phiTheta1= new TH2D("hist_p_phiTheta1","p passing fid;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,10.,50.);
+	TH2D * hist_p_phiTheta2= new TH2D("hist_p_phiTheta2","p passing fid+PID;Phi [deg];Theta [deg];Counts" ,300,-100.,380.,300,10.,50.);
+
+	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                ,300,  -7.,  7.,300, 0., 5.);
+	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,300,   0.,  7.,300,-2., 2.);
+	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p  passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300, -20., 20.,300,-1., 1.);
+	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p  passing cuts, before vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
+	TH2D * hist_p_phiVz    = new TH2D("hist_p_phiVz"    ,"p  passing cuts,  after vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
+	TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p  passing cuts, before vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
+	TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p  passing cuts,  after vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
+	TH2D * hist_p_pBeta    = new TH2D("hist_p_pBeta"    ,"p  passing fid. cuts;p [GeV];#beta;Counts"                 ,300,   0.,  4.,300, 0.,1.3);
 
 	// ---------------------------------------
 	// Diagnostic pi+ histograms
-	TH2D * hist_pip_pBeta    = new TH2D("hist_pip_pBeta"    ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"            ,100,   0.,  4.,500, 0.,1.3);
-	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"           ,100,  -7.,  7.,100, 0., 5.);
+	TH2D * hist_pip_pBeta    = new TH2D("hist_pip_pBeta"    ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"            ,300,   0.,  4.,300, 0.,1.3);
+	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"           ,300,  -7.,  7.,300, 0., 5.);
 	// ---------------------------------------
 	// Setting up output tree and branches
 	TTree * outtree = new TTree("T","Skimmed tree");
@@ -433,7 +435,7 @@ int main(int argc, char ** argv)
 					hist_p_mass      -> Fill(mass[i]);
 					hist_p_pMass     -> Fill(mom [i],mass[i]);
 					hist_pos_pBeta   -> Fill(mom[i],beta [i]);
-
+					hist_p_phiTheta1 -> Fill(phi[i],theta[i]);
 					// --------------------------------------------------------------------
 					// Look specifically for protons
 					double beta_assuming_proton = mom[i]/sqrt(mom[i]*mom[i] + mP*mP);
@@ -447,7 +449,7 @@ int main(int argc, char ** argv)
 						Part_type[i] = 2212;
 
 						hist_p_deltaTmom -> Fill(delta_t,mom [i]);
-						hist_p_phiTheta  -> Fill(phi[i],theta[i]);
+						hist_p_phiTheta2 -> Fill(phi[i],theta[i]);
 
 						if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
 						{
@@ -509,6 +511,7 @@ int main(int argc, char ** argv)
         hist_e_EC_out2-> SetLineColor(8);
 	hist_e_EC_tot1-> SetLineColor(2);
         hist_e_EC_tot2-> SetLineColor(8);
+	hist_e_vz     -> SetLineColor(2);
 	// ---
 	TLegend * leg = new TLegend(0.5,0.5,0.8,0.8);
 	leg -> AddEntry(hist_e_Nphe0,"before cuts"       );
@@ -525,28 +528,173 @@ int main(int argc, char ** argv)
         hist_e_EC_in0 -> Draw();
         hist_e_EC_in1 -> Draw("same");
         hist_e_EC_in2 -> Draw("same");
-        leg          -> Draw("same");
+        leg           -> Draw("same");
 
 	TCanvas *c3 = new TCanvas("c3");
         hist_e_EC_out0 -> Draw();
         hist_e_EC_out1 -> Draw("same");
         hist_e_EC_out2 -> Draw("same");
-        leg          -> Draw("same");
+        leg            -> Draw("same");
 
 	TCanvas *c4 = new TCanvas("c4");
         hist_e_EC_tot0 -> Draw();
         hist_e_EC_tot1 -> Draw("same");
         hist_e_EC_tot2 -> Draw("same");
-        leg          -> Draw("same");
+        leg            -> Draw("same");
 
+	TCanvas *c5 = new TCanvas("c5");
+	c5 -> Divide(3,1);
+	c5 -> cd(1);	hist_e_thetaMom0 -> Draw("COLZ"); 
+	c5 -> cd(2);	hist_e_thetaMom1 -> Draw("COLZ");
+        c5 -> cd(3);	hist_e_thetaMom2 -> Draw("COLZ");
+
+	TCanvas *c6 = new TCanvas("c6");
+	c6 -> Divide(2,1);
+	c6 -> cd(1);	hist_e_momCor -> Draw();
+	c6 -> cd(2);	hist_e_momMomCor -> Draw("COLZ");
+
+	TCanvas *c7 = new TCanvas("c7");
+	hist_e_vzVzCor -> Draw("COLZ");
+	
+	TCanvas *c8 = new TCanvas("c8");
+	c8 -> Divide(3,1);
+        c8 -> cd(1);	hist_e_Ein_Eout0 -> Draw("COLZ");
+        c8 -> cd(2);	hist_e_Ein_Eout1 -> Draw("COLZ");
+        c8 -> cd(3);	hist_e_Ein_Eout2 -> Draw("COLZ");
+
+	TCanvas *c9 = new TCanvas("c9");
+        c9 -> Divide(3,1);
+	c9 -> cd(1);	hist_e_xyEC_hit0 -> Draw("COLZ");
+        c9 -> cd(2);	hist_e_xyEC_hit1 -> Draw("COLZ");
+        c9 -> cd(3);	hist_e_xyEC_hit2 -> Draw("COLZ");
+	
+	TCanvas *c10 = new TCanvas("c10");
+        c10 -> Divide(3,1);
+	c10 -> cd(1);	hist_e_p_Etot0 -> Draw("COLZ");
+        c10 -> cd(2);	hist_e_p_Etot1 -> Draw("COLZ");
+        c10 -> cd(3);	hist_e_p_Etot2 -> Draw("COLZ");
+
+	TCanvas *c11 = new TCanvas("c11");
+        c11 -> Divide(3,1);
+	c11 -> cd(1);	hist_e_p_E0 -> Draw("COLZ");
+	c11 -> cd(2);	hist_e_p_E1 -> Draw("COLZ");
+	c11 -> cd(3);	hist_e_p_E2 -> Draw("COLZ");
+
+	TCanvas *c12 = new TCanvas("c12");	
+	hist_e_phiTheta0 -> Draw("COLZ");
+	TCanvas *c13 = new TCanvas("c13");
+	hist_e_phiTheta1 -> Draw("COLZ");
+	TCanvas *c14 = new TCanvas("c14");
+	hist_e_phiTheta2 -> Draw("COLZ");
+
+	TCanvas *c15 = new TCanvas("c15");
+        hist_e_vz0 -> Draw();
+        hist_e_vz  -> Draw("same");
+
+	TCanvas *c16 = new TCanvas("c16");
+        c16 -> Divide(3,2);
+	c16 -> cd(1);	hist_e_vz_sec10 -> Draw();
+	c16 -> cd(2);	hist_e_vz_sec20 -> Draw();
+	c16 -> cd(3);	hist_e_vz_sec30 -> Draw();
+	c16 -> cd(4);	hist_e_vz_sec40 -> Draw();
+	c16 -> cd(5);	hist_e_vz_sec50 -> Draw();
+	c16 -> cd(6);	hist_e_vz_sec60 -> Draw();
+
+	TCanvas *c17 = new TCanvas("c17");
+        c17 -> Divide(3,2);
+	c17 -> cd(1);	hist_e_vz_sec1 -> Draw();
+        c17 -> cd(2);	hist_e_vz_sec2 -> Draw();
+        c17 -> cd(3);	hist_e_vz_sec3 -> Draw();
+        c17 -> cd(4);	hist_e_vz_sec4 -> Draw();
+        c17 -> cd(5);	hist_e_vz_sec5 -> Draw();
+        c17 -> cd(6);	hist_e_vz_sec6 -> Draw();
+
+	TCanvas *c18 = new TCanvas("c18");
+        c18 -> Divide(2,1);
+	c18 -> cd(1);	hist_e_phiVz0 -> Draw("COLZ");
+        c18 -> cd(2);	hist_e_phiVz  -> Draw("COLZ");
+    
+	TCanvas *c19 = new TCanvas("c19");
+        c19 -> Divide(2,1);
+	c19 -> cd(1);	hist_e_thetaVz0 -> Draw("COLZ");
+        c19 -> cd(2);	hist_e_thetaVz  -> Draw("COLZ");
+
+	TCanvas *c20 = new TCanvas("c20");
+	hist_pos_pBeta -> Draw("COLZ");
+
+	TCanvas *c21 = new TCanvas("c21");
+        hist_p_pBeta -> Draw("COLZ");
+
+	TCanvas *c22 = new TCanvas("c22");
+	c22 -> Divide(2,1);
+        c22 -> cd(1);	hist_p_mass ->Draw();
+        c22 -> cd(2);	hist_p_pMass->Draw("COLZ");
+
+	TCanvas *c23 = new TCanvas("c23");
+        hist_p_p_momCor -> Draw("COLZ");
+	
+	TCanvas *c24 = new TCanvas("c24");
+        hist_p_vzVzCor -> Draw("COLZ");
+
+	TCanvas *c25 = new TCanvas("c25");
+        c25 -> Divide(2,1);
+	c25 -> cd(1);	hist_p_phiVz0 -> Draw("COLZ");
+        c25 -> cd(2);	hist_p_phiVz  -> Draw("COLZ");
+	
+	TCanvas *c26 = new TCanvas("c26");
+        c26 -> Divide(2,1);
+	c26 -> cd(1);	hist_p_thetaVz0 -> Draw("COLZ");
+        c26 -> cd(2);	hist_p_thetaVz  -> Draw("COLZ");
+ 
+	TCanvas *c27 = new TCanvas("c27");
+	hist_p_deltaTmom -> Draw("COLZ");
+	
+	TCanvas *c28 = new TCanvas("c28");
+        hist_p_phiTheta0 -> Draw("COLZ");
+	
+	TCanvas *c29 = new TCanvas("c29");
+        hist_p_phiTheta1 -> Draw("COLZ");
+
+	TCanvas *c30 = new TCanvas("c30");
+        hist_p_phiTheta2 -> Draw("COLZ");
+
+	// --------------------------------------------------------------------------------------------------
+	// Print histograms on a pdf file
+	c1  -> Print("plots.pdf(","pdf");
+	c2  -> Print("plots.pdf" ,"pdf");
+	c3  -> Print("plots.pdf" ,"pdf");
+        c4  -> Print("plots.pdf" ,"pdf");
+	c5  -> Print("plots.pdf" ,"pdf");
+	c6  -> Print("plots.pdf" ,"pdf");
+	c7  -> Print("plots.pdf" ,"pdf");
+	c8  -> Print("plots.pdf" ,"pdf");
+	c9  -> Print("plots.pdf" ,"pdf");
+	c10 -> Print("plots.pdf" ,"pdf");
+	c11 -> Print("plots.pdf" ,"pdf");
+	c12 -> Print("plots.pdf" ,"pdf");
+	c13 -> Print("plots.pdf" ,"pdf");
+	c14 -> Print("plots.pdf" ,"pdf");
+	c15 -> Print("plots.pdf" ,"pdf");
+	c16 -> Print("plots.pdf" ,"pdf");
+	c17 -> Print("plots.pdf" ,"pdf");
+	c18 -> Print("plots.pdf" ,"pdf");
+	c19 -> Print("plots.pdf" ,"pdf");
+	c20 -> Print("plots.pdf" ,"pdf");
+	c21 -> Print("plots.pdf" ,"pdf");
+	c22 -> Print("plots.pdf" ,"pdf");
+	c23 -> Print("plots.pdf" ,"pdf");
+	c24 -> Print("plots.pdf" ,"pdf");
+	c25 -> Print("plots.pdf" ,"pdf");
+	c26 -> Print("plots.pdf" ,"pdf");
+	c27 -> Print("plots.pdf" ,"pdf");
+	c28 -> Print("plots.pdf" ,"pdf");
+	c29 -> Print("plots.pdf" ,"pdf");
+	c30 -> Print("plots.pdf)","pdf");
+	
 	// --------------------------------------------------------------------------------------------------
 	// Write the output file
 	outfile->cd();
 	outtree->Write();
-	c1                  ->Write();
-	c2                  ->Write();
-	c3                  ->Write();
-        c4                  ->Write();
 	hist_e_EC_in0       ->Write();
 	hist_e_EC_in1       ->Write();
 	hist_e_EC_in2       ->Write();
@@ -613,7 +761,8 @@ int main(int argc, char ** argv)
 	hist_p_thetaVz      ->Write();
 	hist_p_deltaTmom    ->Write();
 	hist_p_phiTheta0    ->Write();
-	hist_p_phiTheta     ->Write();
+	hist_p_phiTheta1    ->Write();
+	hist_p_phiTheta2    ->Write();
 	// ---
 	hist_pip_deltaTmom  ->Write();
 

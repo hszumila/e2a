@@ -79,11 +79,11 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 
 	// ---------------------------------------------------------------------------
 	// Correction for Ebeam = 4.4GeV and 2250A data.
-	if ( E1 > 3000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
+	if ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
 
 		double phiMin, phiMax;
 		// Sanitize theta
-		if (theta_deg < 15.)return false;
+		if (theta_deg < 15.) return false;
 
 		// Sanitize momentum
 		if (mom_e > 3.7) mom_e = 3.7;
@@ -117,14 +117,14 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 		{
 			phiMin -= M_PI/180.*b[0]*(1. - 1/((theta_deg - t0)/(b[0]/a[0]) + 1.));
 			phiMax += M_PI/180.*b[1]*(1. - 1/((theta_deg - t0)/(b[1]/a[1]) + 1.));
-		}
+		}	
 
 		return ((phi < phiMax) && (phi>phiMin));
 	}
 	// ---------------------------------------------------------------------------
 	// Correction for Ebeam = 2.2GeV and 2250A data.
 
-	if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
+	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
 		bool status = true;
 		phi_deg -= sector*60;
 		Float_t par[6];               // six parameters to determine the outline of Theta vs Phi
@@ -479,7 +479,11 @@ bool Fiducial::read_p_pid_params()
 // ===================================================================================================================================
 bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 {
-	const double prot_mom_lim=2.15;
+	double prot_mom_lim;
+
+	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.70;
+	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.15;
+
 	if (mom > prot_mom_lim) mom = prot_mom_lim;
 
 	double delta_t_up_limit = prot_deltat_mean->Eval(mom) + cut_sigma * prot_deltat_sig->Eval(mom);

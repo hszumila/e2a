@@ -190,19 +190,19 @@ int main(int argc, char ** argv)
 	TH2D * hist_p_phiTheta1= new TH2D("hist_p_phiTheta1","p passing fid;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,10.,50.);
 	TH2D * hist_p_phiTheta2= new TH2D("hist_p_phiTheta2","p passing fid+PID;Phi [deg];Theta [deg];Counts" ,300,-100.,380.,300,10.,50.);
 
-	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p  passing fid. cuts;deltaT;p [GeV];Counts"                ,300,  -7.,  7.,300, 0., 5.);
-	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p  passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts"    ,300,   0.,  7.,300,-2., 2.);
-	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p  passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300, -20., 20.,300,-1., 1.);
-	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p  passing cuts, before vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
-	TH2D * hist_p_phiVz    = new TH2D("hist_p_phiVz"    ,"p  passing cuts,  after vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
-	TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p  passing cuts, before vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
-	TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p  passing cuts,  after vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
-	TH2D * hist_p_pBeta    = new TH2D("hist_p_pBeta"    ,"p  passing fid. cuts;p [GeV];#beta;Counts"                 ,300,   0.,  4.,300, 0.,1.3);
+	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p passing fid. cuts;deltaT;p [GeV];Counts"             ,300,  -7.,  7.,300, 0., 3.);
+	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts" ,300,   0.,  3.,300,-.000005, .000005);
+	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300, -20., 20.,300,-1., 1.);
+	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p passing cuts, before vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
+	TH2D * hist_p_phiVz    = new TH2D("hist_p_phiVz"    ,"p passing cuts,  after vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
+	TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p passing cuts, before vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
+	TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p passing cuts,  after vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
+	TH2D * hist_p_pBeta    = new TH2D("hist_p_pBeta"    ,"p passing fid. cuts;p [GeV];#beta;Counts"                 ,300,   0.,  4.,300, 0.,1.3);
 
 	// ---------------------------------------
 	// Diagnostic pi+ histograms
 	TH2D * hist_pip_pBeta    = new TH2D("hist_pip_pBeta"    ,"pi+ passing fid. cuts;p [GeV];#beta;Counts"            ,300,   0.,  4.,300, 0.,1.3);
-	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"           ,300,  -7.,  7.,300, 0., 5.);
+	TH2D * hist_pip_deltaTmom= new TH2D("hist_pip_deltaTmom","pi+ passing fid. cuts;deltaT;p [GeV];Counts"           ,300,  -7.,  7.,300, 0.,5.0);
 	// ---------------------------------------
 	// Setting up output tree and branches
 	TTree * outtree = new TTree("T","Skimmed tree");
@@ -372,8 +372,8 @@ int main(int argc, char ** argv)
 		Part_type[0] = -11;
 
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
-		if (180./M_PI*T3_e_mom.Theta()>16.) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
-		else 				    T3_e_mom_cor = T3_e_mom;
+		if ((tab_E1==4461)&&(180./M_PI*T3_e_mom.Theta()>16.)) T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
+		else 						      T3_e_mom_cor = T3_e_mom;
 
 		mom_x    [0] = T3_e_mom_cor.X();
 		mom_y    [0] = T3_e_mom_cor.Y();
@@ -443,7 +443,7 @@ int main(int argc, char ** argv)
 					double delta_t = p_t0 - e_t0;
 					if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
 							(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
-					  ){
+					){
 						nParticles++;
 						nProtons++;	
 						Part_type[i] = 2212;
@@ -453,8 +453,8 @@ int main(int argc, char ** argv)
 
 						if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
 						{
-							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
-						}	
+							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);	
+						}
 						else{p_mom_corrected=mom[i];}
 
 						mom_x    [i] = T3_p_mom.X();

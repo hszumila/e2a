@@ -39,8 +39,8 @@ Run_dependent::~Run_dependent()
 bool Run_dependent::read_p_pcor_params() // Proton correction parameters
 {
 	char param_file_name[256];
-	if((run>=18338)&&(run<=18438))	sprintf(param_file_name,"%s/.e2a/prot_mom_corr_18338-18438.dat",homedir.c_str());
-
+	sprintf(param_file_name,"%s/.e2a/prot_mom_corr_18338_18438.dat",homedir.c_str());
+				        
 	std::ifstream param_file(param_file_name);
 
 	for(int i = 0 ; i < 6; i++){

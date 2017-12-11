@@ -78,7 +78,7 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("SC_Time"  ,SC_Time ); // Time in the scintillators per particle
 	t->SetBranchAddress("SC_Path"  ,SC_Path ); // Path Length per particle
 	t->SetBranchAddress("CC_Time"  ,CC_Time ); // Time in the cherenkov per particle
-        t->SetBranchAddress("CC_Path"  ,CC_Path ); // Path Length per particle
+	t->SetBranchAddress("CC_Path"  ,CC_Path ); // Path Length per particle
 	t->SetBranchAddress("Charge"   ,charge  ); // Charge per particle
 	t->SetBranchAddress("Beta"     ,beta    ); // Beta per particle
 	t->SetBranchAddress("Mass"     ,mass    ); // Mass per particle
@@ -122,12 +122,12 @@ int main(int argc, char ** argv)
 	TH1D * hist_e_EC_in2   = new TH1D("hist_e_EC_in2"   ,"e- passing PID+fid;E_in [GeV];Counts"              ,300,   0.,  1.);
 
 	TH1D * hist_e_EC_out0  = new TH1D("hist_e_EC_out0"  ,"e- before cuts;E_out [GeV];Counts"                 ,300,   0.,  1.);
-        TH1D * hist_e_EC_out1  = new TH1D("hist_e_EC_out1"  ,"e- passing PID;E_out [GeV];Counts"                 ,300,   0.,  1.);
-        TH1D * hist_e_EC_out2  = new TH1D("hist_e_EC_out2"  ,"e- passing PID+fid;E_out [GeV];Counts"             ,300,   0.,  1.);
-	
+	TH1D * hist_e_EC_out1  = new TH1D("hist_e_EC_out1"  ,"e- passing PID;E_out [GeV];Counts"                 ,300,   0.,  1.);
+	TH1D * hist_e_EC_out2  = new TH1D("hist_e_EC_out2"  ,"e- passing PID+fid;E_out [GeV];Counts"             ,300,   0.,  1.);
+
 	TH1D * hist_e_EC_tot0   = new TH1D("hist_e_EC_tot0"  ,"e- before cuts;E_tot [GeV];Counts"                ,300,   0.,  1.);
-        TH1D * hist_e_EC_tot1   = new TH1D("hist_e_EC_tot1"  ,"e- passing PID;E_tot [GeV];Counts"                ,300,   0.,  1.);
-        TH1D * hist_e_EC_tot2   = new TH1D("hist_e_EC_tot2"  ,"e- passing PID+fid;E_tot [GeV];Counts"            ,300,   0.,  1.);
+	TH1D * hist_e_EC_tot1   = new TH1D("hist_e_EC_tot1"  ,"e- passing PID;E_tot [GeV];Counts"                ,300,   0.,  1.);
+	TH1D * hist_e_EC_tot2   = new TH1D("hist_e_EC_tot2"  ,"e- passing PID+fid;E_tot [GeV];Counts"            ,300,   0.,  1.);
 
 	TH2D * hist_e_phiTheta0= new TH2D("hist_e_phiTheta0","e- before  cuts;Phi [deg];Theta [deg];Counts"      ,300,-100.,380.,300,10.,50.);
 	TH2D * hist_e_phiTheta1= new TH2D("hist_e_phiTheta1","e- passing PID;Phi [deg];Theta [deg];Counts"       ,300,-100.,380.,300,10.,50.);
@@ -138,7 +138,7 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_Ein_Eout2= new TH2D("hist_e_Ein_Eout2","e- passing PID+fid;E_in/p;E_out/p;Counts"          ,300,   0., 0.5,300, 0.,0.5);
 
 	TH2D * hist_e_xyEC_hit0= new TH2D("hist_e_xyEC_hit0","e- before cuts;ECx [cm];ECy [cm];Counts"           ,300,-400.,400.,300,-400.,400.);
-        TH2D * hist_e_xyEC_hit1= new TH2D("hist_e_xyEC_hit1","e- passing PID;ECx [cm];ECy [cm];Counts"           ,300,-400.,400.,300,-400.,400.);
+	TH2D * hist_e_xyEC_hit1= new TH2D("hist_e_xyEC_hit1","e- passing PID;ECx [cm];ECy [cm];Counts"           ,300,-400.,400.,300,-400.,400.);
 	TH2D * hist_e_xyEC_hit2= new TH2D("hist_e_xyEC_hit2","e- passing PID+fid;ECx [cm];ECy [cm];Counts"       ,300,-400.,400.,300,-400.,400.);
 
 	TH2D * hist_e_p_Etot0  = new TH2D("hist_e_p_Etot0"  ,"e- before cuts;p [GeV];E_tot/p;Counts"             ,300,   0.,  5.,300, 0.,0.7);
@@ -186,17 +186,17 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic proton histograms
-	TH2D * hist_p_phiTheta0= new TH2D("hist_p_phiTheta0","p before cuts;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,10.,50.);
-	TH2D * hist_p_phiTheta1= new TH2D("hist_p_phiTheta1","p passing fid;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,10.,50.);
-	TH2D * hist_p_phiTheta2= new TH2D("hist_p_phiTheta2","p passing fid+PID;Phi [deg];Theta [deg];Counts" ,300,-100.,380.,300,10.,50.);
+	TH2D * hist_p_phiTheta0= new TH2D("hist_p_phiTheta0","p before cuts;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,0.,55.);
+	TH2D * hist_p_phiTheta1= new TH2D("hist_p_phiTheta1","p passing fid;Phi [deg];Theta [deg];Counts"     ,300,-100.,380.,300,0.,55.);
+	TH2D * hist_p_phiTheta2= new TH2D("hist_p_phiTheta2","p passing fid+PID;Phi [deg];Theta [deg];Counts" ,300,-100.,380.,300,0.,55.);
 
 	TH2D * hist_p_deltaTmom= new TH2D("hist_p_deltaTmom","p passing fid. cuts;deltaT;p [GeV];Counts"             ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p passing fid. cuts;p [GeV];(p - p_corr) [GeV];Counts" ,300,   0.,  3.,300,-.000005, .000005);
+	TH2D * hist_p_p_momCor = new TH2D("hist_p_p_momCor" ,"p passing fid. cuts;p [GeV];p - p_corr [GeV];Counts" ,100,   0.,  3.,100,-.1,.01);
 	TH2D * hist_p_vzVzCor  = new TH2D("hist_p_vzVzCor"  ,"p passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300, -20., 20.,300,-1., 1.);
 	TH2D * hist_p_phiVz0   = new TH2D("hist_p_phiVz0"   ,"p passing cuts, before vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
 	TH2D * hist_p_phiVz    = new TH2D("hist_p_phiVz"    ,"p passing cuts,  after vtx corr; phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10.);
-	TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p passing cuts, before vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
-	TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p passing cuts,  after vtx corr; theta [deg];vz [cm];Counts",300, -10., 80.,300,-11,11);
+	TH2D * hist_p_thetaVz0 = new TH2D("hist_p_thetaVz0" ,"p passing cuts, before vtx corr; theta [deg];vz [cm];Counts",300, 0.,100.,300,-11,11);
+	TH2D * hist_p_thetaVz  = new TH2D("hist_p_thetaVz"  ,"p passing cuts,  after vtx corr; theta [deg];vz [cm];Counts",300, 0.,100.,300,-11,11);
 	TH2D * hist_p_pBeta    = new TH2D("hist_p_pBeta"    ,"p passing fid. cuts;p [GeV];#beta;Counts"                 ,300,   0.,  4.,300, 0.,1.3);
 
 	// ---------------------------------------
@@ -214,7 +214,7 @@ int main(int argc, char ** argv)
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom;
 
 	int nParticles;
-	int nProtons;
+	int nProtons, nNeutrons;
 	int Part_type   [20];
 	double vtx_z_unc[20];
 	double vtx_z_cor[20];
@@ -223,18 +223,20 @@ int main(int argc, char ** argv)
 	double mom_z    [20];
 
 	/* 
-	=========================
-	Part_type values (http://www.star.bnl.gov/public/comp/simu/newsite/gstar/kumacs/NewParticle.html)
-	  -11 = electron
-         2212 = proton
-          211 = pi+
-         -211 = pi-
-          111 = pi0
-	=========================
-	*/ 
+	   =========================
+	   Part_type values (http://www.star.bnl.gov/public/comp/simu/newsite/gstar/kumacs/NewParticle.html)
+	   -11 = electron
+	   2212 = proton
+	   2112 = neutron
+	   211 = pi+
+	   -211 = pi-
+	   111 = pi0
+	   =========================
+	 */ 
 
 	outtree->Branch("nParticles", &nParticles, "nParticles/I"           );
 	outtree->Branch("nProtons"  , &nProtons  , "nProtons/I"             );
+	outtree->Branch("nNeutrons" , &nNeutrons , "nNeutrons/I"            );
 	outtree->Branch("Part_type" , &Part_type , "Part_type[nParticles]/I");
 	outtree->Branch("e_vz"      , &e_vz      , "e_vz/D"                 );
 	outtree->Branch("vtx_z_unc" , &vtx_z_unc , "vtx_z_unc[nParticles]/D");
@@ -320,41 +322,41 @@ int main(int argc, char ** argv)
 		// ---------------------------------------------------------------------------------------
 
 		hist_e_Nphe0     -> Fill( Nphe        [0]  );
-                hist_e_EC_in0    -> Fill( EC_in       [0]  );
-                hist_e_EC_out0   -> Fill( EC_out      [0]  );
-                hist_e_EC_tot0   -> Fill( EC_tot      [0]  );
-                hist_e_phiTheta0 -> Fill( phi         [0], theta        [0]);
-                hist_e_Ein_Eout0 -> Fill( EC_in[0]/mom[0], EC_out[0]/mom[0]);
-                hist_e_p_Etot0   -> Fill( mom         [0], EC_tot[0]/mom[0]);
-                hist_e_xyEC_hit0 -> Fill( EC_X        [0], EC_Y         [0]);
-                hist_e_p_E0      -> Fill( mom         [0], el_cand_EC      );
-                hist_e_thetaMom0 -> Fill( theta       [0], mom          [0]);
+		hist_e_EC_in0    -> Fill( EC_in       [0]  );
+		hist_e_EC_out0   -> Fill( EC_out      [0]  );
+		hist_e_EC_tot0   -> Fill( EC_tot      [0]  );
+		hist_e_phiTheta0 -> Fill( phi         [0], theta        [0]);
+		hist_e_Ein_Eout0 -> Fill( EC_in[0]/mom[0], EC_out[0]/mom[0]);
+		hist_e_p_Etot0   -> Fill( mom         [0], EC_tot[0]/mom[0]);
+		hist_e_xyEC_hit0 -> Fill( EC_X        [0], EC_Y         [0]);
+		hist_e_p_E0      -> Fill( mom         [0], el_cand_EC      );
+		hist_e_thetaMom0 -> Fill( theta       [0], mom          [0]);
 
 		// ---------------------------------------------------------------------------------------
 		//Electron particle Identification
 		if (!(                  (EC_in [0] > EC_in_cut) &&      // Electron candidate has enough energy deposit in inner layer of EC    
-                                        (el_cand_EC > el_EC_cut) &&     // Enough total energy in the EC
-                                        (fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) // Electron PID (E/p)
-                     ))
-                {continue;}
+					(el_cand_EC > el_EC_cut) &&     // Enough total energy in the EC
+					(fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) // Electron PID (E/p)
+		     ))
+		{continue;}
 
 		// ---------------------------------------
 		// Additional cut for 2GeV data:
 		double el_sccc_dt = SC_Time[0] - CC_Time[0] - (SC_Path[0] - CC_Path[0])/(c_m_s*ns_to_s*100.);
-		
+
 		if(			(tab_E1==2261)&&(	
 					CC_Chi2[0]>=0.1 ||
 					el_sccc_dt < sc_cc_dt_cut_sect[e_sect] ||
 					sqrt(mom[0]*mom[0]+me*me)>tab_E1/1000.
-				   ))
+					))
 		{continue;}	
-		
+
 		// ---------------------------------------------------------------------------------------
-                // If the event made it here, the electron candidate passed all PID cuts
+		// If the event made it here, the electron candidate passed all PID cuts
 		hist_e_Nphe1     -> Fill( Nphe        [0]  );
 		hist_e_EC_in1    -> Fill( EC_in       [0]  );
 		hist_e_EC_out1   -> Fill( EC_out      [0]  );
-                hist_e_EC_tot1   -> Fill( EC_tot      [0]  );
+		hist_e_EC_tot1   -> Fill( EC_tot      [0]  );
 		hist_e_phiTheta1 -> Fill( phi         [0], theta        [0]);
 		hist_e_Ein_Eout1 -> Fill( EC_in[0]/mom[0], EC_out[0]/mom[0]);
 		hist_e_p_Etot1   -> Fill( mom         [0], EC_tot[0]/mom[0]);
@@ -366,7 +368,7 @@ int main(int argc, char ** argv)
 		// Electron Fiducial cuts
 		if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
 		if (!fid_params.CutUVW(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
-		
+
 		// ---------------------------------------------------------------------------------------
 		nParticles++;
 		Part_type[0] = -11;
@@ -386,7 +388,7 @@ int main(int argc, char ** argv)
 		hist_e_Nphe2    -> Fill(Nphe[0]);
 		hist_e_EC_in2   -> Fill(EC_in[0]);
 		hist_e_EC_out2  -> Fill(EC_out[0]);
-                hist_e_EC_tot2  -> Fill(EC_tot[0]);
+		hist_e_EC_tot2  -> Fill(EC_tot[0]);
 		hist_e_xyEC_hit2-> Fill(EC_X[0],EC_Y[0]);
 		hist_e_thetaMom2-> Fill(theta[0],mom[0]);
 		hist_e_momCor   -> Fill(T3_e_mom_cor.Mag()-T3_e_mom.Mag());
@@ -411,13 +413,15 @@ int main(int argc, char ** argv)
 		else {cout << "Something is wrong with the definition of sectors" << endl;}
 
 		// --------------------------------------------------------------------------------------------------
-		// Loop over events looking for positive particles
-		nProtons=0;      
+		// Loop over events looking for other particles
+		nProtons =0;      
+		nNeutrons=0;
 		for (int i=1 ; i<gPart ; i++)
 		{
 			T3_p_mom.SetXYZ(px[i],py[i],pz[i]);
 			double e_t0 = SC_Time[0] - SC_Path[0]/c_cm_ns;
 
+			// ------------------------------------------------------------------------------------------
 			// Test if positive particle
 			if(             (StatSC[i] > 0) && 		// SC status is good for the positive candidate
 					(StatDC[i] > 0) &&              // DC status is good for the positive candidate
@@ -443,7 +447,7 @@ int main(int argc, char ** argv)
 					double delta_t = p_t0 - e_t0;
 					if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
 							(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
-					){
+					  ){
 						nParticles++;
 						nProtons++;	
 						Part_type[i] = 2212;
@@ -487,6 +491,27 @@ int main(int argc, char ** argv)
 					// --------------------------------------------------------------------
 				}
 			}
+			// ------------------------------------------------------------------------------------------
+			// Test if neutral particle
+			if(             StatEC[i] > 0 && 
+					StatDC[i] <=0 &&
+					StatSC[i] <=0 &&
+					Stat  [i] > 0 &&
+					charge[i] ==0
+			  )
+			{
+				// --------------------------------------------------------------------
+				// Look specifically for neutrons 
+				if(             beta[i]<0.95 &&
+						id_guess[i] == 2112
+				  )
+				{
+					nNeutrons++;
+					Part_type[i] = 2112;
+				}
+
+			}
+
 		}
 
 		// --------------------------------------------------------------------------------------------------
@@ -504,13 +529,13 @@ int main(int argc, char ** argv)
 	// --------------------------------------------------------------------------------------------------
 	// Editing histograms
 	hist_e_Nphe1  -> SetLineColor(2);
-        hist_e_Nphe2  -> SetLineColor(8);
+	hist_e_Nphe2  -> SetLineColor(8);
 	hist_e_EC_in1 -> SetLineColor(2);
 	hist_e_EC_in2 -> SetLineColor(8);
 	hist_e_EC_out1-> SetLineColor(2);
-        hist_e_EC_out2-> SetLineColor(8);
+	hist_e_EC_out2-> SetLineColor(8);
 	hist_e_EC_tot1-> SetLineColor(2);
-        hist_e_EC_tot2-> SetLineColor(8);
+	hist_e_EC_tot2-> SetLineColor(8);
 	hist_e_vz     -> SetLineColor(2);
 	// ---
 	TLegend * leg = new TLegend(0.5,0.5,0.8,0.8);
@@ -525,28 +550,28 @@ int main(int argc, char ** argv)
 	leg          -> Draw("same");
 
 	TCanvas *c2 = new TCanvas("c2");
-        hist_e_EC_in0 -> Draw();
-        hist_e_EC_in1 -> Draw("same");
-        hist_e_EC_in2 -> Draw("same");
-        leg           -> Draw("same");
+	hist_e_EC_in0 -> Draw();
+	hist_e_EC_in1 -> Draw("same");
+	hist_e_EC_in2 -> Draw("same");
+	leg           -> Draw("same");
 
 	TCanvas *c3 = new TCanvas("c3");
-        hist_e_EC_out0 -> Draw();
-        hist_e_EC_out1 -> Draw("same");
-        hist_e_EC_out2 -> Draw("same");
-        leg            -> Draw("same");
+	hist_e_EC_out0 -> Draw();
+	hist_e_EC_out1 -> Draw("same");
+	hist_e_EC_out2 -> Draw("same");
+	leg            -> Draw("same");
 
 	TCanvas *c4 = new TCanvas("c4");
-        hist_e_EC_tot0 -> Draw();
-        hist_e_EC_tot1 -> Draw("same");
-        hist_e_EC_tot2 -> Draw("same");
-        leg            -> Draw("same");
+	hist_e_EC_tot0 -> Draw();
+	hist_e_EC_tot1 -> Draw("same");
+	hist_e_EC_tot2 -> Draw("same");
+	leg            -> Draw("same");
 
 	TCanvas *c5 = new TCanvas("c5");
 	c5 -> Divide(3,1);
 	c5 -> cd(1);	hist_e_thetaMom0 -> Draw("COLZ"); 
 	c5 -> cd(2);	hist_e_thetaMom1 -> Draw("COLZ");
-        c5 -> cd(3);	hist_e_thetaMom2 -> Draw("COLZ");
+	c5 -> cd(3);	hist_e_thetaMom2 -> Draw("COLZ");
 
 	TCanvas *c6 = new TCanvas("c6");
 	c6 -> Divide(2,1);
@@ -555,27 +580,27 @@ int main(int argc, char ** argv)
 
 	TCanvas *c7 = new TCanvas("c7");
 	hist_e_vzVzCor -> Draw("COLZ");
-	
+
 	TCanvas *c8 = new TCanvas("c8");
 	c8 -> Divide(3,1);
-        c8 -> cd(1);	hist_e_Ein_Eout0 -> Draw("COLZ");
-        c8 -> cd(2);	hist_e_Ein_Eout1 -> Draw("COLZ");
-        c8 -> cd(3);	hist_e_Ein_Eout2 -> Draw("COLZ");
+	c8 -> cd(1);	hist_e_Ein_Eout0 -> Draw("COLZ");
+	c8 -> cd(2);	hist_e_Ein_Eout1 -> Draw("COLZ");
+	c8 -> cd(3);	hist_e_Ein_Eout2 -> Draw("COLZ");
 
 	TCanvas *c9 = new TCanvas("c9");
-        c9 -> Divide(3,1);
+	c9 -> Divide(3,1);
 	c9 -> cd(1);	hist_e_xyEC_hit0 -> Draw("COLZ");
-        c9 -> cd(2);	hist_e_xyEC_hit1 -> Draw("COLZ");
-        c9 -> cd(3);	hist_e_xyEC_hit2 -> Draw("COLZ");
-	
+	c9 -> cd(2);	hist_e_xyEC_hit1 -> Draw("COLZ");
+	c9 -> cd(3);	hist_e_xyEC_hit2 -> Draw("COLZ");
+
 	TCanvas *c10 = new TCanvas("c10");
-        c10 -> Divide(3,1);
+	c10 -> Divide(3,1);
 	c10 -> cd(1);	hist_e_p_Etot0 -> Draw("COLZ");
-        c10 -> cd(2);	hist_e_p_Etot1 -> Draw("COLZ");
-        c10 -> cd(3);	hist_e_p_Etot2 -> Draw("COLZ");
+	c10 -> cd(2);	hist_e_p_Etot1 -> Draw("COLZ");
+	c10 -> cd(3);	hist_e_p_Etot2 -> Draw("COLZ");
 
 	TCanvas *c11 = new TCanvas("c11");
-        c11 -> Divide(3,1);
+	c11 -> Divide(3,1);
 	c11 -> cd(1);	hist_e_p_E0 -> Draw("COLZ");
 	c11 -> cd(2);	hist_e_p_E1 -> Draw("COLZ");
 	c11 -> cd(3);	hist_e_p_E2 -> Draw("COLZ");
@@ -588,11 +613,11 @@ int main(int argc, char ** argv)
 	hist_e_phiTheta2 -> Draw("COLZ");
 
 	TCanvas *c15 = new TCanvas("c15");
-        hist_e_vz0 -> Draw();
-        hist_e_vz  -> Draw("same");
+	hist_e_vz0 -> Draw();
+	hist_e_vz  -> Draw("same");
 
 	TCanvas *c16 = new TCanvas("c16");
-        c16 -> Divide(3,2);
+	c16 -> Divide(3,2);
 	c16 -> cd(1);	hist_e_vz_sec10 -> Draw();
 	c16 -> cd(2);	hist_e_vz_sec20 -> Draw();
 	c16 -> cd(3);	hist_e_vz_sec30 -> Draw();
@@ -601,69 +626,69 @@ int main(int argc, char ** argv)
 	c16 -> cd(6);	hist_e_vz_sec60 -> Draw();
 
 	TCanvas *c17 = new TCanvas("c17");
-        c17 -> Divide(3,2);
+	c17 -> Divide(3,2);
 	c17 -> cd(1);	hist_e_vz_sec1 -> Draw();
-        c17 -> cd(2);	hist_e_vz_sec2 -> Draw();
-        c17 -> cd(3);	hist_e_vz_sec3 -> Draw();
-        c17 -> cd(4);	hist_e_vz_sec4 -> Draw();
-        c17 -> cd(5);	hist_e_vz_sec5 -> Draw();
-        c17 -> cd(6);	hist_e_vz_sec6 -> Draw();
+	c17 -> cd(2);	hist_e_vz_sec2 -> Draw();
+	c17 -> cd(3);	hist_e_vz_sec3 -> Draw();
+	c17 -> cd(4);	hist_e_vz_sec4 -> Draw();
+	c17 -> cd(5);	hist_e_vz_sec5 -> Draw();
+	c17 -> cd(6);	hist_e_vz_sec6 -> Draw();
 
 	TCanvas *c18 = new TCanvas("c18");
-        c18 -> Divide(2,1);
+	c18 -> Divide(2,1);
 	c18 -> cd(1);	hist_e_phiVz0 -> Draw("COLZ");
-        c18 -> cd(2);	hist_e_phiVz  -> Draw("COLZ");
-    
+	c18 -> cd(2);	hist_e_phiVz  -> Draw("COLZ");
+
 	TCanvas *c19 = new TCanvas("c19");
-        c19 -> Divide(2,1);
+	c19 -> Divide(2,1);
 	c19 -> cd(1);	hist_e_thetaVz0 -> Draw("COLZ");
-        c19 -> cd(2);	hist_e_thetaVz  -> Draw("COLZ");
+	c19 -> cd(2);	hist_e_thetaVz  -> Draw("COLZ");
 
 	TCanvas *c20 = new TCanvas("c20");
 	hist_pos_pBeta -> Draw("COLZ");
 
 	TCanvas *c21 = new TCanvas("c21");
-        hist_p_pBeta -> Draw("COLZ");
+	hist_p_pBeta -> Draw("COLZ");
 
 	TCanvas *c22 = new TCanvas("c22");
 	c22 -> Divide(2,1);
-        c22 -> cd(1);	hist_p_mass ->Draw();
-        c22 -> cd(2);	hist_p_pMass->Draw("COLZ");
+	c22 -> cd(1);	hist_p_mass ->Draw();
+	c22 -> cd(2);	hist_p_pMass->Draw("COLZ");
 
 	TCanvas *c23 = new TCanvas("c23");
-        hist_p_p_momCor -> Draw("COLZ");
-	
+	hist_p_p_momCor -> Draw("COLZ");
+
 	TCanvas *c24 = new TCanvas("c24");
-        hist_p_vzVzCor -> Draw("COLZ");
+	hist_p_vzVzCor -> Draw("COLZ");
 
 	TCanvas *c25 = new TCanvas("c25");
-        c25 -> Divide(2,1);
+	c25 -> Divide(2,1);
 	c25 -> cd(1);	hist_p_phiVz0 -> Draw("COLZ");
-        c25 -> cd(2);	hist_p_phiVz  -> Draw("COLZ");
-	
+	c25 -> cd(2);	hist_p_phiVz  -> Draw("COLZ");
+
 	TCanvas *c26 = new TCanvas("c26");
-        c26 -> Divide(2,1);
+	c26 -> Divide(2,1);
 	c26 -> cd(1);	hist_p_thetaVz0 -> Draw("COLZ");
-        c26 -> cd(2);	hist_p_thetaVz  -> Draw("COLZ");
- 
+	c26 -> cd(2);	hist_p_thetaVz  -> Draw("COLZ");
+
 	TCanvas *c27 = new TCanvas("c27");
 	hist_p_deltaTmom -> Draw("COLZ");
-	
+
 	TCanvas *c28 = new TCanvas("c28");
-        hist_p_phiTheta0 -> Draw("COLZ");
-	
+	hist_p_phiTheta0 -> Draw("COLZ");
+
 	TCanvas *c29 = new TCanvas("c29");
-        hist_p_phiTheta1 -> Draw("COLZ");
+	hist_p_phiTheta1 -> Draw("COLZ");
 
 	TCanvas *c30 = new TCanvas("c30");
-        hist_p_phiTheta2 -> Draw("COLZ");
+	hist_p_phiTheta2 -> Draw("COLZ");
 
 	// --------------------------------------------------------------------------------------------------
 	// Print histograms on a pdf file
 	c1  -> Print("plots.pdf(","pdf");
 	c2  -> Print("plots.pdf" ,"pdf");
 	c3  -> Print("plots.pdf" ,"pdf");
-        c4  -> Print("plots.pdf" ,"pdf");
+	c4  -> Print("plots.pdf" ,"pdf");
 	c5  -> Print("plots.pdf" ,"pdf");
 	c6  -> Print("plots.pdf" ,"pdf");
 	c7  -> Print("plots.pdf" ,"pdf");
@@ -690,7 +715,7 @@ int main(int argc, char ** argv)
 	c28 -> Print("plots.pdf" ,"pdf");
 	c29 -> Print("plots.pdf" ,"pdf");
 	c30 -> Print("plots.pdf)","pdf");
-	
+
 	// --------------------------------------------------------------------------------------------------
 	// Write the output file
 	outfile->cd();

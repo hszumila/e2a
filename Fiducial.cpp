@@ -78,7 +78,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	}
 
 	// ---------------------------------------------------------------------------
-	// Correction for Ebeam = 4.4GeV and 2250A data.
+	// Cut for Ebeam = 4.4GeV and 2250A data.
 	if ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
 
 		double phiMin, phiMax;
@@ -122,7 +122,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 		return ((phi < phiMax) && (phi>phiMin));
 	}
 	// ---------------------------------------------------------------------------
-	// Correction for Ebeam = 2.2GeV and 2250A data.
+	// Cut for Ebeam = 2.2GeV and 2250A data.
 
 	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
 		bool status = true;

@@ -69,7 +69,7 @@ float Run_dependent::ProtonMomCorrection_He3_4Cell(TVector3 V3Pr, float vertex_p
 					*proton_p+down_parm[2])*proton_p+down_parm[1])*proton_p+down_parm[0]);
 
 
-	if(polinom_up<0.  ) polinom_up   = 0;
+	if(polinom_up  <0.) polinom_up   = 0;
 	if(polinom_down<0.) polinom_down = 0;
 
 	float  p_corr_up   = proton_p + proton_p*polinom_up;
@@ -82,9 +82,9 @@ float Run_dependent::ProtonMomCorrection_He3_4Cell(TVector3 V3Pr, float vertex_p
 		return p_corr_down;
 	}
 
-	if((theta_p<=70.)&&(theta_p>=30)&&(theta_p>(20*vertex_p+50))){return p_corr_up;}
-	else if(proton_p<0.57){return p_corr_down;}
-	else {return p_corr_up;}
+	if((theta_p<=70.)&&(theta_p>=30)&&(theta_p>(20*vertex_p+50)))	return p_corr_up;
+	else if(proton_p<0.57)						return p_corr_down;
+	else 								return p_corr_up;
 
 	return -1.;
 

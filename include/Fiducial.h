@@ -16,6 +16,7 @@ class Fiducial
 		bool e_inFidRegion(TVector3 mom);
 		bool in_e_EoverP(double EoverP, double mom, double cut_sigma);
 		bool in_p_deltaT(double delta_t, double mom, double cut_sigma);
+		bool in_pip_deltaT(double delta_t, double mom, double cut_sigma);
 		bool pFiducialCut(TVector3 momentum);
 		bool CutUVW(TVector3 ecxyz);
 		double vz_corr(TVector3 T3_mom);
@@ -29,12 +30,13 @@ class Fiducial
 		std::string tar;
 
 		// Helper functions
-		bool read_e_fid_params ();
-		bool read_e_pcor_params();
-		bool read_e_pid_params ();
-		bool read_p_fid_params ();
-		bool read_p_pid_params ();
-		bool read_vz_cor_params();
+		bool read_e_fid_params   ();
+		bool read_e_pcor_params  ();
+		bool read_e_pid_params   ();
+		bool read_p_fid_params   ();
+		bool read_p_pid_params   ();
+		bool read_pip_pid_params ();
+		bool read_vz_cor_params  ();
 
 		// Fiducial Cut Data
 		double fgPar_Efid_t0_p [6][2];
@@ -76,6 +78,10 @@ class Fiducial
 		// Proton PID data
 		TF1 *prot_deltat_sig;
 		TF1 *prot_deltat_mean;
+		
+		// Pi+ PID data
+		TF1 *pip_deltat_sig;
+                TF1 *pip_deltat_mean;
 };
 
 #endif

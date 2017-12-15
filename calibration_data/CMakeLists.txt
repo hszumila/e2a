@@ -4,6 +4,7 @@ INSTALL (FILES
 	FCP_2261_2250.dat FCP_4461_2250.dat
 	EMCP_2261_2250.dat EMCP_4461_2250.dat
 	protdeltat_mom_2261_2250.root protdeltat_mom_4461_2250.root
+	pipdeltat_mom_2261_2250.root pipdeltat_mom_4461_2250.root
 	PFID_2261_2250.dat PFID_4461_2250.dat
 	run_table.dat
 	prot_mom_corr_18338_18438.dat

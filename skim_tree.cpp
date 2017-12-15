@@ -175,6 +175,7 @@ int main(int argc, char ** argv)
 	// ---
 
 	TH1D * hist_e_momCor   = new TH1D("hist_e_momCor"   ,"e- passing fid. cuts;p corrected - p[GeV];Counts"          ,300, -.1,.04);
+	TH1D * hist_e_momCor1  = new TH1D("hist_e_momCor1"  ,"e- passing fid. cuts;p corrected/p;Counts"          ,300,0.97,1.01);
 	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  ,300,  0.,  6.,300,-.1,.04);
 	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300,-20., 20.,300,-1., 1.);
 
@@ -420,6 +421,7 @@ int main(int argc, char ** argv)
 		hist_e_xyEC_hit2-> Fill(EC_X[0],EC_Y[0]);
 		hist_e_thetaMom2-> Fill(theta[0],mom[0]);
 		hist_e_momCor   -> Fill(T3_e_mom_cor.Mag()-T3_e_mom.Mag());
+		hist_e_momCor1  -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
 		hist_e_momMomCor-> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()-T3_e_mom.Mag());
 		hist_e_vzVzCor  -> Fill(targetZ[0],e_vz_corrected-targetZ[0]);
 		hist_e_Ein_Eout2-> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
@@ -511,8 +513,8 @@ int main(int argc, char ** argv)
 					}
 					// --------------------------------------------------------------------
 					// Look specifically for pions +
-					else if(id_guess[i] == 211       // Guess at the particle ID is good for the pion+ candidate
-							// PID cuts for pions here
+					else if((id_guess[i] == 211)&&       // Guess at the particle ID is good for the pion+ candidate
+							(fid_params.in_pip_deltaT(pip_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID
 					       ){
 						Part_type [nParticles] = 211;
 						e_deltat  [nParticles] = pip_delta_t;
@@ -547,12 +549,14 @@ int main(int argc, char ** argv)
 					hist_neu_pBeta   -> Fill(mom [i],beta [i]);
 					hist_n_phiTheta1 -> Fill(phi [i],theta[i]);
 
+					// Need to correct beta[i] before cutting on it
+					// Probably won't be cutting on id_guess[i] for neutrons. Gotta check with Larry
 					// --------------------------------------------------------------------
 					// Look specifically for neutrons 
-					if(             beta[i] < 0.95 &&
-							id_guess[i] == 2112 // Guess at the particle ID is good for the neutron candidate
-					  )
-					{
+					//if(             beta[i] < 0.95 &&
+					//		id_guess[i] == 2112 // Guess at the particle ID is good for the neutron candidate
+					//  )
+					//{
 
 						Part_type[nParticles] = 2112;
 
@@ -562,7 +566,7 @@ int main(int argc, char ** argv)
 						nNeutrons++;
 						nParticles++;
 					
-					}
+					//}
 
 				}
 
@@ -589,7 +593,11 @@ int main(int argc, char ** argv)
 
 
 		// Fill the output tree
-		outtree->Fill();
+		//if(	(nParticles==2)&&
+		//	(nProtons  ==1)
+		//){
+			outtree->Fill();
+		//}
 	}
 	cerr << "Finished with the event loop...\n";
 
@@ -641,10 +649,11 @@ int main(int argc, char ** argv)
 	c5 -> cd(3);	hist_e_thetaMom2 -> Draw("COLZ");
 
 	TCanvas *c6 = new TCanvas("c6");
-	c6 -> Divide(2,1);
+	c6 -> Divide(3,1);
 	c6 -> cd(1);	hist_e_momCor -> Draw();
-	c6 -> cd(2);	hist_e_momMomCor -> Draw("COLZ");
-
+	c6 -> cd(2);    hist_e_momCor1-> Draw();
+	c6 -> cd(3);	hist_e_momMomCor -> Draw("COLZ");
+	
 	TCanvas *c7 = new TCanvas("c7");
 	hist_e_vzVzCor -> Draw("COLZ");
 

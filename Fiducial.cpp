@@ -16,6 +16,8 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 	el_Ep_ratio_sig  = NULL;
 	prot_deltat_sig  = NULL;
 	prot_deltat_mean = NULL;
+	pip_deltat_sig   = NULL;
+        pip_deltat_mean  = NULL;
 	vz_corr_func     = NULL;
 
 	// Initialize the key run settings
@@ -28,12 +30,13 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 
 	// Read in the various parameters
 	bool all_ok=true;
-	all_ok &= read_e_fid_params (); // Electron fiducial regions
-	all_ok &= read_e_pcor_params(); // Electron momentum corrections
-	all_ok &= read_e_pid_params (); // Electron E/p params
-	all_ok &= read_p_pid_params (); // Proton delta_t vs mom params
-	all_ok &= read_vz_cor_params(); // vz corrections
-	all_ok &= read_p_fid_params (); // Proton fiducial regions
+	all_ok &= read_e_fid_params   (); // Electron fiducial regions
+	all_ok &= read_e_pcor_params  (); // Electron momentum corrections
+	all_ok &= read_e_pid_params   (); // Electron E/p params
+	all_ok &= read_p_pid_params   (); // Proton delta_t vs mom params
+	all_ok &= read_pip_pid_params (); // Pi+ delta_t vs mom params
+	all_ok &= read_vz_cor_params  (); // vz corrections
+	all_ok &= read_p_fid_params   (); // Proton fiducial regions
 
 	if (all_ok)
 		std::cerr << "Successfully read in the various parameters...\n";
@@ -47,16 +50,13 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 Fiducial::~Fiducial()
 {
 	// Memory clean up
-	if (prot_deltat_sig)
-		delete prot_deltat_sig;
-	if (prot_deltat_mean)
-		delete prot_deltat_mean;
-	if (el_Ep_ratio_sig)
-		delete el_Ep_ratio_sig;
-	if (el_Ep_ratio_mean)
-		delete el_Ep_ratio_mean;
-	if (vz_corr_func)
-		delete vz_corr_func;
+	if (prot_deltat_sig )	delete prot_deltat_sig;
+	if (prot_deltat_mean)	delete prot_deltat_mean;
+	if (pip_deltat_sig  )   delete pip_deltat_sig;
+        if (pip_deltat_mean )   delete pip_deltat_mean;
+	if (el_Ep_ratio_sig )	delete el_Ep_ratio_sig;
+	if (el_Ep_ratio_mean)	delete el_Ep_ratio_mean;
+	if (vz_corr_func    )	delete vz_corr_func;
 }
 // ===================================================================================================================================
 bool Fiducial::e_inFidRegion(TVector3 mom)
@@ -196,7 +196,6 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 // ===================================================================================================================================
 bool Fiducial::read_p_fid_params()
 {
-
 	//Parameters for 4 GeV proton's Fiducial Cut Rustam Niyazov
 	//"http://www.physics.odu.edu/~rust/clas/fidp.html"
 
@@ -455,10 +454,8 @@ bool Fiducial::read_p_pid_params()
 	TFile * file_in1 = new TFile(param_file_name);
 
 	// If we previously set these, we should clean up their memory
-	if (prot_deltat_sig)
-		delete prot_deltat_sig;
-	if (prot_deltat_mean)
-		delete prot_deltat_mean;
+	if (prot_deltat_sig)	delete prot_deltat_sig;
+	if (prot_deltat_mean)	delete prot_deltat_mean;
 
 	// Pull from file
 	prot_deltat_sig =(TF1*)file_in1->Get("sig_pol9" )->Clone();
@@ -469,12 +466,39 @@ bool Fiducial::read_p_pid_params()
 	gFile = old_gfile;
 
 	// Test that the histograms were pulled successfully
-	if (!prot_deltat_sig)
-		return false;
-	if (!prot_deltat_mean)
-		return false;
+	if (!prot_deltat_sig)	return false;
+	if (!prot_deltat_mean)	return false;
 
 	return true;
+}
+// ===================================================================================================================================
+bool Fiducial::read_pip_pid_params()
+{
+        char param_file_name[256];
+        sprintf(param_file_name,"%s/.e2a/pipdeltat_mom_%d_%d.root",homedir.c_str(),E1,torus_current);
+        TFile * old_gfile = gFile;
+        TFile * file_in1 = new TFile(param_file_name);
+
+        // If we previously set these, we should clean up their memory
+        if (pip_deltat_sig)    delete pip_deltat_sig;
+        if (pip_deltat_mean)   delete pip_deltat_mean;
+
+        // Pull from file
+        pip_deltat_sig =(TF1*)file_in1->Get("sig_pol9" )->Clone();
+        pip_deltat_mean=(TF1*)file_in1->Get("mean_pol9")->Clone();
+
+        // Put the root global file pointer back to where it was. I hate ROOT. 
+        file_in1->Close();
+        gFile = old_gfile;
+
+        // Test that the histograms were pulled successfully
+        if (!pip_deltat_sig)   return false;
+        if (!pip_deltat_mean)  return false;
+
+	// 4.4 GeV parameters obtained from runs 179-08,08,10,12,13,14,15,16,17,19,20,21,22
+	// 2.2 GeV parameters obtained from runs 181-80,81,82,83,85,86,88,90,98,99 and 182-00,01,02,03,04,05,06
+
+        return true;
 }
 // ===================================================================================================================================
 bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
@@ -493,6 +517,24 @@ bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 		return true;
 	else
 		return false;
+}
+// ===================================================================================================================================
+bool Fiducial::in_pip_deltaT(double delta_t, double mom, double cut_sigma)
+{
+        double pip_mom_lim;
+
+	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) pip_mom_lim=2.5;
+        else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) pip_mom_lim=1.5;
+
+        if (mom > pip_mom_lim) mom = pip_mom_lim;
+
+        double delta_t_up_limit = pip_deltat_mean->Eval(mom) + cut_sigma * pip_deltat_sig->Eval(mom);
+        double delta_t_lo_limit = pip_deltat_mean->Eval(mom) - cut_sigma * pip_deltat_sig->Eval(mom);
+
+        if ((delta_t > delta_t_lo_limit) && (delta_t < delta_t_up_limit))
+                return true;
+        else
+                return false;
 }
 // ===================================================================================================================================
 bool Fiducial::in_e_EoverP(double EoverP, double mom, double cut_sigma)

@@ -504,11 +504,13 @@ bool Fiducial::read_pip_pid_params()
 bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 {
 	double prot_mom_lim;
+	double prot_min = 0.3; //GeV
 
 	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.70;
 	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.15;
 
 	if (mom > prot_mom_lim) mom = prot_mom_lim;
+	if (mom < prot_min    ) return false;
 
 	double delta_t_up_limit = prot_deltat_mean->Eval(mom) + cut_sigma * prot_deltat_sig->Eval(mom);
 	double delta_t_lo_limit = prot_deltat_mean->Eval(mom) - cut_sigma * prot_deltat_sig->Eval(mom);

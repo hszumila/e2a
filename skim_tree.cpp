@@ -177,10 +177,11 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_thetaVz  = new TH2D("hist_e_thetaVz"  ,"e- passing cuts,  after vtx corr;#theta [deg];vz [cm];Counts" ,300, -10., 60.,300,-11,11);
 	// ---
 
-	TH1D * hist_e_momCor   = new TH1D("hist_e_momCor"   ,"e- passing fid. cuts;p corrected - p[GeV];Counts"          ,300, -.1,.04);
-	TH1D * hist_e_momCor1  = new TH1D("hist_e_momCor1"  ,"e- passing fid. cuts;p corrected/p;Counts"          ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor= new TH2D("hist_e_momMomCor","e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  ,300,  0.,  6.,300,-.1,.04);
-	TH2D * hist_e_vzVzCor  = new TH2D("hist_e_vzVzCor"  ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300,-20., 20.,300,-1., 1.);
+	TH1D * hist_e_momCor    = new TH1D("hist_e_momCor"    ,"e- passing fid. cuts;p corrected - p[GeV];Counts"          ,300, -.1,.04 );
+	TH1D * hist_e_momCor1   = new TH1D("hist_e_momCor1"   ,"e- passing fid. cuts;p corrected/p;Counts"                 ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor = new TH2D("hist_e_momMomCor" ,"e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  ,300,  0.,  6.,300,-.1 ,.04 );
+	TH2D * hist_e_momMomCor1= new TH2D("hist_e_momMomCor1","e- passing fid. cuts;p [GeV];p corrected/p;Counts"         ,300,  0.,  6.,300,0.97,1.01);
+	TH2D * hist_e_vzVzCor   = new TH2D("hist_e_vzVzCor"   ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300,-20., 20.,300,-1. , 1. );
 
 	// ---------------------------------------
 	// Diagnostic positive particle histograms
@@ -435,26 +436,27 @@ int main(int argc, char ** argv)
 
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
-		hist_e_Nphe2    -> Fill(Nphe  [0]);
-		hist_e_EC_in2   -> Fill(EC_in [0]);
-		hist_e_EC_out2  -> Fill(EC_out[0]);
-		hist_e_EC_tot2  -> Fill(EC_tot[0]);
-		hist_e_xyEC_hit2-> Fill(EC_X[0],EC_Y[0]);
-		hist_e_thetaMom2-> Fill(theta[0],mom[0]);
-		hist_e_momCor   -> Fill(T3_e_mom_cor.Mag()-T3_e_mom.Mag());
-		hist_e_momCor1  -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		hist_e_momMomCor-> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()-T3_e_mom.Mag());
-		hist_e_vzVzCor  -> Fill(targetZ[0],e_vz_corrected-targetZ[0]);
-		hist_e_Ein_Eout2-> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
-		hist_e_p_Etot2  -> Fill(mom    [0],EC_tot[0]/mom[0]);
-		hist_e_p_E2     -> Fill(mom    [0],el_cand_EC      );
-		hist_e_phiTheta2-> Fill(phi    [0],theta  [0]      );
-		hist_e_phiVz0   -> Fill(phi    [0],targetZ[0]      );
-		hist_e_phiVz    -> Fill(phi    [0],e_vz_corrected  );
-		hist_e_thetaVz0 -> Fill(theta  [0],targetZ[0]      );
-		hist_e_thetaVz  -> Fill(theta  [0],e_vz_corrected  );
-		hist_e_vz0      -> Fill(targetZ[0]                 );
-		hist_e_vz       -> Fill(e_vz_corrected             );
+		hist_e_Nphe2     -> Fill(Nphe  [0]);
+		hist_e_EC_in2    -> Fill(EC_in [0]);
+		hist_e_EC_out2   -> Fill(EC_out[0]);
+		hist_e_EC_tot2   -> Fill(EC_tot[0]);
+		hist_e_xyEC_hit2 -> Fill(EC_X[0],EC_Y[0]);
+		hist_e_thetaMom2 -> Fill(theta[0],mom[0]);
+		hist_e_momCor    -> Fill(T3_e_mom_cor.Mag()-T3_e_mom.Mag());
+		hist_e_momCor1   -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
+		hist_e_momMomCor -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()-T3_e_mom.Mag());
+		hist_e_momMomCor1-> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
+		hist_e_vzVzCor   -> Fill(targetZ[0],e_vz_corrected-targetZ[0]);
+		hist_e_Ein_Eout2 -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
+		hist_e_p_Etot2   -> Fill(mom    [0],EC_tot[0]/mom[0]);
+		hist_e_p_E2      -> Fill(mom    [0],el_cand_EC      );
+		hist_e_phiTheta2 -> Fill(phi    [0],theta  [0]      );
+		hist_e_phiVz0    -> Fill(phi    [0],targetZ[0]      );
+		hist_e_phiVz     -> Fill(phi    [0],e_vz_corrected  );
+		hist_e_thetaVz0  -> Fill(theta  [0],targetZ[0]      );
+		hist_e_thetaVz   -> Fill(theta  [0],e_vz_corrected  );
+		hist_e_vz0       -> Fill(targetZ[0]                 );
+		hist_e_vz        -> Fill(e_vz_corrected             );
 		if      (e_sect==0) {hist_e_vz_sec10 -> Fill(targetZ[0]);	hist_e_vz_sec1 -> Fill(e_vz_corrected);}
 		else if (e_sect==1) {hist_e_vz_sec20 -> Fill(targetZ[0]);	hist_e_vz_sec2 -> Fill(e_vz_corrected);}
 		else if (e_sect==2) {hist_e_vz_sec30 -> Fill(targetZ[0]);	hist_e_vz_sec3 -> Fill(e_vz_corrected);}
@@ -698,10 +700,14 @@ int main(int argc, char ** argv)
 	hist_e_thetaMom3 -> Draw("COLZ");
 
 	TCanvas *c6 = new TCanvas("c6");
-	c6 -> Divide(3,1);
+	c6 -> Divide(2,1);
 	c6 -> cd(1);	hist_e_momCor -> Draw();
 	c6 -> cd(2);    hist_e_momCor1-> Draw();
-	c6 -> cd(3);	hist_e_momMomCor -> Draw("COLZ");
+
+	TCanvas *c61 = new TCanvas("c61");
+	c61 -> Divide(2,1);
+	c61 -> cd(1);    hist_e_momMomCor -> Draw("COLZ");
+	c61 -> cd(2);    hist_e_momMomCor1-> Draw("COLZ");
 
 	TCanvas *c7 = new TCanvas("c7");
 	hist_e_vzVzCor -> Draw("COLZ");
@@ -839,47 +845,48 @@ int main(int argc, char ** argv)
 	hist_n_phiTheta2 -> Draw("COLZ");
 	// --------------------------------------------------------------------------------------------------
 	// Print histograms on a pdf file
-	c1  -> Print("plots.pdf(","pdf");
-	c2  -> Print("plots.pdf" ,"pdf");
-	c3  -> Print("plots.pdf" ,"pdf");
-	c4  -> Print("plots.pdf" ,"pdf");
-	c5  -> Print("plots.pdf" ,"pdf");
-	c51 -> Print("plots.pdf" ,"pdf");
-	c6  -> Print("plots.pdf" ,"pdf");
-	c7  -> Print("plots.pdf" ,"pdf");
-	c8  -> Print("plots.pdf" ,"pdf");
-	c9  -> Print("plots.pdf" ,"pdf");
-	c10 -> Print("plots.pdf" ,"pdf");
-	c11 -> Print("plots.pdf" ,"pdf");
-	c12 -> Print("plots.pdf" ,"pdf");
-	c13 -> Print("plots.pdf" ,"pdf");
-	c14 -> Print("plots.pdf" ,"pdf");
-	c15 -> Print("plots.pdf" ,"pdf");
-	c16 -> Print("plots.pdf" ,"pdf");
-	c17 -> Print("plots.pdf" ,"pdf");
-	c18 -> Print("plots.pdf" ,"pdf");
-	c19 -> Print("plots.pdf" ,"pdf");
-	c20 -> Print("plots.pdf" ,"pdf");
-	c21 -> Print("plots.pdf" ,"pdf");
-	c22 -> Print("plots.pdf" ,"pdf");
-	c23 -> Print("plots.pdf" ,"pdf");
-	c24 -> Print("plots.pdf" ,"pdf");
-	c25 -> Print("plots.pdf" ,"pdf");
-	c26 -> Print("plots.pdf" ,"pdf");
-	c27 -> Print("plots.pdf" ,"pdf");
-	c28 -> Print("plots.pdf" ,"pdf");
-	c29 -> Print("plots.pdf" ,"pdf");
-	c30 -> Print("plots.pdf" ,"pdf");
-	c31 -> Print("plots.pdf" ,"pdf");
-	c32 -> Print("plots.pdf" ,"pdf");
-	c33 -> Print("plots.pdf" ,"pdf");
-	c34 -> Print("plots.pdf" ,"pdf");
-	c35 -> Print("plots.pdf" ,"pdf");
-	c36 -> Print("plots.pdf" ,"pdf");
-	c37 -> Print("plots.pdf" ,"pdf");
-	c38 -> Print("plots.pdf" ,"pdf");
-	c39 -> Print("plots.pdf" ,"pdf");
-	c40 -> Print("plots.pdf)","pdf");
+	c1  -> Print(Form("plots_%d.pdf(",tab_run),"pdf");
+	c2  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c3  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c4  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c5  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c51 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c6  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c61 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c7  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c8  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c9  -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c10 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c11 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c12 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c13 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c14 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c15 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c16 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c17 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c18 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c19 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c20 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c21 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c22 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c23 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c24 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c25 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c26 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c27 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c28 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c29 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c30 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c31 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c32 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c33 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c34 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c35 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c36 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c37 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c38 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c39 -> Print(Form("plots_%d.pdf",tab_run) ,"pdf");
+	c40 -> Print(Form("plots_%d.pdf)",tab_run),"pdf");
 
 	// --------------------------------------------------------------------------------------------------
 	// Write the output file
@@ -898,7 +905,9 @@ int main(int argc, char ** argv)
 	hist_e_thetaMom1    ->Write();
 	hist_e_thetaMom2    ->Write();
 	hist_e_momCor       ->Write();
+	hist_e_momCor1      ->Write();
 	hist_e_momMomCor    ->Write();
+	hist_e_momMomCor1   ->Write();
 	hist_e_vzVzCor      ->Write();
 	hist_e_Ein_Eout0    ->Write();
 	hist_e_Ein_Eout1    ->Write();

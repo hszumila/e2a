@@ -16,9 +16,9 @@
 using namespace std;
 
 // Range of momentum for which we have good fits for PID
-const double epratio_sig_cutrange=3.; // +/- sigma for PID cut
-const double pdeltat_sig_cutrange=3.;
-const double pipdeltat_sig_cutrange=1.5;
+const double epratio_sig_cutrange   =3.; // +/- sigma for electron PID cut
+const double pdeltat_sig_cutrange   =3.; // +/- sigma for proton   PID cut
+const double pipdeltat_sig_cutrange =2.; // +/- sigma for pion     PID cut
 
 // Difference between positive corrected z vertex and electron corrected z vertex
 const double pos_z_cut_min = -2;
@@ -56,6 +56,7 @@ int main(int argc, char ** argv)
 	float Xb, STT, Q2, W, Nu, Yb;
 	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart],
 	      SC_Time[maxPart], SC_Path[maxPart], CC_Time[maxPart], CC_Path[maxPart],
+	      EC_Time[maxPart], EC_Path[maxPart],
 	      charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
 	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart], CC_Chi2[maxPart];
@@ -79,6 +80,8 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("SC_Path"  ,SC_Path ); // Path Length per particle
 	t->SetBranchAddress("CC_Time"  ,CC_Time ); // Time in the cherenkov per particle
 	t->SetBranchAddress("CC_Path"  ,CC_Path ); // Path Length per particle
+	t->SetBranchAddress("EC_Time"  ,EC_Time ); // Time in the EC per particle
+	t->SetBranchAddress("EC_Path"  ,EC_Path ); // Path Length per particle
 	t->SetBranchAddress("Charge"   ,charge  ); // Charge per particle
 	t->SetBranchAddress("Beta"     ,beta    ); // Beta per particle
 	t->SetBranchAddress("Mass"     ,mass    ); // Mass per particle
@@ -223,6 +226,10 @@ int main(int argc, char ** argv)
 	TH2D * hist_n_pBeta    = new TH2D("hist_n_pBeta"    ,"n passing fid. cuts;p [GeV];#beta;Counts"         ,300,   0.,  4.,300, 0.,1.3);
 
 	// ---------------------------------------
+	// Diagnostic electron momentum correction
+	TH2D * hist_e_thetaMom3= new TH2D("e_thetaMom3"     ,"e- passing PID+fid;#theta [deg];Mom [GeV];p correction" ,300,  10., 50.,300, 0., 6.);
+
+	// ---------------------------------------
 	// Setting up output tree and branches
 	TTree * outtree = new TTree("T","Skimmed tree");
 	double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
@@ -236,9 +243,11 @@ int main(int argc, char ** argv)
 	int nParticles;
 	int nProtons, nNeutrons, nPiplus, nPiminus, nPi0;
 	int Part_type    [maxPart];
-	double vtx_z_unc [maxPart], vtx_z_cor[maxPart];
-	double mom_x     [maxPart], mom_y    [maxPart], mom_z    [maxPart]; 
+	double vtx_z_unc [maxPart], vtx_z_cor[maxPart], Mass[maxPart];
+	double mom_x     [maxPart], mom_y    [maxPart], mom_z  [maxPart]; 
 	double e_deltat  [maxPart];
+	double ec_time   [maxPart], ec_path  [maxPart];
+	double ec_in     [maxPart], ec_out   [maxPart], ec_tot [maxPart];
 
 	/* 
 	   =========================
@@ -266,6 +275,12 @@ int main(int argc, char ** argv)
 	outtree->Branch("mom_z"     ,  mom_z     , "mom_z[nParticles]/D"     );
 	outtree->Branch("e_deltat"  ,  e_deltat  , "e_deltat[nParticles]/D"  );
 
+	outtree->Branch("ec_time"   ,  ec_time   , "ec_time[nParticles]/D"   );
+	outtree->Branch("ec_path"   ,  ec_path   , "ec_path[nParticles]/D"   );
+	outtree->Branch("ec_in"     ,  ec_in     , "ec_in[nParticles]/D"     );
+	outtree->Branch("ec_out"    ,  ec_out    , "ec_out[nParticles]/D"    );
+	outtree->Branch("ec_tot"    ,  ec_tot    , "ec_tot[nParticles]/D"    );
+	outtree->Branch("Mass"      ,  Mass      , "Mass[nParticles]/D"      );
 	// --------------------------------------------------------------------------------------------------
 	// Obtaining run number and other important parameters
 	t->GetEvent(0);
@@ -411,6 +426,12 @@ int main(int argc, char ** argv)
 		mom_z    [0] = T3_e_mom_cor.Z();
 		vtx_z_unc[0] = targetZ[0];
 		vtx_z_cor[0] = e_vz_corrected;
+		ec_time  [0] = EC_Time[0];
+                ec_path  [0] = EC_Path[0];
+                ec_in    [0] = EC_in  [0];
+                ec_out   [0] = EC_out [0];
+                ec_tot   [0] = EC_tot [0];
+		Mass     [0] = mass   [0];
 
 		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
@@ -441,7 +462,7 @@ int main(int argc, char ** argv)
 		else if (e_sect==4) {hist_e_vz_sec50 -> Fill(targetZ[0]);	hist_e_vz_sec5 -> Fill(e_vz_corrected);}
 		else if (e_sect==5) {hist_e_vz_sec60 -> Fill(targetZ[0]);	hist_e_vz_sec6 -> Fill(e_vz_corrected);}
 		else {cout << "Something is wrong with the definition of sectors" << endl;}
-
+		hist_e_thetaMom3-> Fill(theta[0],mom[0],T3_e_mom_cor.Mag()-T3_e_mom.Mag());
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for other particles
 		for (int i=1 ; i<gPart ; i++)
@@ -489,7 +510,7 @@ int main(int argc, char ** argv)
 						if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
 							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
 						else	p_mom_corrected=mom[i];	
-		
+
 						Part_type[nParticles] = 2212;
 						e_deltat [nParticles] = delta_t;
 						mom_x    [nParticles] = T3_p_mom.X();
@@ -497,17 +518,23 @@ int main(int argc, char ** argv)
 						mom_z    [nParticles] = T3_p_mom.Z();
 						vtx_z_unc[nParticles] = targetZ  [i];	
 						vtx_z_cor[nParticles] = p_vz_corrected;
+						ec_time  [nParticles] = EC_Time[i];
+                				ec_path  [nParticles] = EC_Path[i];
+                				ec_in    [nParticles] = EC_in  [i];
+                				ec_out   [nParticles] = EC_out [i];
+                				ec_tot   [nParticles] = EC_tot [i];
+						Mass     [nParticles] = mass   [i];
 
-						hist_p_deltaTmom2-> Fill(delta_t            ,mom [i]);
-						hist_p_phiTheta2 -> Fill(phi    [i],theta[i]);
+						hist_p_deltaTmom2-> Fill(delta_t   ,mom [i]		     );
+						hist_p_phiTheta2 -> Fill(phi    [i],theta[i]		     );
 						hist_p_vzVzCor   -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
 						hist_p_p_momCor  -> Fill(mom    [i],mom [i]-p_mom_corrected  );
 						hist_p_phiVz0    -> Fill(phi    [i],targetZ[i]               );
 						hist_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
 						hist_p_thetaVz0  -> Fill(theta  [i],targetZ[i]               );
-						hist_p_thetaVz   -> Fill(theta  [i],p_vz_corrected        	   );
+						hist_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	     );
 						hist_p_pBeta     -> Fill(mom    [i],beta [i]                 );
-						
+
 						nProtons++;
 						nParticles++;
 					}
@@ -516,17 +543,23 @@ int main(int argc, char ** argv)
 					else if((id_guess[i] == 211)&&       // Guess at the particle ID is good for the pion+ candidate
 							(fid_params.in_pip_deltaT(pip_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID
 					       ){
-						Part_type [nParticles] = 211;
-						e_deltat  [nParticles] = pip_delta_t;
-						mom_x     [nParticles] = T3_p_mom.X();
-						mom_y     [nParticles] = T3_p_mom.Y();
-						mom_z     [nParticles] = T3_p_mom.Z();
-						vtx_z_unc [nParticles] = targetZ  [i];
-						vtx_z_cor [nParticles] = p_vz_corrected;
+						Part_type[nParticles] = 211;
+						e_deltat [nParticles] = pip_delta_t;
+						mom_x    [nParticles] = T3_p_mom.X();
+						mom_y    [nParticles] = T3_p_mom.Y();
+						mom_z    [nParticles] = T3_p_mom.Z();
+						vtx_z_unc[nParticles] = targetZ  [i];
+						vtx_z_cor[nParticles] = p_vz_corrected;
+						ec_time  [nParticles] = EC_Time[i];
+                                                ec_path  [nParticles] = EC_Path[i];
+                                                ec_in    [nParticles] = EC_in  [i];
+                                                ec_out   [nParticles] = EC_out [i];
+                                                ec_tot   [nParticles] = EC_tot [i];
+						Mass     [nParticles] = mass   [i];
 
 						hist_pip_pBeta      -> Fill(mom[i] ,beta [i]);	
 						hist_pip_deltaTmom2 -> Fill(pip_delta_t     ,mom  [i]);
-					
+
 						nPiplus++;
 						nParticles++;
 					}
@@ -544,7 +577,7 @@ int main(int argc, char ** argv)
 			       )
 			{
 				hist_n_phiTheta0 -> Fill(phi[i],theta[i]);
-				if(fid_params.pFiducialCut(T3_p_mom)){
+				//if(fid_params.pFiducialCut(T3_p_mom)){
 
 					hist_neu_pBeta   -> Fill(mom [i],beta [i]);
 					hist_n_phiTheta1 -> Fill(phi [i],theta[i]);
@@ -554,21 +587,33 @@ int main(int argc, char ** argv)
 					// --------------------------------------------------------------------
 					// Look specifically for neutrons 
 					//if(             beta[i] < 0.95 &&
-					//		id_guess[i] == 2112 // Guess at the particle ID is good for the neutron candidate
+					// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
 					//  )
 					//{
 
-						Part_type[nParticles] = 2112;
+					Part_type[nParticles] = 2112;
+					e_deltat [nParticles] = pip_delta_t;
+                                        mom_x    [nParticles] = T3_p_mom.X();
+                                        mom_y    [nParticles] = T3_p_mom.Y();
+                                        mom_z    [nParticles] = T3_p_mom.Z();
+                                        vtx_z_unc[nParticles] = targetZ  [i];
+                                        vtx_z_cor[nParticles] = p_vz_corrected;
+                                        ec_time  [nParticles] = EC_Time[i];
+                                        ec_path  [nParticles] = EC_Path[i];
+                                        ec_in    [nParticles] = EC_in  [i];
+                                        ec_out   [nParticles] = EC_out [i];
+                                        ec_tot   [nParticles] = EC_tot [i];
+                                        Mass     [nParticles] = mass   [i];
 
-						hist_n_phiTheta2 -> Fill(phi[i],theta[i]);
-						hist_n_pBeta     -> Fill(mom[i],beta [i]);
-						
-						nNeutrons++;
-						nParticles++;
-					
+					hist_n_phiTheta2 -> Fill(phi[i],theta[i]);
+					hist_n_pBeta     -> Fill(mom[i],beta [i]);
+
+					nNeutrons++;
+					nParticles++;
+
 					//}
 
-				}
+				//}
 
 			}
 			// ------------------------------------------------------------------------------------------
@@ -593,11 +638,12 @@ int main(int argc, char ** argv)
 
 
 		// Fill the output tree
-		//if(	(nParticles==2)&&
-		//	(nProtons  ==1)
-		//){
-			outtree->Fill();
-		//}
+		if(	(nParticles>=3) &&
+			(nProtons  >=2)// &&
+			//(nNeutrons ==1)
+		){
+		outtree->Fill();
+		}
 	}
 	cerr << "Finished with the event loop...\n";
 
@@ -648,12 +694,15 @@ int main(int argc, char ** argv)
 	c5 -> cd(2);	hist_e_thetaMom1 -> Draw("COLZ");
 	c5 -> cd(3);	hist_e_thetaMom2 -> Draw("COLZ");
 
+	TCanvas *c51 = new TCanvas("c51");
+	hist_e_thetaMom3 -> Draw("COLZ");
+
 	TCanvas *c6 = new TCanvas("c6");
 	c6 -> Divide(3,1);
 	c6 -> cd(1);	hist_e_momCor -> Draw();
 	c6 -> cd(2);    hist_e_momCor1-> Draw();
 	c6 -> cd(3);	hist_e_momMomCor -> Draw("COLZ");
-	
+
 	TCanvas *c7 = new TCanvas("c7");
 	hist_e_vzVzCor -> Draw("COLZ");
 
@@ -795,6 +844,7 @@ int main(int argc, char ** argv)
 	c3  -> Print("plots.pdf" ,"pdf");
 	c4  -> Print("plots.pdf" ,"pdf");
 	c5  -> Print("plots.pdf" ,"pdf");
+	c51 -> Print("plots.pdf" ,"pdf");
 	c6  -> Print("plots.pdf" ,"pdf");
 	c7  -> Print("plots.pdf" ,"pdf");
 	c8  -> Print("plots.pdf" ,"pdf");

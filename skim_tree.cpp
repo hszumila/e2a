@@ -702,11 +702,11 @@ int main(int argc, char ** argv)
 
 
 		// Fill the output tree
-		if(		(nParticles>=3) &&
-				(nProtons  >=2)
-		  ){
+		//if(		(nParticles>=3) &&
+		//		(nProtons  >=2)
+		//  ){
 			outtree->Fill();
-		}
+		//}
 	}
 	cerr << "Finished with the event loop...\n";
 

@@ -863,12 +863,12 @@ bool Fiducial::pFiducialCut(TVector3 momentum){
 // V_z correction
 double Fiducial::vz_corr(TVector3 T3_mom) 
 {
-	double theta = 180./M_PI*T3_mom.Theta();
+	double theta = T3_mom.Theta();
 	double phi   = 180./M_PI*T3_mom.Phi();
-	double phi_mod = phi;
+	double phi_mod = phi+30.;
 	if(phi_mod<0) phi_mod+=360;
 
-	return (-(vz_corr_func->GetParameter(1)))*cos((phi_mod-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta*M_PI/180.); 
+	return (-(vz_corr_func->GetParameter(1)))*cos((phi_mod-(vz_corr_func->GetParameter(2)))*M_PI/180.)/tan(theta); 
 
 	//Vertex Correction Parameters:
 	//E1 = 2.2GeV: obtained from empty run 18283, for 4He

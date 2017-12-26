@@ -53,11 +53,11 @@ int main(int argc, char ** argv)
 	const int maxPart = 50;
 	int gPart, CCPart, DCPart, ECPart, SCPart, NRun;
 	int StatDC[maxPart], StatCC[maxPart], StatEC[maxPart], StatSC[maxPart], id_guess[maxPart];
-	float Xb, STT, Q2, W, Nu, Yb;
+	float STT, W, Yb;
 	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart],
 	      SC_Time[maxPart], SC_Path[maxPart], CC_Time[maxPart], CC_Path[maxPart],
 	      EC_Time[maxPart], EC_Path[maxPart],
-	      charge[maxPart], beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
+	      Charge[maxPart], Beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
 	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart], CC_Chi2[maxPart];
 	t->SetBranchAddress("NRun"     ,&NRun   ); // Run number
@@ -82,8 +82,8 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("CC_Path"  ,CC_Path ); // Path Length per particle
 	t->SetBranchAddress("EC_Time"  ,EC_Time ); // Time in the EC per particle
 	t->SetBranchAddress("EC_Path"  ,EC_Path ); // Path Length per particle
-	t->SetBranchAddress("Charge"   ,charge  ); // Charge per particle
-	t->SetBranchAddress("Beta"     ,beta    ); // Beta per particle
+	t->SetBranchAddress("Charge"   ,Charge  ); // Charge per particle
+	t->SetBranchAddress("Beta"     ,Beta    ); // Beta per particle
 	t->SetBranchAddress("Mass"     ,mass    ); // Mass per particle
 	t->SetBranchAddress("Momentum" ,mom     ); // Momentum magnitude per particle
 	t->SetBranchAddress("Momentumx",px      ); // Momentum x component per particle
@@ -98,10 +98,7 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("EC_Y"     ,EC_Y    ); // y positions of hit in the calorimeter
 	t->SetBranchAddress("EC_Z"     ,EC_Z    ); // z positions of hit in the calorimeter
 	t->SetBranchAddress("CC_Chi2"  ,CC_Chi2 ); // angle between CC hit and nearest SC hit (in rad)
-	//t->SetBranchAddress("BjorkenX" ,&Xb     ); // Bjorken X
-	//t->SetBranchAddress("Q2"       ,&Q2     ); // Momentum transfer
 	//t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
-	//t->SetBranchAddress("Nu"       ,&Nu     ); // Energy transfer
 	//t->SetBranchAddress("Yb"       ,&Yb     ); // Y-scaling variable
 
 	/* 
@@ -186,18 +183,18 @@ int main(int argc, char ** argv)
 	TH2D * hist_e_momMomCor = new TH2D("hist_e_momMomCor" ,"e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  ,300,  0.,  6.,300,-.1 ,.04 );
 	TH2D * hist_e_momMomCor1= new TH2D("hist_e_momMomCor1","e- passing fid. cuts;p [GeV];p corrected/p;Counts"         ,300,  0.,  6.,300,0.97,1.01);
 
-	TH1D * hist_e_momCor_sec1   = new TH1D("hist_e_momCor_sec1"   ,"e- passing PID+fid sec1;p corrected/p;Counts"         ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor_sec1= new TH2D("hist_e_momMomCor_sec1","e- passing PID+fid sec1;p [GeV];p corrected/p;Counts" ,300,  0.,  6.,300,0.97,1.01);	
-	TH1D * hist_e_momCor_sec2   = new TH1D("hist_e_momCor_sec2"   ,"e- passing PID+fid sec2;p corrected/p;Counts"         ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor_sec2= new TH2D("hist_e_momMomCor_sec2","e- passing PID+fid sec2;p [GeV];p corrected/p;Counts" ,300,  0.,  6.,300,0.97,1.01);
-	TH1D * hist_e_momCor_sec3   = new TH1D("hist_e_momCor_sec3"   ,"e- passing PID+fid sec3;p corrected/p;Counts"         ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor_sec3= new TH2D("hist_e_momMomCor_sec3","e- passing PID+fid sec3;p [GeV];p corrected/p;Counts" ,300,  0.,  6.,300,0.97,1.01);
-	TH1D * hist_e_momCor_sec4   = new TH1D("hist_e_momCor_sec4"   ,"e- passing PID+fid sec4;p corrected/p;Counts"         ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor_sec4= new TH2D("hist_e_momMomCor_sec4","e- passing PID+fid sec4;p [GeV];p corrected/p;Counts" ,300,  0.,  6.,300,0.97,1.01);
-	TH1D * hist_e_momCor_sec5   = new TH1D("hist_e_momCor_sec5"   ,"e- passing PID+fid sec5;p corrected/p;Counts"         ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor_sec5= new TH2D("hist_e_momMomCor_sec5","e- passing PID+fid sec5;p [GeV];p corrected/p;Counts" ,300,  0.,  6.,300,0.97,1.01);
-	TH1D * hist_e_momCor_sec6   = new TH1D("hist_e_momCor_sec6"   ,"e- passing PID+fid sec6;p corrected/p;Counts"         ,300,0.97,1.01);
-	TH2D * hist_e_momMomCor_sec6= new TH2D("hist_e_momMomCor_sec6","e- passing PID+fid sec6;p [GeV];p corrected/p;Counts" ,300,  0.,  6.,300,0.97,1.01);
+	TH1D * hist_e_momCor_sec1   = new TH1D("hist_e_momCor_sec1"   ,"e- passing PID+fid sec1;p corrected/p;Counts"        ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor_sec1= new TH2D("hist_e_momMomCor_sec1","e- passing PID+fid sec1;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);	
+	TH1D * hist_e_momCor_sec2   = new TH1D("hist_e_momCor_sec2"   ,"e- passing PID+fid sec2;p corrected/p;Counts"        ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor_sec2= new TH2D("hist_e_momMomCor_sec2","e- passing PID+fid sec2;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
+	TH1D * hist_e_momCor_sec3   = new TH1D("hist_e_momCor_sec3"   ,"e- passing PID+fid sec3;p corrected/p;Counts"        ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor_sec3= new TH2D("hist_e_momMomCor_sec3","e- passing PID+fid sec3;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
+	TH1D * hist_e_momCor_sec4   = new TH1D("hist_e_momCor_sec4"   ,"e- passing PID+fid sec4;p corrected/p;Counts"        ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor_sec4= new TH2D("hist_e_momMomCor_sec4","e- passing PID+fid sec4;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
+	TH1D * hist_e_momCor_sec5   = new TH1D("hist_e_momCor_sec5"   ,"e- passing PID+fid sec5;p corrected/p;Counts"        ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor_sec5= new TH2D("hist_e_momMomCor_sec5","e- passing PID+fid sec5;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
+	TH1D * hist_e_momCor_sec6   = new TH1D("hist_e_momCor_sec6"   ,"e- passing PID+fid sec6;p corrected/p;Counts"        ,300,0.97,1.01);
+	TH2D * hist_e_momMomCor_sec6= new TH2D("hist_e_momMomCor_sec6","e- passing PID+fid sec6;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
 
 	TH2D * hist_e_vzVzCor   = new TH2D("hist_e_vzVzCor"   ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300,-20., 20.,300,-1. , 1. );
 
@@ -255,7 +252,7 @@ int main(int argc, char ** argv)
 	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
 	double EC_in_cut, el_EC_cut;
 	double e_t0,beta_assuming_proton,p_t0,delta_t,beta_assuming_pip,pip_t0,pip_delta_t;
-	double corr_px, corr_py, corr_pz;
+	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p;
 
 	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
@@ -263,12 +260,14 @@ int main(int argc, char ** argv)
 	int nParticles;
 	int nProtons, nNeutrons, nPiplus, nPiminus, nPi0;
 	int Part_type    [maxPart];
+	double Nu, Q2, Xb;
 	double vtx_z_unc [maxPart], vtx_z_cor[maxPart], Mass[maxPart];
 	double mom_x     [maxPart], mom_y    [maxPart], mom_z  [maxPart]; 
 	double e_deltat  [maxPart];
 	double ec_time   [maxPart], ec_path  [maxPart];
 	double ec_in     [maxPart], ec_out   [maxPart], ec_tot [maxPart];
-
+	double ec_x      [maxPart], ec_y     [maxPart], ec_z   [maxPart];
+	double charge    [maxPart], beta     [maxPart];
 	/* 
 	   =========================
 	   Part_type values	(http://www.star.bnl.gov/public/comp/simu/newsite/gstar/kumacs/NewParticle.html)
@@ -285,21 +284,26 @@ int main(int argc, char ** argv)
 	outtree->Branch("nProtons"  , &nProtons  , "nProtons/I"              );
 	outtree->Branch("nNeutrons" , &nNeutrons , "nNeutrons/I"             );
 	outtree->Branch("nPiplus"   , &nPiplus   , "nPiplus/I"               );
+	outtree->Branch("Nu"        , &Nu        , "Nu/D"                    );
+	outtree->Branch("Q2"        , &Q2        , "Q2/D"                    );
+	outtree->Branch("Xb"        , &Xb        , "Xb/D"                    );
+	outtree->Branch("charge"    ,  charge    , "charge[nParticles]/D"    );
+	outtree->Branch("beta"      ,  beta      , "beta[nParticles]/D"      );
 	outtree->Branch("Part_type" ,  Part_type , "Part_type[nParticles]/I" );
-	//outtree->Branch("e_vz"      , &e_vz      , "e_vz/D"                  );
 	outtree->Branch("vtx_z_unc" ,  vtx_z_unc , "vtx_z_unc[nParticles]/D" );
 	outtree->Branch("vtx_z_cor" ,  vtx_z_cor , "vtx_z_cor[nParticles]/D" );
-	//outtree->Branch("e_mom"     , e_mom      , "e_mom[3]/D"             );
 	outtree->Branch("mom_x"     ,  mom_x     , "mom_x[nParticles]/D"     );
 	outtree->Branch("mom_y"     ,  mom_y     , "mom_y[nParticles]/D"     );
 	outtree->Branch("mom_z"     ,  mom_z     , "mom_z[nParticles]/D"     );
 	outtree->Branch("e_deltat"  ,  e_deltat  , "e_deltat[nParticles]/D"  );
-
 	outtree->Branch("ec_time"   ,  ec_time   , "ec_time[nParticles]/D"   );
 	outtree->Branch("ec_path"   ,  ec_path   , "ec_path[nParticles]/D"   );
 	outtree->Branch("ec_in"     ,  ec_in     , "ec_in[nParticles]/D"     );
 	outtree->Branch("ec_out"    ,  ec_out    , "ec_out[nParticles]/D"    );
 	outtree->Branch("ec_tot"    ,  ec_tot    , "ec_tot[nParticles]/D"    );
+	outtree->Branch("ec_x"      ,  ec_x      , "ec_x[nParticles]/D"      );
+	outtree->Branch("ec_y"      ,  ec_y      , "ec_y[nParticles]/D"      );
+	outtree->Branch("ec_z"      ,  ec_z      , "ec_z[nParticles]/D"      );
 	outtree->Branch("Mass"      ,  Mass      , "Mass[nParticles]/D"      );
 	// --------------------------------------------------------------------------------------------------
 	// Obtaining run number and other important parameters
@@ -377,7 +381,7 @@ int main(int argc, char ** argv)
 					(StatDC[0] > 0) && // DC status is good for the electron candidate
 					(StatCC[0] > 0) && // CC status is good for the electron candidate
 					(StatSC[0] > 0) && // SC status is good for the electron candidate
-					(charge[0] < 0)    // Electron candidate curvature direction is negative
+					(Charge[0] < 0)    // Electron candidate curvature direction is negative
 		     ))
 		{continue;}
 		// ---------------------------------------------------------------------------------------
@@ -429,8 +433,8 @@ int main(int argc, char ** argv)
 
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
-		if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
-		if (!fid_params.CutUVW(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+		//if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
+		//if (!fid_params.CutUVW(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
 
 		// ---------------------------------------------------------------------------------------
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
@@ -439,6 +443,12 @@ int main(int argc, char ** argv)
 		   )
 			T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
 		else 	T3_e_mom_cor = T3_e_mom;
+
+		// If we get to here, then the electron passed fiducial cuts
+
+		Nu = tab_E1/1000. - T3_e_mom_cor.Mag();	//Energy transfer
+		Q2 = 4.*tab_E1/1000.*T3_e_mom_cor.Mag()*sin(T3_e_mom_cor.Theta()/2.)*sin(T3_e_mom_cor.Theta()/2.);	//4-momentum transfer^2
+		Xb = Q2 / (2*mP*Nu);	//Bjorken scaling variable
 
 		nParticles++;
 		Part_type[0] = -11;
@@ -453,9 +463,13 @@ int main(int argc, char ** argv)
 		ec_in    [0] = EC_in  [0];
 		ec_out   [0] = EC_out [0];
 		ec_tot   [0] = EC_tot [0];
+		ec_x     [0] = EC_X   [0];
+		ec_y     [0] = EC_Y   [0];
+		ec_z     [0] = EC_Z   [0];
 		Mass     [0] = mass   [0];
+		charge   [0] = Charge [0];
+		beta     [0] = Beta   [0];
 
-		// If we get to here, then the electron passed fiducial cuts
 		// Fill some diagnostic histograms
 		hist_e_Nphe2     -> Fill(Nphe  [0]);
 		hist_e_EC_in2    -> Fill(EC_in [0]);
@@ -525,6 +539,8 @@ int main(int argc, char ** argv)
 			Part_type[i] = 0;
 
 			T3_p_mom.SetXYZ(px[i],py[i],pz[i]);
+			u1 = T3_p_mom.Unit();
+			
 			e_t0 = SC_Time[0] - SC_Path[0]/c_cm_ns;
 
 			beta_assuming_proton = mom[i]/sqrt(mom[i]*mom[i] + mP*mP);
@@ -539,7 +555,7 @@ int main(int argc, char ** argv)
 			if(             (StatSC[i] > 0) && 		// SC status is good for the positive candidate
 					(StatDC[i] > 0) &&              // DC status is good for the positive candidate
 					(Stat  [i] > 0) &&		// Global status is good for the positive candidate
-					(charge[i] > 0) 		// Charge is positive
+					(Charge[i] > 0) 		// Charge is positive
 			  )
 			{
 				hist_p_phiTheta0    -> Fill(phi[i]     ,theta[i]);
@@ -547,14 +563,13 @@ int main(int argc, char ** argv)
 				hist_pip_deltaTmom0 -> Fill(pip_delta_t,mom  [i]);
 
 				// Passing positive hadron fiducial cuts
-				if(fid_params.pFiducialCut(T3_p_mom)
-				  ){
+				//if(fid_params.pFiducialCut(T3_p_mom)){
 					// Positive particle vertex (_z) correction
 					p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
 					hist_p_mass         -> Fill(mass[i]);
 					hist_p_pMass        -> Fill(mom [i]    ,mass [i]);
-					hist_pos_pBeta      -> Fill(mom [i]    ,beta [i]);
+					hist_pos_pBeta      -> Fill(mom [i]    ,Beta [i]);
 					hist_p_phiTheta1    -> Fill(phi [i]    ,theta[i]);
 					hist_p_deltaTmom1   -> Fill(delta_t    ,mom  [i]);
 					hist_pip_deltaTmom1 -> Fill(pip_delta_t,mom  [i]);
@@ -567,7 +582,6 @@ int main(int argc, char ** argv)
 							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
 						else	p_mom_corrected=mom[i];	
 
-						u1 = T3_p_mom.Unit();
 						corr_px = p_mom_corrected*u1.X();
 						corr_py = p_mom_corrected*u1.Y();
 						corr_pz = p_mom_corrected*u1.Z();
@@ -587,6 +601,11 @@ int main(int argc, char ** argv)
 						ec_out   [nParticles] = EC_out [i];
 						ec_tot   [nParticles] = EC_tot [i];
 						Mass     [nParticles] = mass   [i];
+						ec_x     [nParticles] = EC_X   [i];
+                				ec_y     [nParticles] = EC_Y   [i];
+                				ec_z     [nParticles] = EC_Z   [i];
+						charge   [nParticles] = Charge [i];
+						beta     [nParticles] = Beta   [i];
 
 						hist_p_deltaTmom2-> Fill(delta_t   ,mom [i]		     );
 						hist_p_phiTheta2 -> Fill(phi    [i],theta[i]		     );
@@ -596,7 +615,7 @@ int main(int argc, char ** argv)
 						hist_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
 						hist_p_thetaVz0  -> Fill(theta  [i],targetZ[i]               );
 						hist_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	     );
-						hist_p_pBeta     -> Fill(mom    [i],beta [i]                 );
+						hist_p_pBeta     -> Fill(mom    [i],Beta [i]                 );
 
 						nProtons++;
 						nParticles++;
@@ -619,8 +638,13 @@ int main(int argc, char ** argv)
 						ec_out   [nParticles] = EC_out [i];
 						ec_tot   [nParticles] = EC_tot [i];
 						Mass     [nParticles] = mass   [i];
+						ec_x     [nParticles] = EC_X   [i];
+                                                ec_y     [nParticles] = EC_Y   [i];
+                                                ec_z     [nParticles] = EC_Z   [i];
+						charge   [nParticles] = Charge [i];
+						beta     [nParticles] = Beta   [i];
 
-						hist_pip_pBeta      -> Fill(mom[i] ,beta [i]);	
+						hist_pip_pBeta      -> Fill(mom[i] ,Beta [i]);	
 						hist_pip_deltaTmom2 -> Fill(pip_delta_t     ,mom  [i]);
 
 						nPiplus++;
@@ -628,7 +652,7 @@ int main(int argc, char ** argv)
 					}
 
 					// --------------------------------------------------------------------
-				}
+				//}
 			}
 			// ------------------------------------------------------------------------------------------
 			// Test if neutral particle
@@ -636,7 +660,7 @@ int main(int argc, char ** argv)
 					StatDC[i] <=0 && // DC status is good for the positive candidate
 					StatSC[i] <=0 && // SC status is good for the positive candidate
 					Stat  [i] > 0 && // Global status is good for the positive candidate
-					charge[i] ==0    // Charge is neutral
+					Charge[i] ==0    // Charge is neutral
 			       )
 			{
 				n_ec_xyz.SetXYZ(EC_X[i],EC_Y[i],EC_Z[i]);
@@ -644,22 +668,31 @@ int main(int argc, char ** argv)
 				hist_n_phiTheta0 -> Fill(phi[i],theta[i]);
 				//if(fid_params.CutUVW(n_ec_xyz)){
 
-				hist_neu_pBeta   -> Fill(mom [i],beta [i]);
+				hist_neu_pBeta   -> Fill(mom [i],Beta [i]);
 				hist_n_phiTheta1 -> Fill(phi [i],theta[i]);
 
-				// Need to correct beta[i] before cutting on it
+				// Need to correct Beta[i] before cutting on it
 				// --------------------------------------------------------------------
 				// Look specifically for neutrons 
-				//if(             beta[i] < 0.95 &&
+				//if(             Beta[i] < 0.95 &&
 				// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
 				//  )
 				//{
 
+				n_p  = Beta[i]*mN/sqrt(1-Beta[i]*Beta[i]);
+
+                                n_px = n_p*u1.X();
+                                n_py = n_p*u1.Y();
+                                n_pz = n_p*u1.Z();
+
 				Part_type[nParticles] = 2112;
 				e_deltat [nParticles] = pip_delta_t;
-				mom_x    [nParticles] = T3_p_mom.X();
-				mom_y    [nParticles] = T3_p_mom.Y();
-				mom_z    [nParticles] = T3_p_mom.Z();
+				mom_x    [nParticles] = n_px;
+				mom_y    [nParticles] = n_py;
+				mom_z    [nParticles] = n_pz;
+				//mom_x    [nParticles] = T3_p_mom.X();
+                                //mom_y    [nParticles] = T3_p_mom.Y();
+                                //mom_z    [nParticles] = T3_p_mom.Z();
 				vtx_z_unc[nParticles] = targetZ  [i];
 				vtx_z_cor[nParticles] = p_vz_corrected;
 				ec_time  [nParticles] = EC_Time[i];
@@ -668,9 +701,14 @@ int main(int argc, char ** argv)
 				ec_out   [nParticles] = EC_out [i];
 				ec_tot   [nParticles] = EC_tot [i];
 				Mass     [nParticles] = mass   [i];
+				ec_x     [nParticles] = EC_X   [i];
+                                ec_y     [nParticles] = EC_Y   [i];
+                                ec_z     [nParticles] = EC_Z   [i];
+				charge   [nParticles] = Charge [i];
+				beta     [nParticles] = Beta   [i];
 
 				hist_n_phiTheta2 -> Fill(phi[i],theta[i]);
-				hist_n_pBeta     -> Fill(mom[i],beta [i]);
+				hist_n_pBeta     -> Fill(mom[i],Beta [i]);
 
 				nNeutrons++;
 				nParticles++;
@@ -685,26 +723,38 @@ int main(int argc, char ** argv)
 			else if(        (StatSC[i] > 0) &&              // SC status is good for the positive candidate
 					(StatDC[i] > 0) &&              // DC status is good for the positive candidate
 					(Stat  [i] > 0) &&              // Global status is good for the positive candidate
-					(charge[i] < 0)                 // Charge is negative
+					(Charge[i] < 0)                 // Charge is negative
 			       )
 			{
+				Part_type[nParticles] = -211;
+                                e_deltat [nParticles] = delta_t;
+                                mom_x    [nParticles] = T3_p_mom.X();
+                                mom_y    [nParticles] = T3_p_mom.Y();
+                                mom_z    [nParticles] = T3_p_mom.Z();
+                                vtx_z_unc[nParticles] = targetZ  [i];
+                                vtx_z_cor[nParticles] = p_vz_corrected;
+                                ec_time  [nParticles] = EC_Time[i];
+                                ec_path  [nParticles] = EC_Path[i];
+                                ec_in    [nParticles] = EC_in  [i];
+                                ec_out   [nParticles] = EC_out [i];
+                                ec_tot   [nParticles] = EC_tot [i];
+                        	Mass     [nParticles] = mass   [i];
+				ec_x     [nParticles] = EC_X   [i];
+                                ec_y     [nParticles] = EC_Y   [i];
+                                ec_z     [nParticles] = EC_Z   [i];
+				charge   [nParticles] = Charge [i];
+				beta     [nParticles] = Beta   [i];
 
+				nParticles++;
 			}
 
 		}
 
 		// --------------------------------------------------------------------------------------------------
-		// Prep the output tree
-		//e_vz     = e_vz_corrected;
-		//e_mom[0] = px[0];
-		//e_mom[1] = py[0];
-		//e_mom[2] = pz[0];
-
-
 		// Fill the output tree
-		//if(		(nParticles>=3) &&
-		//		(nProtons  >=2)
-		//  ){
+		//if((nParticles>=3) &&(nProtons  >=2))
+		//if((nParticles==2)&&(nProtons==1))
+		//{
 			outtree->Fill();
 		//}
 	}

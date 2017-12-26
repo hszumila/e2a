@@ -3,6 +3,7 @@
 
 const double me = 0.000510998;
 const double mP = 0.938272;
+const double mN = 0.93957;
 const double mpc= 0.139570;
 const double mp0= 0.134977;
 const double c_cm_ns = 29.9792458;

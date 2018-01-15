@@ -33,7 +33,6 @@ Run_dependent::Run_dependent(int run_number)
 Run_dependent::~Run_dependent()
 {
 	// Memory clean up
-
 }
 // ===================================================================================================================================
 bool Run_dependent::read_p_pcor_params() // Proton correction parameters
@@ -60,7 +59,7 @@ float Run_dependent::ProtonMomCorrection_He3_4Cell(TVector3 V3Pr, float vertex_p
 	// Returns the corrected MAGNITUDE of the proton momentum,
 
 	float proton_p     = V3Pr.Mag();
-	float theta_p      = V3Pr.Theta()*57.3;
+	float theta_p      = V3Pr.Theta()*180./M_PI;
 
 	float polinom_up   = (((((up_parm[5]*proton_p+up_parm[4])*proton_p+up_parm[3])
 					*proton_p+up_parm[2])*proton_p+up_parm[1])*proton_p+up_parm[0]);
@@ -77,10 +76,7 @@ float Run_dependent::ProtonMomCorrection_He3_4Cell(TVector3 V3Pr, float vertex_p
 
 	if((theta_p>=70.)) return p_corr_up;
 
-	if((theta_p < 30.)||(vertex_p>=(1/20.*theta_p-5/2))||
-			(theta_p<=(-200*proton_p+86))){
-		return p_corr_down;
-	}
+	if((theta_p < 30.)||(vertex_p>=(1/20.*theta_p-5/2))||(theta_p<=(-200*proton_p+86))) return p_corr_down;
 
 	if((theta_p<=70.)&&(theta_p>=30)&&(theta_p>(20*vertex_p+50)))	return p_corr_up;
 	else if(proton_p<0.57)						return p_corr_down;

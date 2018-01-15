@@ -17,6 +17,7 @@ class Fiducial
 		bool in_e_EoverP(double EoverP, double mom, double cut_sigma);
 		bool in_p_deltaT(double delta_t, double mom, double cut_sigma);
 		bool in_pip_deltaT(double delta_t, double mom, double cut_sigma);
+		bool in_pim_deltaT(double delta_t, double mom, double cut_sigma);
 		bool pFiducialCut(TVector3 momentum);
 		bool CutUVW(TVector3 ecxyz);
 		double vz_corr(TVector3 T3_mom);
@@ -36,6 +37,7 @@ class Fiducial
 		bool read_p_fid_params   ();
 		bool read_p_pid_params   ();
 		bool read_pip_pid_params ();
+		bool read_pim_pid_params ();
 		bool read_vz_cor_params  ();
 
 		// Fiducial Cut Data
@@ -82,6 +84,10 @@ class Fiducial
 		// Pi+ PID data
 		TF1 *pip_deltat_sig;
                 TF1 *pip_deltat_mean;
+
+		// Pi- PID data
+                TF1 *pim_deltat_sig;
+                TF1 *pim_deltat_mean;
 };
 
 #endif

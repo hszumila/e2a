@@ -18,6 +18,8 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 	prot_deltat_mean = NULL;
 	pip_deltat_sig   = NULL;
         pip_deltat_mean  = NULL;
+	pim_deltat_sig   = NULL;
+        pim_deltat_mean  = NULL;
 	vz_corr_func     = NULL;
 
 	// Initialize the key run settings
@@ -35,6 +37,7 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 	all_ok &= read_e_pid_params   (); // Electron E/p params
 	all_ok &= read_p_pid_params   (); // Proton delta_t vs mom params
 	all_ok &= read_pip_pid_params (); // Pi+ delta_t vs mom params
+	all_ok &= read_pim_pid_params (); // Pi- delta_t vs mom params
 	all_ok &= read_vz_cor_params  (); // vz corrections
 	all_ok &= read_p_fid_params   (); // Proton fiducial regions
 
@@ -54,6 +57,8 @@ Fiducial::~Fiducial()
 	if (prot_deltat_mean)	delete prot_deltat_mean;
 	if (pip_deltat_sig  )   delete pip_deltat_sig;
         if (pip_deltat_mean )   delete pip_deltat_mean;
+	if (pim_deltat_sig  )   delete pim_deltat_sig;
+        if (pim_deltat_mean )   delete pim_deltat_mean;
 	if (el_Ep_ratio_sig )	delete el_Ep_ratio_sig;
 	if (el_Ep_ratio_mean)	delete el_Ep_ratio_mean;
 	if (vz_corr_func    )	delete vz_corr_func;
@@ -501,6 +506,35 @@ bool Fiducial::read_pip_pid_params()
         return true;
 }
 // ===================================================================================================================================
+bool Fiducial::read_pim_pid_params()
+{
+        char param_file_name[256];
+        sprintf(param_file_name,"%s/.e2a/pimdeltat_mom_%d_%d.root",homedir.c_str(),E1,torus_current);
+        TFile * old_gfile = gFile;
+        TFile * file_in1 = new TFile(param_file_name);
+
+        // If we previously set these, we should clean up their memory
+        if (pim_deltat_sig)    delete pim_deltat_sig;
+        if (pim_deltat_mean)   delete pim_deltat_mean;
+
+        // Pull from file
+        pim_deltat_sig =(TF1*)file_in1->Get("sig_pol9" )->Clone();
+        pim_deltat_mean=(TF1*)file_in1->Get("mean_pol9")->Clone();
+
+        // Put the root global file pointer back to where it was. I hate ROOT. 
+        file_in1->Close();
+        gFile = old_gfile;
+
+        // Test that the histograms were pulled successfully
+        if (!pim_deltat_sig)   return false;
+        if (!pim_deltat_mean)  return false;
+
+        // 4.4 GeV parameters obtained from runs 179-08,08,10,12,13,14,15,16,17,19,20,21,22
+        // 2.2 GeV parameters obtained from runs 181-80,81,82,83,85,86,88,90,98,99 and 182-00,01,02,03,04,05,06
+
+        return true;
+}
+// ===================================================================================================================================
 bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 {
 	double prot_mom_lim;
@@ -526,12 +560,30 @@ bool Fiducial::in_pip_deltaT(double delta_t, double mom, double cut_sigma)
         double pip_mom_lim;
 
 	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) pip_mom_lim=2.5;
-        else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) pip_mom_lim=1.5;
+        else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) pip_mom_lim=1.4;
 
         if (mom > pip_mom_lim) mom = pip_mom_lim;
 
         double delta_t_up_limit = pip_deltat_mean->Eval(mom) + cut_sigma * pip_deltat_sig->Eval(mom);
         double delta_t_lo_limit = pip_deltat_mean->Eval(mom) - cut_sigma * pip_deltat_sig->Eval(mom);
+
+        if ((delta_t > delta_t_lo_limit) && (delta_t < delta_t_up_limit))
+                return true;
+        else
+                return false;
+}
+// ===================================================================================================================================
+bool Fiducial::in_pim_deltaT(double delta_t, double mom, double cut_sigma)
+{
+        double pim_mom_lim;
+
+        if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) pim_mom_lim=2.5;
+        else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) pim_mom_lim=1.4;
+
+        if (mom > pim_mom_lim) mom = pim_mom_lim;
+
+        double delta_t_up_limit = pim_deltat_mean->Eval(mom) + cut_sigma * pim_deltat_sig->Eval(mom);
+        double delta_t_lo_limit = pim_deltat_mean->Eval(mom) - cut_sigma * pim_deltat_sig->Eval(mom);
 
         if ((delta_t > delta_t_lo_limit) && (delta_t < delta_t_up_limit))
                 return true;

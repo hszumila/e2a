@@ -59,7 +59,9 @@ int main(int argc, char ** argv)
 	      EC_Time[maxPart], EC_Path[maxPart],
 	      Charge[maxPart], Beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
-	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart], CC_Chi2[maxPart];
+	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart], EC_U[maxPart],EC_V[maxPart],EC_W[maxPart], 
+	      CC_Chi2[maxPart];
+
 	t->SetBranchAddress("NRun"     ,&NRun   ); // Run number
 	t->SetBranchAddress("gPart"    ,&gPart  ); // Number of particles observed (globally) in the event
 	t->SetBranchAddress("CCPart"   ,&CCPart ); // Number of particles observed in the Cherenkovs
@@ -97,6 +99,9 @@ int main(int argc, char ** argv)
 	t->SetBranchAddress("EC_X"     ,EC_X    ); // x positions of hit in the calorimeter
 	t->SetBranchAddress("EC_Y"     ,EC_Y    ); // y positions of hit in the calorimeter
 	t->SetBranchAddress("EC_Z"     ,EC_Z    ); // z positions of hit in the calorimeter
+	t->SetBranchAddress("EC_U"     ,EC_U    ); // u positions of hit in the calorimeter
+	t->SetBranchAddress("EC_V"     ,EC_V    ); // v positions of hit in the calorimeter
+	t->SetBranchAddress("EC_W"     ,EC_W    ); // w positions of hit in the calorimeter
 	t->SetBranchAddress("CC_Chi2"  ,CC_Chi2 ); // angle between CC hit and nearest SC hit (in rad)
 	//t->SetBranchAddress("W"        ,&W      ); // Hadronic mass
 	//t->SetBranchAddress("Yb"       ,&Yb     ); // Y-scaling variable
@@ -240,7 +245,7 @@ int main(int argc, char ** argv)
 
 	// ---------------------------------------
 	// Diagnostic neutral histograms
-	TH2D * h2_neu_pBeta     = new TH2D("h2_neu_pBeta"     ,"neutral passing fid. cuts;p [GeV];#beta;Counts"   ,300,   0.,  4.,300, 0.,1.3);
+	TH2D * h2_neu_pBeta  = new TH2D("h2_neu_pBeta"  ,"neutral passing fid. cuts;p [GeV];#beta;Counts"   ,300,   0.,  4.,300, 0.,1.3);
 
 	// ---------------------------------------
 	// Diagnostic neutron histograms
@@ -249,6 +254,13 @@ int main(int argc, char ** argv)
 	TH2D * h2_n_phiTheta2= new TH2D("h2_n_phiTheta2","n passing fid+PID;#phi [deg];#theta [deg];Counts" ,300,-100.,380.,300,0.,55.);
 
 	TH2D * h2_n_pBeta    = new TH2D("h2_n_pBeta"    ,"n passing fid. cuts;p [GeV];#beta;Counts"         ,300,   0.,  4.,300, 0.,1.3);
+
+	TH1D * h1_u_0        = new TH1D("h1_u_0"        ,"n before u cut;EC_{u} [cm];Counts"                ,100,   0., 500.);
+	TH1D * h1_v_0        = new TH1D("h1_v_0"        ,"n before v cut;EC_{v} [cm];Counts"                ,100,   0., 500.);
+	TH1D * h1_w_0        = new TH1D("h1_w_0"        ,"n before w cut;EC_{w} [cm];Counts"                ,100,   0., 500.);
+	TH1D * h1_u_1        = new TH1D("h1_u_1"        ,"n after u cut;EC_{u} [cm];Counts"                 ,100,   0., 500.);
+	TH1D * h1_v_1        = new TH1D("h1_v_1"        ,"n after v cut;EC_{v} [cm];Counts"                 ,100,   0., 500.);
+	TH1D * h1_w_1        = new TH1D("h1_w_1"        ,"n after w cut;EC_{w} [cm];Counts"                 ,100,   0., 500.);
 
 	// ---------------------------------------
 	// Diagnostic pi- histograms
@@ -270,7 +282,7 @@ int main(int argc, char ** argv)
 	double e_t0,beta_assuming_proton,p_t0,delta_t,beta_assuming_pip,pip_t0,pip_delta_t;
 	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p;
 
-	TVector3 e_ec_xyz, n_ec_xyz;
+	TVector3 e_ec_xyz, n_ec_uvw;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
 
 	int nParticles;
@@ -451,8 +463,8 @@ int main(int argc, char ** argv)
 
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
-		if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
-		if (!fid_params.CutUVW(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+		//if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
+		//if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
 
 		// ---------------------------------------------------------------------------------------
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
@@ -590,101 +602,102 @@ int main(int argc, char ** argv)
 				h2_pip_deltaTmom0 -> Fill(pip_delta_t,mom  [i]);
 
 				// Passing positive hadron fiducial cuts
-				if(fid_params.pFiducialCut(T3_p_mom)){
-					// Positive particle vertex (_z) correction
-					p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
+				//if(fid_params.pFiducialCut(T3_p_mom)){
 
-					h1_p_mass         -> Fill(mass[i]);
-					h2_p_pMass        -> Fill(mom [i]    ,mass [i]);
-					h2_pos_pBeta      -> Fill(mom [i]    ,Beta [i]);
-					h2_p_phiTheta1    -> Fill(phi [i]    ,theta[i]);
-					h2_p_deltaTmom1   -> Fill(delta_t    ,mom  [i]);
-					h2_pip_deltaTmom1 -> Fill(pip_delta_t,mom  [i]);
-					// --------------------------------------------------------------------
-					// Look specifically for protons
-					if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
-							(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
-					  ){
-						if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
-							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
-						else	p_mom_corrected=mom[i];	
+				// Positive particle vertex (_z) correction
+				p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
-						corr_px = p_mom_corrected*u1.X();
-						corr_py = p_mom_corrected*u1.Y();
-						corr_pz = p_mom_corrected*u1.Z();
+				h1_p_mass         -> Fill(mass[i]);
+				h2_p_pMass        -> Fill(mom [i]    ,mass [i]);
+				h2_pos_pBeta      -> Fill(mom [i]    ,Beta [i]);
+				h2_p_phiTheta1    -> Fill(phi [i]    ,theta[i]);
+				h2_p_deltaTmom1   -> Fill(delta_t    ,mom  [i]);
+				h2_pip_deltaTmom1 -> Fill(pip_delta_t,mom  [i]);
+				// --------------------------------------------------------------------
+				// Look specifically for protons
+				if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
+						(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
+				  ){
+					if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
+						p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
+					else	p_mom_corrected=mom[i];	
 
-						T3_p_mom.SetXYZ(corr_px,corr_py,corr_pz);
+					corr_px = p_mom_corrected*u1.X();
+					corr_py = p_mom_corrected*u1.Y();
+					corr_pz = p_mom_corrected*u1.Z();
 
-						Part_type[nParticles] = 2212;
-						e_deltat [nParticles] = delta_t;
-						mom_x    [nParticles] = T3_p_mom.X();
-						mom_y    [nParticles] = T3_p_mom.Y();
-						mom_z    [nParticles] = T3_p_mom.Z();
-						vtx_z_unc[nParticles] = targetZ  [i];	
-						vtx_z_cor[nParticles] = p_vz_corrected;
-						ec_time  [nParticles] = EC_Time[i];
-						ec_path  [nParticles] = EC_Path[i];
-						ec_in    [nParticles] = EC_in  [i];
-						ec_out   [nParticles] = EC_out [i];
-						ec_tot   [nParticles] = EC_tot [i];
-						Mass     [nParticles] = mass   [i];
-						ec_x     [nParticles] = EC_X   [i];
-						ec_y     [nParticles] = EC_Y   [i];
-						ec_z     [nParticles] = EC_Z   [i];
-						charge   [nParticles] = Charge [i];
-						beta     [nParticles] = Beta   [i];
+					T3_p_mom.SetXYZ(corr_px,corr_py,corr_pz);
 
-						h2_p_deltaTmom2-> Fill(delta_t   ,mom                   [i]);
-						h2_p_phiTheta2 -> Fill(phi    [i],theta                 [i]);
-						h2_p_vzVzCor   -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
-						h2_p_p_momCor0 -> Fill(mom    [i],mom [i]-p_mom_corrected  );
-						h2_p_p_momCor1 -> Fill(mom    [i],p_mom_corrected/mom   [i]);
-						h2_p_th_pCor0  -> Fill(theta  [i],mom [i]-p_mom_corrected  );
-						h2_p_th_pCor1  -> Fill(theta  [i],p_mom_corrected/mom   [i]);
-						h2_p_th_p_cor0 -> Fill(theta  [i],mom[i],mom[i]-p_mom_corrected);
-						h2_p_th_p_cor1 -> Fill(theta  [i],mom[i],p_mom_corrected/mom[i]);
-						h2_p_phiVz0    -> Fill(phi    [i],targetZ               [i]);
-						h2_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
-						h2_p_thetaVz0  -> Fill(theta  [i],targetZ               [i]);
-						h2_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	   );
-						h2_p_pBeta     -> Fill(mom    [i],Beta                  [i]);
+					Part_type[nParticles] = 2212;
+					e_deltat [nParticles] = delta_t;
+					mom_x    [nParticles] = T3_p_mom.X();
+					mom_y    [nParticles] = T3_p_mom.Y();
+					mom_z    [nParticles] = T3_p_mom.Z();
+					vtx_z_unc[nParticles] = targetZ  [i];	
+					vtx_z_cor[nParticles] = p_vz_corrected;
+					ec_time  [nParticles] = EC_Time[i];
+					ec_path  [nParticles] = EC_Path[i];
+					ec_in    [nParticles] = EC_in  [i];
+					ec_out   [nParticles] = EC_out [i];
+					ec_tot   [nParticles] = EC_tot [i];
+					Mass     [nParticles] = mass   [i];
+					ec_x     [nParticles] = EC_X   [i];
+					ec_y     [nParticles] = EC_Y   [i];
+					ec_z     [nParticles] = EC_Z   [i];
+					charge   [nParticles] = Charge [i];
+					beta     [nParticles] = Beta   [i];
 
-						nProtons++;
-						nParticles++;
-					}
-					// --------------------------------------------------------------------
-					// Look specifically for pions +
-					else if((id_guess[i] == 211)&&       // Guess at the particle ID is good for the pion+ candidate
-							(fid_params.in_pip_deltaT(pip_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID
-					       ){
-						Part_type[nParticles] = 211;
-						e_deltat [nParticles] = pip_delta_t;
-						mom_x    [nParticles] = T3_p_mom.X();
-						mom_y    [nParticles] = T3_p_mom.Y();
-						mom_z    [nParticles] = T3_p_mom.Z();
-						vtx_z_unc[nParticles] = targetZ  [i];
-						vtx_z_cor[nParticles] = p_vz_corrected;
-						ec_time  [nParticles] = EC_Time[i];
-						ec_path  [nParticles] = EC_Path[i];
-						ec_in    [nParticles] = EC_in  [i];
-						ec_out   [nParticles] = EC_out [i];
-						ec_tot   [nParticles] = EC_tot [i];
-						Mass     [nParticles] = mass   [i];
-						ec_x     [nParticles] = EC_X   [i];
-						ec_y     [nParticles] = EC_Y   [i];
-						ec_z     [nParticles] = EC_Z   [i];
-						charge   [nParticles] = Charge [i];
-						beta     [nParticles] = Beta   [i];
+					h2_p_deltaTmom2-> Fill(delta_t   ,mom                   [i]);
+					h2_p_phiTheta2 -> Fill(phi    [i],theta                 [i]);
+					h2_p_vzVzCor   -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
+					h2_p_p_momCor0 -> Fill(mom    [i],mom [i]-p_mom_corrected  );
+					h2_p_p_momCor1 -> Fill(mom    [i],p_mom_corrected/mom   [i]);
+					h2_p_th_pCor0  -> Fill(theta  [i],mom [i]-p_mom_corrected  );
+					h2_p_th_pCor1  -> Fill(theta  [i],p_mom_corrected/mom   [i]);
+					h2_p_th_p_cor0 -> Fill(theta  [i],mom[i],mom[i]-p_mom_corrected);
+					h2_p_th_p_cor1 -> Fill(theta  [i],mom[i],p_mom_corrected/mom[i]);
+					h2_p_phiVz0    -> Fill(phi    [i],targetZ               [i]);
+					h2_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
+					h2_p_thetaVz0  -> Fill(theta  [i],targetZ               [i]);
+					h2_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	   );
+					h2_p_pBeta     -> Fill(mom    [i],Beta                  [i]);
 
-						h2_pip_pBeta      -> Fill(mom[i]          ,Beta [i]);	
-						h2_pip_deltaTmom2 -> Fill(pip_delta_t     ,mom  [i]);
-
-						nPiplus++;
-						nParticles++;
-					}
-
-					// --------------------------------------------------------------------
+					nProtons++;
+					nParticles++;
 				}
+				// --------------------------------------------------------------------
+				// Look specifically for pions +
+				else if((id_guess[i] == 211)&&       // Guess at the particle ID is good for the pion+ candidate
+						(fid_params.in_pip_deltaT(pip_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID
+				       ){
+					Part_type[nParticles] = 211;
+					e_deltat [nParticles] = pip_delta_t;
+					mom_x    [nParticles] = T3_p_mom.X();
+					mom_y    [nParticles] = T3_p_mom.Y();
+					mom_z    [nParticles] = T3_p_mom.Z();
+					vtx_z_unc[nParticles] = targetZ  [i];
+					vtx_z_cor[nParticles] = p_vz_corrected;
+					ec_time  [nParticles] = EC_Time[i];
+					ec_path  [nParticles] = EC_Path[i];
+					ec_in    [nParticles] = EC_in  [i];
+					ec_out   [nParticles] = EC_out [i];
+					ec_tot   [nParticles] = EC_tot [i];
+					Mass     [nParticles] = mass   [i];
+					ec_x     [nParticles] = EC_X   [i];
+					ec_y     [nParticles] = EC_Y   [i];
+					ec_z     [nParticles] = EC_Z   [i];
+					charge   [nParticles] = Charge [i];
+					beta     [nParticles] = Beta   [i];
+
+					h2_pip_pBeta      -> Fill(mom[i]          ,Beta [i]);	
+					h2_pip_deltaTmom2 -> Fill(pip_delta_t     ,mom  [i]);
+
+					nPiplus++;
+					nParticles++;
+				}
+
+				// --------------------------------------------------------------------
+				//}
 			}
 			// ------------------------------------------------------------------------------------------
 			// Test if neutral particle
@@ -696,21 +709,32 @@ int main(int argc, char ** argv)
 					Beta  [i] < 1
 			       )
 			{
-				n_ec_xyz.SetXYZ(EC_X[i],EC_Y[i],EC_Z[i]);
+
 
 				h2_n_phiTheta0 -> Fill(phi[i],theta[i]);
-				if(fid_params.CutUVW(n_ec_xyz)){
 
-					h2_neu_pBeta   -> Fill(mom [i],Beta [i]);
-					h2_n_phiTheta1 -> Fill(phi [i],theta[i]);
 
-					// Need to correct Beta[i] before cutting on it
-					// --------------------------------------------------------------------
-					// Look specifically for neutrons 
-					//if(             Beta[i] < 0.95 &&
-					// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
-					//  )
-					//{
+				h2_neu_pBeta   -> Fill(mom [i],Beta [i]);
+				h2_n_phiTheta1 -> Fill(phi [i],theta[i]);
+
+				// Need to correct Beta[i] before cutting on it
+				// --------------------------------------------------------------------
+				// Look specifically for neutrons 
+				//if(             Beta[i] < 0.95 &&
+				// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
+				//  )
+				//{
+
+				h1_u_0 -> Fill(EC_U[i]);
+				h1_v_0 -> Fill(EC_V[i]);
+				h1_w_0 -> Fill(EC_W[i]);
+
+				n_ec_uvw.SetXYZ(EC_U[i],EC_V[i],EC_W[i]);
+				if(fid_params.CutUVW( n_ec_uvw ,10.)){ // Cut 10 cm from the edges of the EC
+
+					h1_u_1 -> Fill(EC_U[i]);
+                                	h1_v_1 -> Fill(EC_V[i]);
+                                	h1_w_1 -> Fill(EC_W[i]);
 
 					n_p  = Beta[i]*mN/sqrt(1-Beta[i]*Beta[i]);
 
@@ -746,9 +770,11 @@ int main(int argc, char ** argv)
 					nNeutrons++;
 					nParticles++;
 
-					//}
-
 				}
+
+				//}
+
+
 
 			}
 			// ------------------------------------------------------------------------------------------
@@ -799,10 +825,10 @@ int main(int argc, char ** argv)
 
 		// --------------------------------------------------------------------------------------------------
 		// Fill the output tree
-		//if((nParticles>=3) &&(nProtons  >=2))
-		//{
-		outtree->Fill();
-		//}
+		if((nParticles>=3) &&(nProtons  >=2))
+		{
+			outtree->Fill();
+		}
 	}
 	cerr << "Finished with the event loop...\n";
 
@@ -1043,12 +1069,21 @@ int main(int argc, char ** argv)
 	h2_n_phiTheta2 -> Draw("COLZ");
 
 	TCanvas *c49 = new TCanvas("c49");
-	h2_pim_deltaTmom0 -> Draw("COLZ");
+	c49 -> Divide(3,2);
+	c49 -> cd(1);	h1_u_0 -> Draw();
+	c49 -> cd(2);   h1_v_0 -> Draw();
+	c49 -> cd(3);   h1_w_0 -> Draw();
+	c49 -> cd(4);   h1_u_1 -> Draw();
+	c49 -> cd(5);   h1_v_1 -> Draw();
+	c49 -> cd(6);   h1_w_1 -> Draw();
 
 	TCanvas *c50 = new TCanvas("c50");
-	h2_pim_deltaTmom1 -> Draw("COLZ");
+	h2_pim_deltaTmom0 -> Draw("COLZ");
 
 	TCanvas *c51 = new TCanvas("c51");
+	h2_pim_deltaTmom1 -> Draw("COLZ");
+
+	TCanvas *c52 = new TCanvas("c52");
 	h2_pim_deltaTmom2 -> Draw("COLZ");
 
 	// --------------------------------------------------------------------------------------------------
@@ -1104,7 +1139,8 @@ int main(int argc, char ** argv)
 	c48 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
 	c49 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
 	c50 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c51 -> Print(Form("../plots/plots_%d.pdf)",tab_run),"pdf");
+	c51 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
+	c52 -> Print(Form("../plots/plots_%d.pdf)",tab_run),"pdf");
 
 	// --------------------------------------------------------------------------------------------------
 	// Write the output file

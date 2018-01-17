@@ -965,7 +965,7 @@ TVector3 Fiducial::FindUVW(TVector3 xyz)
 	return uvw;
 }       
 // ===================================================================================================================================
-bool Fiducial::CutUVW(TVector3 ecxyz)
+bool Fiducial::CutUVW_e(TVector3 ecxyz)
 {       
 	// Cut the edges of EC according to UVW distance threshold defined by par_EcUVW array.
 	// If it passes the cut, return true, if not return false
@@ -981,6 +981,16 @@ bool Fiducial::CutUVW(TVector3 ecxyz)
 	if(sector>5) sector=5;
 	return (ecuvw.X()>par_EcUVW[sector][0] && ecuvw.Y()<par_EcUVW[sector][1] && ecuvw.Z()<par_EcUVW[sector][2]);
 }
+
+// ===================================================================================================================================
+bool Fiducial::CutUVW(TVector3 ecuvw, double dist)
+{
+	return ( (ecuvw.X() > 40) && (ecuvw.Y() < 370 - dist ) && (ecuvw.Z() < 405 - dist) );
+}
+
+
+
+
 
 
 

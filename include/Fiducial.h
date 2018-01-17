@@ -19,7 +19,8 @@ class Fiducial
 		bool in_pip_deltaT(double delta_t, double mom, double cut_sigma);
 		bool in_pim_deltaT(double delta_t, double mom, double cut_sigma);
 		bool pFiducialCut(TVector3 momentum);
-		bool CutUVW(TVector3 ecxyz);
+		bool CutUVW_e(TVector3 ecxyz);
+		bool CutUVW  (TVector3 ecuvw, double dist);
 		double vz_corr(TVector3 T3_mom);
 		TVector3 eMomentumCorrection(TVector3 V3el);
 		TVector3 FindUVW(TVector3 xyz);

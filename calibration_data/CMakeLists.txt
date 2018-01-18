@@ -14,4 +14,5 @@ INSTALL (FILES
 	vz_2261_4He.root
 	vz_2261_3He.root
 	vz_2261_12C.root
+	n_pathlength_corr_4461.dat
         DESTINATION "~/.e2a/")

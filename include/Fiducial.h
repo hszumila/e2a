@@ -32,14 +32,15 @@ class Fiducial
 		std::string tar;
 
 		// Helper functions
-		bool read_e_fid_params   ();
-		bool read_e_pcor_params  ();
-		bool read_e_pid_params   ();
-		bool read_p_fid_params   ();
-		bool read_p_pid_params   ();
-		bool read_pip_pid_params ();
-		bool read_pim_pid_params ();
-		bool read_vz_cor_params  ();
+		bool read_e_fid_params     ();
+		bool read_e_pcor_params    ();
+		bool read_e_pid_params     ();
+		bool read_p_fid_params     ();
+		bool read_p_pid_params     ();
+		bool read_pip_pid_params   ();
+		bool read_pim_pid_params   ();
+		bool read_vz_cor_params    ();
+		bool read_n_pathlength_corr();
 
 		// Fiducial Cut Data
 		double fgPar_Efid_t0_p [6][2];
@@ -89,6 +90,11 @@ class Fiducial
 		// Pi- PID data
                 TF1 *pim_deltat_sig;
                 TF1 *pim_deltat_mean;
+
+		// Neutron pathlength correction
+		double pl_corr_in  ;
+		double pl_corr_out ;
+		double pl_corr_both;
 };
 
 #endif

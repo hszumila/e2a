@@ -32,14 +32,15 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 
 	// Read in the various parameters
 	bool all_ok=true;
-	all_ok &= read_e_fid_params   (); // Electron fiducial regions
-	all_ok &= read_e_pcor_params  (); // Electron momentum corrections
-	all_ok &= read_e_pid_params   (); // Electron E/p params
-	all_ok &= read_p_pid_params   (); // Proton delta_t vs mom params
-	all_ok &= read_pip_pid_params (); // Pi+ delta_t vs mom params
-	all_ok &= read_pim_pid_params (); // Pi- delta_t vs mom params
-	all_ok &= read_vz_cor_params  (); // vz corrections
-	all_ok &= read_p_fid_params   (); // Proton fiducial regions
+	all_ok &= read_e_fid_params      (); // Electron fiducial regions
+	all_ok &= read_e_pcor_params     (); // Electron momentum corrections
+	all_ok &= read_e_pid_params      (); // Electron E/p params
+	all_ok &= read_p_pid_params      (); // Proton delta_t vs mom params
+	all_ok &= read_pip_pid_params    (); // Pi+ delta_t vs mom params
+	all_ok &= read_pim_pid_params    (); // Pi- delta_t vs mom params
+	all_ok &= read_vz_cor_params     (); // vz corrections
+	all_ok &= read_p_fid_params      (); // Proton fiducial regions
+	all_ok &= read_n_pathlength_corr (); // Neutron pathlength correction params
 
 	if (all_ok)
 		std::cerr << "Successfully read in the various parameters...\n";
@@ -197,6 +198,23 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 		std::cerr << "e_inFidRegion doesn't have correction parameters for the given input. Check it and fix it!\n";
 		exit(-3);
 	}
+}
+// ===================================================================================================================================
+bool Fiducial::read_n_pathlength_corr()
+{
+        //Parameters for neutron path length correction
+
+        char param_file_name[256];
+        sprintf(param_file_name,"%s/.e2a/n_pathlength_corr_%d.dat",homedir.c_str(),E1);
+        std::ifstream param_file(param_file_name);
+        std::cout<<param_file_name<<std::endl;
+       
+	param_file >> pl_corr_in  ;
+	param_file >> pl_corr_out ;
+	param_file >> pl_corr_both;
+       
+	param_file.close();
+        return true;
 }
 // ===================================================================================================================================
 bool Fiducial::read_p_fid_params()
@@ -910,7 +928,6 @@ bool Fiducial::pFiducialCut(TVector3 momentum){
 	return status;
 
 }
-
 // ===================================================================================================================================
 // V_z correction
 double Fiducial::vz_corr(TVector3 T3_mom) 
@@ -926,7 +943,6 @@ double Fiducial::vz_corr(TVector3 T3_mom)
 	//E1 = 2.2GeV: obtained from empty run 18283, for 4He
 	//E1 = 4.4GeV: obtained from empty run 18522, for 4He (works fine for 3He)
 }
-
 // ===================================================================================================================================
 TVector3 Fiducial::FindUVW(TVector3 xyz)
 {       
@@ -981,15 +997,12 @@ bool Fiducial::CutUVW_e(TVector3 ecxyz)
 	if(sector>5) sector=5;
 	return (ecuvw.X()>par_EcUVW[sector][0] && ecuvw.Y()<par_EcUVW[sector][1] && ecuvw.Z()<par_EcUVW[sector][2]);
 }
-
 // ===================================================================================================================================
 bool Fiducial::CutUVW(TVector3 ecuvw, double dist)
 {
 	return ( (ecuvw.X() > 40) && (ecuvw.Y() < 370 - dist ) && (ecuvw.Z() < 405 - dist) );
 }
-
-
-
+// ===================================================================================================================================
 
 
 

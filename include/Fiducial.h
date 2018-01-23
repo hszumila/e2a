@@ -16,8 +16,11 @@ class Fiducial
 		bool e_inFidRegion(TVector3 mom);
 		bool in_e_EoverP(double EoverP, double mom, double cut_sigma);
 		bool in_p_deltaT(double delta_t, double mom, double cut_sigma);
+		bool in_pip_deltaT(double delta_t, double mom, double cut_sigma);
+		bool in_pim_deltaT(double delta_t, double mom, double cut_sigma);
 		bool pFiducialCut(TVector3 momentum);
-		bool CutUVW(TVector3 ecxyz);
+		bool CutUVW_e(TVector3 ecxyz);
+		bool CutUVW  (TVector3 ecuvw, double dist);
 		double vz_corr(TVector3 T3_mom);
 		TVector3 eMomentumCorrection(TVector3 V3el);
 		TVector3 FindUVW(TVector3 xyz);
@@ -29,12 +32,15 @@ class Fiducial
 		std::string tar;
 
 		// Helper functions
-		bool read_e_fid_params ();
-		bool read_e_pcor_params();
-		bool read_e_pid_params ();
-		bool read_p_fid_params ();
-		bool read_p_pid_params ();
-		bool read_vz_cor_params();
+		bool read_e_fid_params     ();
+		bool read_e_pcor_params    ();
+		bool read_e_pid_params     ();
+		bool read_p_fid_params     ();
+		bool read_p_pid_params     ();
+		bool read_pip_pid_params   ();
+		bool read_pim_pid_params   ();
+		bool read_vz_cor_params    ();
+		bool read_n_pathlength_corr();
 
 		// Fiducial Cut Data
 		double fgPar_Efid_t0_p [6][2];
@@ -46,7 +52,7 @@ class Fiducial
 		double fgPar_Efid_Theta_S4[2][8];
 		double fgPar_Efid_Theta_S5[8][8];
 		// Momentum Correction Data
-		double fgPar_Phi[6][3];
+		double fgPar_Phi  [6][3];
 		double fgPar_Theta[6][4];
 
 		// Hadron Correction Data
@@ -76,6 +82,19 @@ class Fiducial
 		// Proton PID data
 		TF1 *prot_deltat_sig;
 		TF1 *prot_deltat_mean;
+		
+		// Pi+ PID data
+		TF1 *pip_deltat_sig;
+                TF1 *pip_deltat_mean;
+
+		// Pi- PID data
+                TF1 *pim_deltat_sig;
+                TF1 *pim_deltat_mean;
+
+		// Neutron pathlength correction
+		double pl_corr_in  ;
+		double pl_corr_out ;
+		double pl_corr_both;
 };
 
 #endif

@@ -49,19 +49,13 @@ int main(int argc, char ** argv){
 	istringstream iss (argv[3]);
 	int in_num_part;
 	iss >> in_num_part;
-
-	int digits = 0; 
-	int copy = in_num_part;
-	while (copy) {
-		copy /= 10;
-		digits++;
-	}
-	if(digits != 8){
-		cout << "Third argument must be an integer of 8 digits." << endl;
-		cout << endl << "You have specified an integer of " << digits << " digits" << endl;
+	
+	if(strlen(argv[3]) != 8){
+		cout << endl << "Third argument must be an integer of 8 digits." << endl;
+		cout << "You have specified an integer of " << strlen(argv[3]) << " digits" << endl;
 		exit(1);
 	}
-
+	
 	int min_p   = (in_num_part/10000000)%10;
 	int max_p   = (in_num_part/1000000 )%10;
 	int min_n   = (in_num_part/100000  )%10;

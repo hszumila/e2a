@@ -31,7 +31,16 @@ const double sc_cc_dt_cut_sect[6]={-2,-5,-8,-8,-2,2};
 int main(int argc, char ** argv){
 	if (argc != 4){
 		cerr << "Wrong number of arguments. Instead try\n"
-			<< "\tskim_tree /path/to/input/file /path/to/output/file\n";
+			<< "\tskim_tree /path/to/input/file /path/to/output/file 00000000\n\n";
+		cout << "where the third argument must be an integer of 8 digits."    << endl;
+                cout << "1st digit: minimum number of protons  required in the event" << endl;
+                cout << "2nd digit: maximum number of protons  required in the event" << endl;
+                cout << "3rd digit: minimum number of neutrons required in the event" << endl;
+                cout << "4th digit: maximum number of neutrons required in the event" << endl;
+                cout << "5th digit: minimum number of pion+    required in the event" << endl;
+                cout << "6th digit: maximum number of pion+    required in the event" << endl;
+                cout << "7th digit: minimum number of pion-    required in the event" << endl;
+                cout << "8th digit: maximum number of pion-    required in the event" << endl;
 		return -1;	
 	}
 
@@ -48,15 +57,7 @@ int main(int argc, char ** argv){
 		digits++;
 	}
 	if(digits != 8){
-		cout << "Third argument must be an integer of 8 digits." << endl << endl;
-		cout << "1st digit: minimum number of protons  required in the event" << endl;
-		cout << "2nd digit: maximum number of protons  required in the event" << endl;
-		cout << "3rd digit: minimum number of neutrons required in the event" << endl;
-		cout << "4th digit: maximum number of neutrons required in the event" << endl;
-		cout << "5th digit: minimum number of pion+    required in the event" << endl;
-		cout << "6th digit: maximum number of pion+    required in the event" << endl;
-		cout << "7th digit: minimum number of pion-    required in the event" << endl;
-		cout << "8th digit: maximum number of pion-    required in the event" << endl;
+		cout << "Third argument must be an integer of 8 digits." << endl;
 		cout << endl << "You have specified an integer of " << digits << " digits" << endl;
 		exit(1);
 	}

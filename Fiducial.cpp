@@ -214,6 +214,10 @@ bool Fiducial::read_n_pathlength_corr()
 	param_file >> pl_corr_both;
        
 	param_file.close();
+
+	if(pl_corr_in==0&&pl_corr_out==0&&pl_corr_both==0)
+		std::cout << "*** WARNING *** Won't be correcting neutron path length since there are no available parameters!" << std::endl;
+
         return true;
 }
 // ===================================================================================================================================
@@ -1023,7 +1027,14 @@ bool Fiducial::CutUVW(TVector3 ecuvw, double dist)
         return((x_rot<390.-dist)&&(x_rot>1.73*abs_y_rot+55.+d_intercept));
 }
 // ===================================================================================================================================
+double Fiducial::corrected_path_length( double uncorrected_path_length , double E_in , double E_out  ){
 
+        if      (E_in > 0  && E_out == 0)       return uncorrected_path_length + pl_corr_in  ;
+        else if (E_in == 0 && E_out > 0 )       return uncorrected_path_length + pl_corr_out ;
+        else if (E_in > 0  && E_out > 0 )       return uncorrected_path_length + pl_corr_both;
+        else{   std::cout << "There's something wrong in corrected_path_length" << std::endl;   exit(3);}
+
+}
 
 
 

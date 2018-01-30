@@ -315,7 +315,7 @@ int main(int argc, char ** argv){
 	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
 	double EC_in_cut, el_EC_cut;
 	double e_t0,beta_assuming_proton,p_t0,delta_t,beta_assuming_pip,pip_t0,pip_delta_t;
-	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p;
+	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p, EC_Path_corr, Beta_corr;
 
 	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
@@ -833,18 +833,19 @@ int main(int argc, char ** argv){
 					Beta  [i] < 1
 			       )
 			{
+	
+				EC_Path_corr = fid_params.corrected_path_length( EC_Path[i] , EC_in[i] , EC_out[i] );
+				Beta_corr = EC_Path_corr / (c_cm_ns*(EC_Time[i]-t0));
 
-				h2_n_phiTheta0 -> Fill(phi[i],theta[i]);
-				h2_neu_pBeta   -> Fill(mom [i],Beta [i]);
-				h2_n_phiTheta1 -> Fill(phi [i],theta[i]);
-
-				// Need to correct Beta[i] before cutting on it
+				h2_n_phiTheta0 -> Fill(phi [i],theta[i] );
+                                h2_neu_pBeta   -> Fill(mom [i],Beta_corr);
+                                h2_n_phiTheta1 -> Fill(phi [i],theta[i] );
+	
 				// --------------------------------------------------------------------
 				// Look specifically for neutrons 
-				//if(             Beta[i] < 0.95 &&
+				if( Beta_corr < 0.95 )
 				// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
-				//  )
-				//{
+				{
 
 				h1_u_0 -> Fill(EC_U[i]);
 				h1_v_0 -> Fill(EC_V[i]);
@@ -857,7 +858,7 @@ int main(int argc, char ** argv){
 					h1_v_1 -> Fill(EC_V[i]);
 					h1_w_1 -> Fill(EC_W[i]);
 
-					n_p  = Beta[i]*mN/sqrt(1-Beta[i]*Beta[i]);
+					n_p  = Beta_corr*mN/sqrt(1-Beta_corr*Beta_corr);
 
 					n_px = n_p*u1.X();
 					n_py = n_p*u1.Y();
@@ -891,17 +892,17 @@ int main(int argc, char ** argv){
 					ec_v     [nParticles] = EC_V   [i];
 					ec_w     [nParticles] = EC_W   [i];
 					charge   [nParticles] = Charge [i];
-					beta     [nParticles] = Beta   [i];
+					beta     [nParticles] = Beta_corr ;
 
-					h2_n_phiTheta2 -> Fill(phi[i],theta[i]);
-					h2_n_pBeta     -> Fill(mom[i],Beta [i]);
+					h2_n_phiTheta2 -> Fill(phi[i],theta[i] );
+					h2_n_pBeta     -> Fill(mom[i],Beta_corr);
 
 					nNeutrons++;
 					nParticles++;
 
 				}
 
-				//}
+				}
 
 			}
 

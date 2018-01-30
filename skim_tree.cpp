@@ -317,7 +317,7 @@ int main(int argc, char ** argv){
 	double e_t0,beta_assuming_proton,p_t0,delta_t,beta_assuming_pip,pip_t0,pip_delta_t;
 	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p;
 
-	TVector3 e_ec_xyz, n_ec_uvw;
+	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
 
 	int nParticles;
@@ -850,8 +850,8 @@ int main(int argc, char ** argv){
 				h1_v_0 -> Fill(EC_V[i]);
 				h1_w_0 -> Fill(EC_W[i]);
 
-				n_ec_uvw.SetXYZ(EC_U[i],EC_V[i],EC_W[i]);
-				if(fid_params.CutUVW( n_ec_uvw ,10.)){ // Cut 10 cm from the edges of the EC
+				n_ec_xyz.SetXYZ(EC_X[i],EC_Y[i],EC_Z[i]);
+				if(fid_params.CutUVW( n_ec_xyz ,10.)){ // Cut 10 cm from the edges of the EC
 
 					h1_u_1 -> Fill(EC_U[i]);
 					h1_v_1 -> Fill(EC_V[i]);

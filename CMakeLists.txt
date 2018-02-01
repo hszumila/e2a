@@ -10,9 +10,10 @@ project (e2a)
 
 # ADD SUBDIRECTORIES
 add_subdirectory(calibration_data)
+add_subdirectory(Rey_neutrons)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})
 
 # Add executable for acceptance corrections
-add_executable(skim_tree skim_tree.cpp Fiducial.cpp)
+add_executable(skim_tree skim_tree.cpp Fiducial.cpp Run_dependent.cpp)
 target_link_libraries(skim_tree ${ROOT_LIBRARIES})

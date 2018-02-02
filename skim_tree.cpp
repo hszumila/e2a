@@ -320,7 +320,7 @@ int main(int argc, char ** argv){
 	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
 
-	int nParticles;
+	int nRun, nParticles;
 	int nProtons, nNeutrons, nPiplus, nPiminus, nPi0;
 	int Part_type    [maxPart];
 	double Nu, Q2, Xb, Nu_unc, Q2_unc, Xb_unc, t0;
@@ -346,6 +346,7 @@ int main(int argc, char ** argv){
 	   =========================
 	 */ 
 
+	outtree->Branch("nRun"      , &nRun      , "nRun/I"                  );
 	outtree->Branch("nParticles", &nParticles, "nParticles/I"            );
 	outtree->Branch("nProtons"  , &nProtons  , "nProtons/I"              );
 	outtree->Branch("nNeutrons" , &nNeutrons , "nNeutrons/I"             );
@@ -429,6 +430,8 @@ int main(int argc, char ** argv){
 		if (event % 100000 == 0){cerr << "Working on event " << event << " out of " << nEvents << "\n";}
 
 		t->GetEvent(event);
+
+		nRun = NRun;
 
 		if (gPart <= 0) continue; // Ignore events that have no particle candidates
 
@@ -528,7 +531,7 @@ int main(int argc, char ** argv){
 		Q2_unc = 4.*tab_E1/1000.*T3_e_mom.Mag()*sin(T3_e_mom.Theta()/2.)*sin(T3_e_mom.Theta()/2.);      //4-momentum transfer^2
 		Xb_unc = Q2_unc / (2*mP*Nu_unc);    //Bjorken scaling variable
 
-		// With electron momentum correction (these are saved in th tree)
+		// With electron momentum correction (these are saved in the tree)
 		Nu = tab_E1/1000. - T3_e_mom_cor.Mag();	//Energy transfer
 		Q2 = 4.*tab_E1/1000.*T3_e_mom_cor.Mag()*sin(T3_e_mom_cor.Theta()/2.)*sin(T3_e_mom_cor.Theta()/2.);	//4-momentum transfer^2
 		Xb = Q2 / (2*mP*Nu);	//Bjorken scaling variable

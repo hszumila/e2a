@@ -9,10 +9,7 @@ INSTALL (FILES
 	PFID_2261_2250.dat PFID_4461_2250.dat
 	run_table.dat
 	prot_mom_corr_18338_18438.dat
-	vz_4461_4He.root
-	vz_2261_56Fe.root
-	vz_2261_4He.root
-	vz_2261_3He.root
-	vz_2261_12C.root
+	vz_4461_4He.root vz_4461_12C.root
+	vz_2261_4He.root vz_2261_12C.root vz_2261_3He.root vz_2261_56Fe.root 
 	n_pathlength_corr_4461.dat
         DESTINATION "~/.e2a/")

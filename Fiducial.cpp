@@ -377,7 +377,7 @@ bool Fiducial::read_vz_cor_params()
 {
 
 	std::string effective_tar;
-	if ((E1==4461)&&(tar=="3He")) effective_tar = "4He"; // Using 4He parameters for 3He in case of 4.4GeV data
+	if ((E1==4461)&&((tar=="3He"))) effective_tar = "4He"; // Using 4He parameters for 3He in case of 4.4GeV data
 	else effective_tar = tar;
 
 	char param_file_name[256];

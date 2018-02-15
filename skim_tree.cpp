@@ -898,7 +898,7 @@ int main(int argc, char ** argv){
 					beta     [nParticles] = Beta_corr ;
 
 					h2_n_phiTheta2 -> Fill(phi[i],theta[i] );
-					h2_n_pBeta     -> Fill(mom[i],Beta_corr);
+					h2_n_pBeta     -> Fill(n_p   ,Beta_corr);
 
 					nNeutrons++;
 					nParticles++;

@@ -13,13 +13,9 @@
 #include "Fiducial.h"
 #include "Run_dependent.h"
 #include "constants.h"
+#include "global_variables.h"
 
 using namespace std;
-
-// Range of momentum for which we have good fits for PID
-const double epratio_sig_cutrange   =3.; // +/- sigma for electron PID cut
-const double pdeltat_sig_cutrange   =3.; // +/- sigma for proton   PID cut
-const double pipdeltat_sig_cutrange =2.; // +/- sigma for pion     PID cut
 
 // Difference between positive corrected z vertex and electron corrected z vertex
 const double pos_z_cut_min = -2;

@@ -25,47 +25,11 @@ const double pos_z_cut_max =  2;
 const double sc_cc_dt_cut_sect[6]={-2,-5,-8,-8,-2,2};
 
 int main(int argc, char ** argv){
-	if (argc != 4){
+	if (argc != 5){
 		cerr << "Wrong number of arguments. Instead try\n"
-			<< "\tskim_tree /path/to/input/file /path/to/output/file 00000000\n\n";
-		cout << "where the third argument must be an integer of 8 digits."    << endl;
-		cout << "1st digit: minimum number of protons  required in the event" << endl;
-		cout << "2nd digit: maximum number of protons  required in the event" << endl;
-		cout << "3rd digit: minimum number of neutrons required in the event" << endl;
-		cout << "4th digit: maximum number of neutrons required in the event" << endl;
-		cout << "5th digit: minimum number of pion+    required in the event" << endl;
-		cout << "6th digit: maximum number of pion+    required in the event" << endl;
-		cout << "7th digit: minimum number of pion-    required in the event" << endl;
-		cout << "8th digit: maximum number of pion-    required in the event" << endl;
+			<< "\te2a_maps /path/to/input/file /path/to/output/file Ebeam_MeV nuclear_target\n\n";
 		return -1;	
 	}
-
-	// --------------------------------------------------------------------------------------------------
-	// Specifying reaction for output file
-	istringstream iss (argv[3]);
-	int in_num_part;
-	iss >> in_num_part;
-
-	if(strlen(argv[3]) != 8){
-		cout << endl << "Third argument must be an integer of 8 digits." << endl;
-		cout << "You have specified an integer of " << strlen(argv[3]) << " digits" << endl;
-		exit(1);
-	}
-
-	int min_p   = (in_num_part/10000000)%10;
-	int max_p   = (in_num_part/1000000 )%10;
-	int min_n   = (in_num_part/100000  )%10;
-	int max_n   = (in_num_part/10000   )%10;
-	int min_pip = (in_num_part/1000    )%10;
-	int max_pip = (in_num_part/100     )%10;
-	int min_pim = (in_num_part/10      )%10;
-	int max_pim = (in_num_part/1       )%10;
-
-	cout << endl << "The output root file will be skimmed for reactions containing the following number of particles" << endl;
-	cout << min_p   << " <= number of protons  <= " << max_p   << endl;
-	cout << min_n   << " <= number of neutrons <= " << max_n   << endl;
-	cout << min_pip << " <= number of pion+    <= " << max_pip << endl;
-	cout << min_pim << " <= number of pion-    <= " << max_pim << endl;	
 
 	// --------------------------------------------------------------------------------------------------
 	// Open up the Root file
@@ -77,23 +41,26 @@ int main(int argc, char ** argv){
 		cerr << "Could not open file " << argv[1] << "\n\tExiting...\n";
 		return -2;
 	}
+
+	istringstream iss (argv[3]);
+        int in_num_part;
+        iss >> in_num_part;
+
 	// --------------------------------------------------------------------------------------------------
 	// Open up the tree, and get the important data
 	TTree * t = (TTree*)f->Get("data");
 	const int nEvents = t->GetEntries();
 	const int maxPart = 50;
-	int gPart, CCPart, DCPart, ECPart, SCPart, NRun;
+	int gPart, CCPart, DCPart, ECPart, SCPart;
 	int StatDC[maxPart], StatCC[maxPart], StatEC[maxPart], StatSC[maxPart], id_guess[maxPart];
 	float STT, W, Yb;
 	float Stat[maxPart], EC_in[maxPart], EC_out[maxPart], EC_tot[maxPart], Nphe[maxPart],
 	      SC_Time[maxPart], SC_Path[maxPart], CC_Time[maxPart], CC_Path[maxPart],
-	      EC_Time[maxPart], EC_Path[maxPart],
 	      Charge[maxPart], Beta[maxPart], mass[maxPart], mom[maxPart], px[maxPart], py[maxPart],
 	      pz[maxPart], theta[maxPart], phi[maxPart], targetZ[maxPart], theta_pq[maxPart],
 	      EC_X[maxPart],EC_Y[maxPart],EC_Z[maxPart], EC_U[maxPart],EC_V[maxPart],EC_W[maxPart], 
 	      CC_Chi2[maxPart];
 
-	t->SetBranchAddress("NRun"     ,&NRun   ); // Run number
 	t->SetBranchAddress("gPart"    ,&gPart  ); // Number of particles observed (globally) in the event
 	t->SetBranchAddress("CCPart"   ,&CCPart ); // Number of particles observed in the Cherenkovs
 	t->SetBranchAddress("DCPart"   ,&DCPart ); // Number of particles observed in the Drift Chambers
@@ -113,8 +80,6 @@ int main(int argc, char ** argv){
 	t->SetBranchAddress("SC_Path"  ,SC_Path ); // Path Length per particle
 	t->SetBranchAddress("CC_Time"  ,CC_Time ); // Time in the cherenkov per particle
 	t->SetBranchAddress("CC_Path"  ,CC_Path ); // Path Length per particle
-	t->SetBranchAddress("EC_Time"  ,EC_Time ); // Time in the EC per particle
-	t->SetBranchAddress("EC_Path"  ,EC_Path ); // Path Length per particle
 	t->SetBranchAddress("Charge"   ,Charge  ); // Charge per particle
 	t->SetBranchAddress("Beta"     ,Beta    ); // Beta per particle
 	t->SetBranchAddress("Mass"     ,mass    ); // Mass per particle
@@ -125,7 +90,6 @@ int main(int argc, char ** argv){
 	t->SetBranchAddress("Theta"    ,theta   ); // Theta per particle
 	t->SetBranchAddress("Phi"      ,phi     ); // Phi per particle
 	t->SetBranchAddress("TargetZ"  ,targetZ ); // Target Z per particle
-	t->SetBranchAddress("Thetapq"  ,theta_pq); // Angle wrt to q vector per particle
 	t->SetBranchAddress("STT"      ,&STT    ); // RF-corrected start time.
 	t->SetBranchAddress("EC_X"     ,EC_X    ); // x positions of hit in the calorimeter
 	t->SetBranchAddress("EC_Y"     ,EC_Y    ); // y positions of hit in the calorimeter
@@ -149,8 +113,6 @@ int main(int argc, char ** argv){
 
 	// ---------------------------------------
 	// Diagnostic electron histograms
-	TH1D * h1_Xb0        = new TH1D("h1_Xb0"        ,"x_{B} without e- p correction"                     ,200,  0.8, 2.0);
-	TH1D * h1_Xb1        = new TH1D("h1_Xb1"        ,"x_{B} with    e- p correction"                     ,200,  0.8, 2.0);
 
 	TH1D * h1_e_Nphe0    = new TH1D("h1_e_Nphe0"    ,"e- before cuts;# photo-electrons in CC;Counts"     ,200,   0.,200.);
 	TH1D * h1_e_Nphe1    = new TH1D("h1_e_Nphe1"    ,"e- passing PID;# photo-electrons in CC;Counts"     ,200,   0.,200.);
@@ -197,45 +159,10 @@ int main(int argc, char ** argv){
 	TH2D * h2_e_thetaMom2= new TH2D("e_thetaMom2"     ,"e- passing PID+fid;#theta [deg];Mom [GeV];Counts"   ,300,  10., 50.,300, 0., 6.);
 
 	// ---
-	TH1D * h1_e_vz_sec10 = new TH1D("h1_e_vz_sec10" ,"e- passing cuts, before vtx corr, sector 1;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec1  = new TH1D("h1_e_vz_sec1"  ,"e- passing cuts,  after vtx corr, sector 1;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec20 = new TH1D("h1_e_vz_sec20" ,"e- passing cuts, before vtx corr, sector 2;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec2  = new TH1D("h1_e_vz_sec2"  ,"e- passing cuts,  after vtx corr, sector 2;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec30 = new TH1D("h1_e_vz_sec30" ,"e- passing cuts, before vtx corr, sector 3;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec3  = new TH1D("h1_e_vz_sec3"  ,"e- passing cuts,  after vtx corr, sector 3;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec40 = new TH1D("h1_e_vz_sec40" ,"e- passing cuts, before vtx corr, sector 4;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec4  = new TH1D("h1_e_vz_sec4"  ,"e- passing cuts,  after vtx corr, sector 4;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec53 = new TH1D("h1_e_vz_sec53" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec5  = new TH1D("h1_e_vz_sec5"  ,"e- passing cuts,  after vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec60 = new TH1D("h1_e_vz_sec60" ,"e- passing cuts, before vtx corr, sector 6;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec6  = new TH1D("h1_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts" ,300, -10., 10.);
 	TH1D * h1_e_vz0      = new TH1D("h1_e_vz0"      ,"e- passing cuts, before vtx corr;electron vz [cm]; Counts"           ,300, -10., 10.);
 	TH1D * h1_e_vz       = new TH1D("h1_e_vz"       ,"e- passing cuts,  after vtx corr;electron vz [cm]; Counts"           ,300, -10., 10.);
 	TH2D * h2_e_phiVz0   = new TH2D("h2_e_phiVz0"   ,"e- passing cuts, before vtx corr;#phi [deg];vz [cm];Counts"   ,300,-100.,380.,300,-10,10);
-	TH2D * h2_e_phiVz    = new TH2D("h2_e_phiVz"    ,"e- passing cuts,  after vtx corr;#phi [deg];vz [cm];Counts"   ,300,-100.,380.,300,-10,10);
 	TH2D * h2_e_thetaVz0 = new TH2D("h2_e_thetaVz0" ,"e- passing cuts, before vtx corr;#theta [deg];vz [cm];Counts" ,300, -10., 60.,300,-11,11);
-	TH2D * h2_e_thetaVz  = new TH2D("h2_e_thetaVz"  ,"e- passing cuts,  after vtx corr;#theta [deg];vz [cm];Counts" ,300, -10., 60.,300,-11,11);
-	// ---
-
-	TH1D * h1_e_momCor    = new TH1D("h1_e_momCor"    ,"e- passing fid. cuts;p corrected - p[GeV];Counts"          ,300, -.1,.04 );
-	TH1D * h1_e_momCor1   = new TH1D("h1_e_momCor1"   ,"e- passing fid. cuts;p corrected/p;Counts"                 ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor = new TH2D("h2_e_momMomCor" ,"e- passing fid. cuts;p [GeV];p corrected - p[GeV];Counts"  ,300,  0.,  6.,300,-.1 ,.04 );
-	TH2D * h2_e_momMomCor1= new TH2D("h2_e_momMomCor1","e- passing fid. cuts;p [GeV];p corrected/p;Counts"         ,300,  0.,  6.,300,0.97,1.01);
-
-	TH1D * h1_e_momCor_sec1   = new TH1D("h1_e_momCor_sec1"   ,"e- passing PID+fid sec1;p corrected/p;Counts"        ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor_sec1= new TH2D("h2_e_momMomCor_sec1","e- passing PID+fid sec1;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
-	TH1D * h1_e_momCor_sec2   = new TH1D("h1_e_momCor_sec2"   ,"e- passing PID+fid sec2;p corrected/p;Counts"        ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor_sec2= new TH2D("h2_e_momMomCor_sec2","e- passing PID+fid sec2;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
-	TH1D * h1_e_momCor_sec3   = new TH1D("h1_e_momCor_sec3"   ,"e- passing PID+fid sec3;p corrected/p;Counts"        ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor_sec3= new TH2D("h2_e_momMomCor_sec3","e- passing PID+fid sec3;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
-	TH1D * h1_e_momCor_sec4   = new TH1D("h1_e_momCor_sec4"   ,"e- passing PID+fid sec4;p corrected/p;Counts"        ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor_sec4= new TH2D("h2_e_momMomCor_sec4","e- passing PID+fid sec4;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
-	TH1D * h1_e_momCor_sec5   = new TH1D("h1_e_momCor_sec5"   ,"e- passing PID+fid sec5;p corrected/p;Counts"        ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor_sec5= new TH2D("h2_e_momMomCor_sec5","e- passing PID+fid sec5;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
-	TH1D * h1_e_momCor_sec6   = new TH1D("h1_e_momCor_sec6"   ,"e- passing PID+fid sec6;p corrected/p;Counts"        ,300,0.97,1.01);
-	TH2D * h2_e_momMomCor_sec6= new TH2D("h2_e_momMomCor_sec6","e- passing PID+fid sec6;p [GeV];p corrected/p;Counts",300, 0., 6.,300,0.97,1.01);
-
-	TH2D * h2_e_vzVzCor   = new TH2D("h2_e_vzVzCor"   ,"e- passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300,-20., 20.,300,-1. , 1. );
 
 	// ---------------------------------------
 	// Diagnostic positive particle histograms
@@ -253,18 +180,9 @@ int main(int argc, char ** argv){
 	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
 	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 3.);
 
-	TH2D * h2_p_p_momCor0= new TH2D("h2_p_p_momCor0","p passing fid. cuts;p [GeV];p - p_corr [GeV];Counts"     ,100, 0., 2.5,100,-.06,.01);
-	TH2D * h2_p_p_momCor1= new TH2D("h2_p_p_momCor1","p passing fid. cuts;p [GeV];p_corr/p;Counts"             ,100, 0., 2.5,100,0.95,1.2);
-	TH2D * h2_p_th_pCor0 = new TH2D("h2_p_th_pCor0" ,"p passing fid. cuts;#theta [deg];p - p_corr [GeV];Counts",100, 0., 150,100,-.06,.01);
-	TH2D * h2_p_th_pCor1 = new TH2D("h2_p_th_pCor1" ,"p passing fid. cuts;#theta [deg];p_corr/p;Counts"        ,100, 0., 150,100,0.95,1.2);
-	TH2D * h2_p_th_p_cor0= new TH2D("h2_p_th_p_cor0","p passing fid. cuts;#theta [deg];p[GeV];p - p_corr [GeV]",100, 0., 150,100,0.  ,2.5);
-	TH2D * h2_p_th_p_cor1= new TH2D("h2_p_th_p_cor1","p passing fid. cuts;#theta [deg];p[GeV];p_corr/p"        ,100, 0., 150,100,0.  ,2.5);
-
-	TH2D * h2_p_vzVzCor  = new TH2D("h2_p_vzVzCor"  ,"p passing fid. cuts;vz [cm];vz corrected - vz [cm];Counts",300, -20., 20.,300,-1., 1 );
 	TH2D * h2_p_phiVz0   = new TH2D("h2_p_phiVz0"   ,"p passing cuts, before vtx corr;#phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10 );
-	TH2D * h2_p_phiVz    = new TH2D("h2_p_phiVz"    ,"p passing cuts,  after vtx corr;#phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10 );
 	TH2D * h2_p_thetaVz0 = new TH2D("h2_p_thetaVz0" ,"p passing cuts, before vtx corr;#theta [deg];vz [cm];Counts",300, 0.,100.,300,-11,11 );
-	TH2D * h2_p_thetaVz  = new TH2D("h2_p_thetaVz"  ,"p passing cuts,  after vtx corr;#theta [deg];vz [cm];Counts",300, 0.,100.,300,-11,11 );
+
 	TH2D * h2_p_pBeta    = new TH2D("h2_p_pBeta"    ,"p passing fid. cuts;p [GeV];#beta;Counts"                 ,300,   0.,  4.,300, 0.,1.3);
 
 	// ---------------------------------------
@@ -275,44 +193,11 @@ int main(int argc, char ** argv){
 	TH2D * h2_pip_deltaTmom2= new TH2D("h2_pip_deltaTmom2","#pi+ passing fid+PID;#Delta t [ns];p [GeV];Counts",300,  -7.,  7.,300, 0.,5.0);
 
 	// ---------------------------------------
-	// Diagnostic neutral histograms
-	TH2D * h2_neu_pBeta  = new TH2D("h2_neu_pBeta"  ,"neutral passing fid. cuts;p [GeV];#beta;Counts"   ,300,   0.,  4.,300, 0.,1.3);
-
-	// ---------------------------------------
-	// Diagnostic neutron histograms
-	TH2D * h2_n_phiTheta0= new TH2D("h2_n_phiTheta0","n before cuts;#phi [deg];#theta [deg];Counts"     ,300,-100.,380.,300,0.,55.);
-	TH2D * h2_n_phiTheta1= new TH2D("h2_n_phiTheta1","n passing fid;#phi [deg];#theta [deg];Counts"     ,300,-100.,380.,300,0.,55.);
-	TH2D * h2_n_phiTheta2= new TH2D("h2_n_phiTheta2","n passing fid+PID;#phi [deg];#theta [deg];Counts" ,300,-100.,380.,300,0.,55.);
-
-	TH2D * h2_n_pBeta    = new TH2D("h2_n_pBeta"    ,"n passing fid. cuts;p [GeV];#beta;Counts"         ,300,   0.,  4.,300, 0.,1.3);
-
-	TH1D * h1_u_0        = new TH1D("h1_u_0"        ,"n before xyz cut;EC_{u} [cm];Counts"              ,100,   0., 500.);
-	TH1D * h1_v_0        = new TH1D("h1_v_0"        ,"n before xyz cut;EC_{v} [cm];Counts"              ,100,   0., 500.);
-	TH1D * h1_w_0        = new TH1D("h1_w_0"        ,"n before xyz cut;EC_{w} [cm];Counts"              ,100,   0., 500.);
-	TH1D * h1_u_1        = new TH1D("h1_u_1"        ,"n after xyz cut;EC_{u} [cm];Counts"               ,100,   0., 500.);
-	TH1D * h1_v_1        = new TH1D("h1_v_1"        ,"n after xyz cut;EC_{v} [cm];Counts"               ,100,   0., 500.);
-	TH1D * h1_w_1        = new TH1D("h1_w_1"        ,"n after xyz cut;EC_{w} [cm];Counts"               ,100,   0., 500.);
-	
-	TH1D * h1_x_0        = new TH1D("h1_x_0"        ,"n before xyz cut;EC_{x} [cm];Counts"              ,100, -500., 500.);
-        TH1D * h1_y_0        = new TH1D("h1_y_0"        ,"n before xyz cut;EC_{y} [cm];Counts"              ,100, -500., 500.);
-        TH1D * h1_z_0        = new TH1D("h1_z_0"        ,"n before xyz cut;EC_{z} [cm];Counts"              ,100,  300., 600.);
-        TH1D * h1_x_1        = new TH1D("h1_x_1"        ,"n after xyz cut;EC_{x} [cm];Counts"               ,100, -500., 500.);
-        TH1D * h1_y_1        = new TH1D("h1_y_1"        ,"n after xyz cut;EC_{y} [cm];Counts"               ,100, -500., 500.);
-        TH1D * h1_z_1        = new TH1D("h1_z_1"        ,"n after xyz cut;EC_{z} [cm];Counts"               ,100,  300., 600.);
-
-	TH2D * h2_n_ECxy_0   = new TH2D("h2_n_ECxy_0"   ,"n before xyz cut;EC_{x} [cm];EC_{y} [cm];Counts"  ,300, -500., 500., 300, -500., 500.);
-	TH2D * h2_n_ECxy_1   = new TH2D("h2_n_ECxy_1"   ,"n after xyz cut;EC_{x} [cm];EC_{y} [cm];Counts"   ,300, -500., 500., 300, -500., 500.);
-
-	// ---------------------------------------
 	// Diagnostic pi- histograms
 	TH2D * h2_pim_pBeta     = new TH2D("h2_pim_pBeta"     ,"#pi- passing fid. cuts;p [GeV];#beta;Counts"      ,300,   0.,  4.,300, 0.,1.3);
 	TH2D * h2_pim_deltaTmom0= new TH2D("h2_pim_deltaTmom0","#pi- before cuts;#Delta t [ns];p [GeV];Counts"    ,300,  -7.,  7.,300, 0.,5.0);
 	TH2D * h2_pim_deltaTmom1= new TH2D("h2_pim_deltaTmom1","#pi- passing fid;#Delta t [ns];p [GeV];Counts"    ,300,  -7.,  7.,300, 0.,5.0);
 	TH2D * h2_pim_deltaTmom2= new TH2D("h2_pim_deltaTmom2","#pi- passing fid+PID;#Delta t [ns];p [GeV];Counts",300,  -7.,  7.,300, 0.,5.0);
-
-	// ---------------------------------------
-	// Diagnostic electron momentum correction
-	TH2D * h2_e_thetaMom3= new TH2D("e_thetaMom3"     ,"e- passing PID+fid;#theta [deg];Mom [GeV];p correction" ,300,  10., 50.,300, 0., 6.);
 
 	// ---------------------------------------
 	// Setting up output tree and branches
@@ -326,19 +211,15 @@ int main(int argc, char ** argv){
 	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
 
-	int nRun, nParticles;
+	int nParticles;
 	int nProtons, nNeutrons, nPiplus, nPiminus, nPi0;
 	int Part_type    [maxPart];
 	double Nu, Q2, Xb, Nu_unc, Q2_unc, Xb_unc, t0;
-	double vtx_z_unc [maxPart], vtx_z_cor[maxPart], Mass[maxPart];
+	double vtx_z_unc [maxPart], vtx_z_cor[maxPart];
 	double mom_x     [maxPart], mom_y    [maxPart], mom_z  [maxPart]; 
 	double e_deltat  [maxPart];
 	int    stat_sc   [maxPart], stat_ec  [maxPart], stat_dc[maxPart];
 	double sc_time   [maxPart], sc_path  [maxPart];
-	double ec_time   [maxPart], ec_path  [maxPart];
-	double ec_in     [maxPart], ec_out   [maxPart], ec_tot [maxPart];
-	double ec_x      [maxPart], ec_y     [maxPart], ec_z   [maxPart];
-	double ec_u      [maxPart], ec_v     [maxPart], ec_w   [maxPart];
 	double charge    [maxPart], beta     [maxPart];
 	/* 
 	   =========================
@@ -352,7 +233,6 @@ int main(int argc, char ** argv){
 	   =========================
 	 */ 
 
-	outtree->Branch("nRun"      , &nRun      , "nRun/I"                  );
 	outtree->Branch("nParticles", &nParticles, "nParticles/I"            );
 	outtree->Branch("nProtons"  , &nProtons  , "nProtons/I"              );
 	outtree->Branch("nNeutrons" , &nNeutrons , "nNeutrons/I"             );
@@ -376,42 +256,26 @@ int main(int argc, char ** argv){
 	outtree->Branch("stat_ec"   ,  stat_ec   , "stat_ec[nParticles]/I"   );
 	outtree->Branch("sc_time"   ,  sc_time   , "sc_time[nParticles]/D"   );
 	outtree->Branch("sc_path"   ,  sc_path   , "sc_path[nParticles]/D"   );
-	outtree->Branch("ec_time"   ,  ec_time   , "ec_time[nParticles]/D"   );
-	outtree->Branch("ec_path"   ,  ec_path   , "ec_path[nParticles]/D"   );
-	outtree->Branch("ec_in"     ,  ec_in     , "ec_in[nParticles]/D"     );
-	outtree->Branch("ec_out"    ,  ec_out    , "ec_out[nParticles]/D"    );
-	outtree->Branch("ec_tot"    ,  ec_tot    , "ec_tot[nParticles]/D"    );
-	outtree->Branch("ec_x"      ,  ec_x      , "ec_x[nParticles]/D"      );
-	outtree->Branch("ec_y"      ,  ec_y      , "ec_y[nParticles]/D"      );
-	outtree->Branch("ec_z"      ,  ec_z      , "ec_z[nParticles]/D"      );
-	outtree->Branch("ec_u"      ,  ec_u      , "ec_u[nParticles]/D"      );
-	outtree->Branch("ec_v"      ,  ec_v      , "ec_v[nParticles]/D"      );
-	outtree->Branch("ec_w"      ,  ec_w      , "ec_w[nParticles]/D"      );
-	outtree->Branch("Mass"      ,  Mass      , "Mass[nParticles]/D"      );
+
 	// --------------------------------------------------------------------------------------------------
 	// Obtaining run number and other important parameters
-	t->GetEvent(0);
-	int tab_run, tab_E1, tab_torus, tab_mini;
+	//t->GetEvent(0);
+	int NRun, tab_E1, tab_torus, tab_mini;
 	string tab_targ;
 
-	char param_file_name[256];
-	string homedir = string(getenv("HOME"));
-	sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
-	ifstream run_table;
-	run_table.open(param_file_name);
-	do{
-		run_table >> tab_run  ;
-		run_table >> tab_E1   ;
-		run_table >> tab_torus;
-		run_table >> tab_mini ;
-		run_table >> tab_targ ;
-	}
-	while(tab_run != NRun);
-	cout << "Run    = " << tab_run   << endl;
-	cout << "Ebeam  = " << tab_E1    << endl;
-	cout << "Torus  = " << tab_torus << endl;
-	cout << "Mini   = " << tab_mini  << endl;
-	cout << "Target = " << tab_targ  << endl;
+	tab_E1    = in_num_part;
+	tab_torus = 2250   ;
+	tab_mini  = 5996   ;
+	tab_targ  = argv[4];
+
+	if      (tab_E1 == 4461) NRun = 17908; // Take a random 4.4 GeV run number
+	else if (tab_E1 == 2261) NRun = 18201; // Take a random 2.2 GeV run number
+
+	cout << "Run    = " << NRun      << endl;
+        cout << "Ebeam  = " << tab_E1    << endl;
+        cout << "Torus  = " << tab_torus << endl;
+        cout << "Mini   = " << tab_mini  << endl;
+        cout << "Target = " << tab_targ  << endl;
 
 	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
 	Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
@@ -437,7 +301,7 @@ int main(int argc, char ** argv){
 
 		t->GetEvent(event);
 
-		nRun = NRun;
+		
 
 		if (gPart <= 0) continue; // Ignore events that have no particle candidates
 
@@ -457,7 +321,7 @@ int main(int argc, char ** argv){
 		// --------------------------------------------------------------------------------------------------
 		double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]); // Define the electron candidate energy in the EC
 		T3_e_mom.SetXYZ(px[0],py[0],pz[0]); // Electron momentum expressed in a TVector3
-		e_vz_corrected = targetZ[0]+fid_params.vz_corr(T3_e_mom);
+		e_vz_corrected = targetZ[0];
 		e_ec_xyz.SetXYZ(EC_X[0],EC_Y[0],EC_Z[0]);
 
 		// ---------------------------------------------------------------------------------------
@@ -523,11 +387,7 @@ int main(int argc, char ** argv){
 
 		// ---------------------------------------------------------------------------------------
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
-		if (            ((tab_E1==4461)&&(180./M_PI*T3_e_mom.Theta()>16.))||
-				( tab_E1==2261)
-		   )
-			T3_e_mom_cor = fid_params.eMomentumCorrection(T3_e_mom);
-		else 	T3_e_mom_cor = T3_e_mom;
+		T3_e_mom_cor = T3_e_mom;
 
 		// If we get to here, then the electron passed fiducial cuts
 		t0 = STT;
@@ -554,86 +414,27 @@ int main(int argc, char ** argv){
 		stat_dc  [0] = StatDC [0];
 		stat_ec  [0] = StatEC [0];
 		sc_time  [0] = SC_Time[0];
-		sc_path  [0] = SC_Path[0];
-		ec_time  [0] = EC_Time[0];
-		ec_path  [0] = EC_Path[0];
-		ec_in    [0] = EC_in  [0];
-		ec_out   [0] = EC_out [0];
-		ec_tot   [0] = EC_tot [0];
-		ec_x     [0] = EC_X   [0];
-		ec_y     [0] = EC_Y   [0];
-		ec_z     [0] = EC_Z   [0];
-		ec_u     [0] = EC_U   [0];
-		ec_v     [0] = EC_V   [0];
-		ec_w     [0] = EC_W   [0];
-		Mass     [0] = mass   [0];
+		sc_path  [0] = SC_Path[0];	
 		charge   [0] = Charge [0];
 		beta     [0] = Beta   [0];
 
-		// Fill some diagnostic histograms
-		h1_Xb0         -> Fill(Xb_unc   );
-		h1_Xb1         -> Fill(Xb       );
+		// Fill some diagnostic histograms	
 		h1_e_Nphe2     -> Fill(Nphe  [0]);
 		h1_e_EC_in2    -> Fill(EC_in [0]);
 		h1_e_EC_out2   -> Fill(EC_out[0]);
 		h1_e_EC_tot2   -> Fill(EC_tot[0]);
 		h2_e_xyEC_hit2 -> Fill(EC_X[0],EC_Y[0]);
-		h2_e_thetaMom2 -> Fill(theta[0],mom[0]);
-		h1_e_momCor    -> Fill(T3_e_mom_cor.Mag()-T3_e_mom.Mag());
-		h1_e_momCor1   -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		h2_e_momMomCor -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()-T3_e_mom.Mag());
-		h2_e_momMomCor1-> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		h2_e_vzVzCor   -> Fill(targetZ[0],e_vz_corrected-targetZ[0]);
+		h2_e_thetaMom2 -> Fill(theta[0],mom[0]);	
 		h2_e_Ein_Eout2 -> Fill(EC_in[0]/mom[0],EC_out[0]/mom[0]);
 		h2_e_Ein_Eout_2-> Fill(EC_in  [0]     , EC_out[0]      );
 		h2_e_p_Etot2   -> Fill(mom    [0],EC_tot[0]/mom[0]);
 		h2_e_p_E2      -> Fill(mom    [0],el_cand_EC      );
 		h2_e_phiTheta2 -> Fill(phi    [0],theta  [0]      );
-		h2_e_phiVz0    -> Fill(phi    [0],targetZ[0]      );
-		h2_e_phiVz     -> Fill(phi    [0],e_vz_corrected  );
-		h2_e_thetaVz0  -> Fill(theta  [0],targetZ[0]      );
-		h2_e_thetaVz   -> Fill(theta  [0],e_vz_corrected  );
+		h2_e_phiVz0    -> Fill(phi    [0],targetZ[0]      );	
+		h2_e_thetaVz0  -> Fill(theta  [0],targetZ[0]      );	
 		h1_e_vz0       -> Fill(targetZ[0]                 );
 		h1_e_vz        -> Fill(e_vz_corrected             );
-
-		if      (e_sect==0) {
-			h1_e_vz_sec10       -> Fill(targetZ[0]);
-			h1_e_vz_sec1        -> Fill(e_vz_corrected);
-			h1_e_momCor_sec1    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-			h2_e_momMomCor_sec1 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		}
-		else if (e_sect==1) {
-			h1_e_vz_sec20       -> Fill(targetZ[0]);
-			h1_e_vz_sec2        -> Fill(e_vz_corrected);
-			h1_e_momCor_sec2    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-			h2_e_momMomCor_sec2 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		}
-		else if (e_sect==2) {
-			h1_e_vz_sec30       -> Fill(targetZ[0]);
-			h1_e_vz_sec3        -> Fill(e_vz_corrected);
-			h1_e_momCor_sec3    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-			h2_e_momMomCor_sec3 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		}
-		else if (e_sect==3) {
-			h1_e_vz_sec40       -> Fill(targetZ[0]);
-			h1_e_vz_sec4        -> Fill(e_vz_corrected);
-			h1_e_momCor_sec4    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-			h2_e_momMomCor_sec4 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		}
-		else if (e_sect==4) {
-			h1_e_vz_sec53       -> Fill(targetZ[0]);
-			h1_e_vz_sec5        -> Fill(e_vz_corrected);
-			h1_e_momCor_sec5    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-			h2_e_momMomCor_sec5 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		}
-		else if (e_sect==5) {
-			h1_e_vz_sec60       -> Fill(targetZ[0]);
-			h1_e_vz_sec6        -> Fill(e_vz_corrected);
-			h1_e_momCor_sec6    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-			h2_e_momMomCor_sec6 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
-		}
-		else {cout << "Something is wrong with the definition of sectors" << endl;}
-		h2_e_thetaMom3-> Fill(theta[0],mom[0],T3_e_mom_cor.Mag()-T3_e_mom.Mag());
+	
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for other particles
 
@@ -670,7 +471,7 @@ int main(int argc, char ** argv){
 				if(fid_params.pFiducialCut(T3_p_mom)){
 
 					// Positive particle vertex (_z) correction
-					p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
+					p_vz_corrected = targetZ[i];
 
 					h1_p_mass         -> Fill(mass[i]);
 					h2_p_pMass        -> Fill(mom [i]    ,mass [i]);
@@ -704,35 +505,14 @@ int main(int argc, char ** argv){
 						stat_dc  [nParticles] = StatDC [i];
 						stat_ec  [nParticles] = StatEC [i];
 						sc_time  [nParticles] = SC_Time[i];
-						sc_path  [nParticles] = SC_Path[i];
-						ec_time  [nParticles] = EC_Time[i];
-						ec_path  [nParticles] = EC_Path[i];
-						ec_in    [nParticles] = EC_in  [i];
-						ec_out   [nParticles] = EC_out [i];
-						ec_tot   [nParticles] = EC_tot [i];
-						Mass     [nParticles] = mass   [i];
-						ec_x     [nParticles] = EC_X   [i];
-						ec_y     [nParticles] = EC_Y   [i];
-						ec_z     [nParticles] = EC_Z   [i];
-						ec_u     [nParticles] = EC_U   [i];
-						ec_v     [nParticles] = EC_V   [i];
-						ec_w     [nParticles] = EC_W   [i];
+						sc_path  [nParticles] = SC_Path[i];	
 						charge   [nParticles] = Charge [i];
 						beta     [nParticles] = Beta   [i];
 
 						h2_p_deltaTmom2-> Fill(delta_t   ,mom                   [i]);
-						h2_p_phiTheta2 -> Fill(phi    [i],theta                 [i]);
-						h2_p_vzVzCor   -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
-						h2_p_p_momCor0 -> Fill(mom    [i],mom [i]-p_mom_corrected  );
-						h2_p_p_momCor1 -> Fill(mom    [i],p_mom_corrected/mom   [i]);
-						h2_p_th_pCor0  -> Fill(theta  [i],mom [i]-p_mom_corrected  );
-						h2_p_th_pCor1  -> Fill(theta  [i],p_mom_corrected/mom   [i]);
-						h2_p_th_p_cor0 -> Fill(theta  [i],mom[i],mom[i]-p_mom_corrected);
-						h2_p_th_p_cor1 -> Fill(theta  [i],mom[i],p_mom_corrected/mom[i]);
-						h2_p_phiVz0    -> Fill(phi    [i],targetZ               [i]);
-						h2_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
-						h2_p_thetaVz0  -> Fill(theta  [i],targetZ               [i]);
-						h2_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	   );
+						h2_p_phiTheta2 -> Fill(phi    [i],theta                 [i]);	
+						h2_p_phiVz0    -> Fill(phi    [i],targetZ               [i]);	
+						h2_p_thetaVz0  -> Fill(theta  [i],targetZ               [i]);	
 						h2_p_pBeta     -> Fill(mom    [i],Beta                  [i]);
 
 						nProtons++;
@@ -754,19 +534,7 @@ int main(int argc, char ** argv){
 						stat_dc  [nParticles] = StatDC [i];
 						stat_ec  [nParticles] = StatEC [i];
 						sc_time  [nParticles] = SC_Time[i];
-						sc_path  [nParticles] = SC_Path[i];
-						ec_time  [nParticles] = EC_Time[i];
-						ec_path  [nParticles] = EC_Path[i];
-						ec_in    [nParticles] = EC_in  [i];
-						ec_out   [nParticles] = EC_out [i];
-						ec_tot   [nParticles] = EC_tot [i];
-						Mass     [nParticles] = mass   [i];
-						ec_x     [nParticles] = EC_X   [i];
-						ec_y     [nParticles] = EC_Y   [i];
-						ec_z     [nParticles] = EC_Z   [i];
-						ec_u     [nParticles] = EC_U   [i];
-						ec_v     [nParticles] = EC_V   [i];
-						ec_w     [nParticles] = EC_W   [i];
+						sc_path  [nParticles] = SC_Path[i];		
 						charge   [nParticles] = Charge [i];
 						beta     [nParticles] = Beta   [i];
 
@@ -808,19 +576,7 @@ int main(int argc, char ** argv){
 					stat_dc  [nParticles] = StatDC [i];
 					stat_ec  [nParticles] = StatEC [i];
 					sc_time  [nParticles] = SC_Time[i];
-					sc_path  [nParticles] = SC_Path[i];
-					ec_time  [nParticles] = EC_Time[i];
-					ec_path  [nParticles] = EC_Path[i];
-					ec_in    [nParticles] = EC_in  [i];
-					ec_out   [nParticles] = EC_out [i];
-					ec_tot   [nParticles] = EC_tot [i];
-					Mass     [nParticles] = mass   [i];
-					ec_x     [nParticles] = EC_X   [i];
-					ec_y     [nParticles] = EC_Y   [i];
-					ec_z     [nParticles] = EC_Z   [i];
-					ec_u     [nParticles] = EC_U   [i];
-					ec_v     [nParticles] = EC_V   [i];
-					ec_w     [nParticles] = EC_W   [i];
+					sc_path  [nParticles] = SC_Path[i];	
 					charge   [nParticles] = Charge [i];
 					beta     [nParticles] = Beta   [i];
 
@@ -832,116 +588,12 @@ int main(int argc, char ** argv){
 				}
 			}
 
-			// ------------------------------------------------------------------------------------------
-			// Test if neutral particle
-			else if(        StatEC[i] > 0 && // EC status is good for the positive candidate
-					StatDC[i] <=0 && // DC status is good for the positive candidate
-					StatSC[i] <=0 && // SC status is good for the positive candidate
-					Stat  [i] > 0 && // Global status is good for the positive candidate
-					Charge[i] ==0 && // Charge is neutral
-					Beta  [i] < 1
-			       )
-			{
-	
-				EC_Path_corr = fid_params.corrected_path_length( EC_Path[i] , EC_in[i] , EC_out[i] );
-				Beta_corr = EC_Path_corr / (c_cm_ns*(EC_Time[i]-t0));
-
-				h2_n_phiTheta0 -> Fill(phi [i],theta[i] );
-                                h2_neu_pBeta   -> Fill(mom [i],Beta_corr);
-                                h2_n_phiTheta1 -> Fill(phi [i],theta[i] );
-	
-				// --------------------------------------------------------------------
-				// Look specifically for neutrons 
-				if( Beta_corr < 0.95 )
-				// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
-				{
-
-				h1_u_0 -> Fill(EC_U[i]);
-				h1_v_0 -> Fill(EC_V[i]);
-				h1_w_0 -> Fill(EC_W[i]);
-
-				h1_x_0 -> Fill(EC_X[i]);
-				h1_y_0 -> Fill(EC_Y[i]);
-				h1_z_0 -> Fill(EC_Z[i]);
-
-				h2_n_ECxy_0 -> Fill(EC_X[i],EC_Y[i]);
-
-				n_ec_xyz.SetXYZ(EC_X[i],EC_Y[i],EC_Z[i]);
-				if(fid_params.CutUVW( n_ec_xyz ,10.)){ // Cut 10 cm from the edges of the EC
-
-					h1_u_1 -> Fill(EC_U[i]);
-					h1_v_1 -> Fill(EC_V[i]);
-					h1_w_1 -> Fill(EC_W[i]);
-
-					h1_x_1 -> Fill(EC_X[i]);
-                                	h1_y_1 -> Fill(EC_Y[i]);
-                                	h1_z_1 -> Fill(EC_Z[i]);
-
-					h2_n_ECxy_1 -> Fill(EC_X[i],EC_Y[i]);
-
-					n_p  = Beta_corr*mN/sqrt(1-Beta_corr*Beta_corr);
-
-					n_px = n_p*u1.X();
-					n_py = n_p*u1.Y();
-					n_pz = n_p*u1.Z();
-
-					Part_type[nParticles] = 2112;
-					e_deltat [nParticles] = pip_delta_t;
-					mom_x    [nParticles] = n_px;
-					mom_y    [nParticles] = n_py;
-					mom_z    [nParticles] = n_pz;
-					//mom_x    [nParticles] = T3_p_mom.X();
-					//mom_y    [nParticles] = T3_p_mom.Y();
-					//mom_z    [nParticles] = T3_p_mom.Z();
-					vtx_z_unc[nParticles] = targetZ  [i];
-					vtx_z_cor[nParticles] = p_vz_corrected;
-					stat_sc  [nParticles] = StatSC [i];
-					stat_dc  [nParticles] = StatDC [i];
-					stat_ec  [nParticles] = StatEC [i];
-					sc_time  [nParticles] = SC_Time[i];
-					sc_path  [nParticles] = SC_Path[i];
-					ec_time  [nParticles] = EC_Time[i];
-					ec_path  [nParticles] = EC_Path[i];
-					ec_in    [nParticles] = EC_in  [i];
-					ec_out   [nParticles] = EC_out [i];
-					ec_tot   [nParticles] = EC_tot [i];
-					Mass     [nParticles] = mass   [i];
-					ec_x     [nParticles] = EC_X   [i];
-					ec_y     [nParticles] = EC_Y   [i];
-					ec_z     [nParticles] = EC_Z   [i];
-					ec_u     [nParticles] = EC_U   [i];
-					ec_v     [nParticles] = EC_V   [i];
-					ec_w     [nParticles] = EC_W   [i];
-					charge   [nParticles] = Charge [i];
-					beta     [nParticles] = Beta_corr ;
-
-					h2_n_phiTheta2 -> Fill(phi[i],theta[i] );
-					h2_n_pBeta     -> Fill(n_p   ,Beta_corr);
-
-					nNeutrons++;
-					nParticles++;
-
-				}
-
-				}
-
-			}
-
 		}
 
 		// --------------------------------------------------------------------------------------------------
 		// Fill the output tree
-		if(             ( nProtons  >= min_p   ) &&
-				( nProtons  <= max_p   ) &&
-				( nNeutrons >= min_n   ) &&
-				( nNeutrons <= max_n   ) &&
-				( nPiplus   >= min_pip ) &&
-				( nPiplus   <= max_pip ) &&
-				( nPiminus  >= min_pim ) &&
-				( nPiminus  <= max_pim )
-		  ){	
-			outtree->Fill();
-		}
+		outtree->Fill();
+
 	}
 	cerr << "Finished with the event loop...\n";
 
@@ -955,7 +607,6 @@ int main(int argc, char ** argv){
 	h1_e_EC_out2-> SetLineColor(8);
 	h1_e_EC_tot1-> SetLineColor(2);
 	h1_e_EC_tot2-> SetLineColor(8);
-	h1_Xb1      -> SetLineColor(2);
 	h1_e_vz     -> SetLineColor(2);
 	// ---
 	TLegend * leg = new TLegend(0.5,0.5,0.8,0.8);
@@ -992,44 +643,6 @@ int main(int argc, char ** argv){
 	c5 -> cd(1);	h2_e_thetaMom0 -> Draw("COLZ"); 
 	c5 -> cd(2);	h2_e_thetaMom1 -> Draw("COLZ");
 	c5 -> cd(3);	h2_e_thetaMom2 -> Draw("COLZ");
-
-	TCanvas *c6 = new TCanvas("c6");
-	h2_e_thetaMom3 -> Draw("COLZ");
-
-	TCanvas *c7 = new TCanvas("c7");
-	c7 -> Divide(2,1);
-	c7 -> cd(1);	h1_e_momCor -> Draw();
-	c7 -> cd(2);    h1_e_momCor1-> Draw();
-
-	TCanvas *c8 = new TCanvas("c8");
-	c8 -> Divide(2,1);
-	c8 -> cd(1);    h2_e_momMomCor -> Draw("COLZ");
-	c8 -> cd(2);    h2_e_momMomCor1-> Draw("COLZ");
-
-	TCanvas *c9 = new TCanvas("c9");
-	c9 -> Divide(3,2);
-	c9 -> cd(1);	h1_e_momCor_sec1 -> Draw();
-	c9 -> cd(2);	h1_e_momCor_sec2 -> Draw();
-	c9 -> cd(3);	h1_e_momCor_sec3 -> Draw();
-	c9 -> cd(4);	h1_e_momCor_sec4 -> Draw();
-	c9 -> cd(5);	h1_e_momCor_sec5 -> Draw();
-	c9 -> cd(6);	h1_e_momCor_sec6 -> Draw();
-
-	TCanvas *c10 = new TCanvas("c10");
-	c10 -> Divide(3,2);
-	c10 -> cd(1);	h2_e_momMomCor_sec1 -> Draw("COLZ");
-	c10 -> cd(2);	h2_e_momMomCor_sec2 -> Draw("COLZ");
-	c10 -> cd(3);	h2_e_momMomCor_sec3 -> Draw("COLZ");
-	c10 -> cd(4);	h2_e_momMomCor_sec4 -> Draw("COLZ");
-	c10 -> cd(5);	h2_e_momMomCor_sec5 -> Draw("COLZ");
-	c10 -> cd(6);	h2_e_momMomCor_sec6 -> Draw("COLZ");
-
-	TCanvas *c11 = new TCanvas("c11");
-	h2_e_vzVzCor -> Draw("COLZ");
-
-	TCanvas *c12 = new TCanvas("c12");
-	h1_Xb0 -> Draw();
-	h1_Xb1 -> Draw("same");
 
 	TCanvas *c13 = new TCanvas("c13");
 	c13 -> Divide(3,1);
@@ -1072,33 +685,11 @@ int main(int argc, char ** argv){
 	h1_e_vz0 -> Draw();
 	h1_e_vz  -> Draw("same");
 
-	TCanvas *c22 = new TCanvas("c22");
-	c22 -> Divide(3,2);
-	c22 -> cd(1);	h1_e_vz_sec10 -> Draw();
-	c22 -> cd(2);	h1_e_vz_sec20 -> Draw();
-	c22 -> cd(3);	h1_e_vz_sec30 -> Draw();
-	c22 -> cd(4);	h1_e_vz_sec40 -> Draw();
-	c22 -> cd(5);	h1_e_vz_sec53 -> Draw();
-	c22 -> cd(6);	h1_e_vz_sec60 -> Draw();
-
-	TCanvas *c23 = new TCanvas("c23");
-	c23 -> Divide(3,2);
-	c23 -> cd(1);	h1_e_vz_sec1 -> Draw();
-	c23 -> cd(2);	h1_e_vz_sec2 -> Draw();
-	c23 -> cd(3);	h1_e_vz_sec3 -> Draw();
-	c23 -> cd(4);	h1_e_vz_sec4 -> Draw();
-	c23 -> cd(5);	h1_e_vz_sec5 -> Draw();
-	c23 -> cd(6);	h1_e_vz_sec6 -> Draw();
-
 	TCanvas *c24 = new TCanvas("c24");
-	c24 -> Divide(2,1);
-	c24 -> cd(1);	h2_e_phiVz0 -> Draw("COLZ");
-	c24 -> cd(2);	h2_e_phiVz  -> Draw("COLZ");
-
+	h2_e_phiVz0 -> Draw("COLZ");
+	
 	TCanvas *c25 = new TCanvas("c25");
-	c25 -> Divide(2,1);
-	c25 -> cd(1);	h2_e_thetaVz0 -> Draw("COLZ");
-	c25 -> cd(2);	h2_e_thetaVz  -> Draw("COLZ");
+	h2_e_thetaVz0 -> Draw("COLZ");
 
 	TCanvas *c26 = new TCanvas("c26");
 	h2_pos_pBeta -> Draw("COLZ");
@@ -1111,33 +702,11 @@ int main(int argc, char ** argv){
 	c28 -> cd(1);	h1_p_mass ->Draw();
 	c28 -> cd(2);	h2_p_pMass->Draw("COLZ");
 
-	TCanvas *c29 = new TCanvas("c29");
-	c29 -> Divide(2,1);
-	c29 -> cd(1);	h2_p_p_momCor0-> Draw("COLZ");
-	c29 -> cd(2);   h2_p_p_momCor1-> Draw("COLZ");
-
-	TCanvas *c30 = new TCanvas("c30");
-	c30 -> Divide(2,1);
-	c30 -> cd(1);	h2_p_th_pCor0-> Draw("COLZ");
-	c30 -> cd(2);	h2_p_th_pCor1-> Draw("COLZ");
-
-	TCanvas *c31 = new TCanvas("c31");
-	c31 -> Divide(2,1);
-	c31 -> cd(1);	h2_p_th_p_cor0 -> Draw("COLZ");
-	c31 -> cd(2);	h2_p_th_p_cor1 -> Draw("COLZ");
-
-	TCanvas *c32 = new TCanvas("c32");
-	h2_p_vzVzCor -> Draw("COLZ");
-
 	TCanvas *c33 = new TCanvas("c33");
-	c33 -> Divide(2,1);
-	c33 -> cd(1);	h2_p_phiVz0 -> Draw("COLZ");
-	c33 -> cd(2);	h2_p_phiVz  -> Draw("COLZ");
+	h2_p_phiVz0 -> Draw("COLZ");
 
 	TCanvas *c34 = new TCanvas("c34");
-	c34 -> Divide(2,1);
-	c34 -> cd(1);	h2_p_thetaVz0 -> Draw("COLZ");
-	c34 -> cd(2);	h2_p_thetaVz  -> Draw("COLZ");
+	h2_p_thetaVz0 -> Draw("COLZ");
 
 	TCanvas *c35 = new TCanvas("c35");
 	h2_p_deltaTmom0 -> Draw("COLZ");
@@ -1166,45 +735,6 @@ int main(int argc, char ** argv){
 	TCanvas *c43 = new TCanvas("c43");
 	h2_pip_deltaTmom2 -> Draw("COLZ");
 
-	TCanvas *c44 = new TCanvas("c44");
-	h2_neu_pBeta -> Draw("COLZ");
-
-	TCanvas *c45 = new TCanvas("c45");
-	h2_n_pBeta -> Draw("COLZ");
-
-	TCanvas *c46 = new TCanvas("c46");
-	h2_n_phiTheta0 -> Draw("COLZ");
-
-	TCanvas *c47 = new TCanvas("c47");
-	h2_n_phiTheta1 -> Draw("COLZ");
-
-	TCanvas *c48 = new TCanvas("c48");
-	h2_n_phiTheta2 -> Draw("COLZ");
-
-	TCanvas *c49 = new TCanvas("c49");
-	c49 -> Divide(3,2);
-	c49 -> cd(1);	h1_u_0 -> Draw();
-	c49 -> cd(2);   h1_v_0 -> Draw();
-	c49 -> cd(3);   h1_w_0 -> Draw();
-	c49 -> cd(4);   h1_u_1 -> Draw();
-	c49 -> cd(5);   h1_v_1 -> Draw();
-	c49 -> cd(6);   h1_w_1 -> Draw();
-
-	TCanvas *c50 = new TCanvas("c50");
-        c50 -> Divide(3,2);
-        c50 -> cd(1);   h1_x_0 -> Draw();
-        c50 -> cd(2);   h1_y_0 -> Draw();
-        c50 -> cd(3);   h1_z_0 -> Draw();
-        c50 -> cd(4);   h1_x_1 -> Draw();
-        c50 -> cd(5);   h1_y_1 -> Draw();
-        c50 -> cd(6);   h1_z_1 -> Draw();
-
-	TCanvas *c51 = new TCanvas("c51");
-	h2_n_ECxy_0 -> Draw("COLZ");
-
-	TCanvas *c52 = new TCanvas("c52");
-	h2_n_ECxy_1 -> Draw("COLZ");
-
 	TCanvas *c53 = new TCanvas("c53");
 	h2_pim_deltaTmom0 -> Draw("COLZ");
 
@@ -1215,63 +745,43 @@ int main(int argc, char ** argv){
 	h2_pim_deltaTmom2 -> Draw("COLZ");
 
 	// --------------------------------------------------------------------------------------------------
-	// Print histograms on a pdf file
+        // Print histograms on a pdf file
 
-	c1  -> Print(Form("../plots/plots_%d.pdf(",tab_run),"pdf");
-	c2  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c3  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c4  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c5  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c6  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");	
-	c7  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c8  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c9  -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");	
-	c10 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c11 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");	
-	c12 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c13 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c14 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c15 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c16 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c17 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c18 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c19 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c20 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c21 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c22 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c23 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c24 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c25 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");	
-	c26 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c27 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c28 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c29 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c30 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c31 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c32 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");	
-	c33 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c34 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c35 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c36 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c37 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c38 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c39 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c40 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c41 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");	
-	c42 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c43 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c44 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c45 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c46 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c47 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c48 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c49 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c50 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c51 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c52 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c53 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c54 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c55 -> Print(Form("../plots/plots_%d.pdf)",tab_run),"pdf");
+        c1  -> Print(Form("./e2a_maps_%d.pdf(",tab_E1) ,"pdf"); 
+        c2  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c3  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c4  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c5  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");   
+        c13 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c14 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c15 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c16 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c17 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c18 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c19 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c20 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c21 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c24 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c25 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c26 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c27 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c28 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c33 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c34 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c35 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c36 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c37 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c38 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c39 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c40 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c41 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c42 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c43 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf"); 
+        c53 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c54 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
+        c55 -> Print(Form("./e2a_maps_%d.pdf)",tab_E1) ,"pdf");
+
+        // --------------------------------------------------------------------------------------------------
 
 	// --------------------------------------------------------------------------------------------------
 	// Write the output file
@@ -1288,12 +798,7 @@ int main(int argc, char ** argv){
 	h1_e_EC_tot2      ->Write();
 	h2_e_thetaMom0    ->Write();
 	h2_e_thetaMom1    ->Write();
-	h2_e_thetaMom2    ->Write();
-	h1_e_momCor       ->Write();
-	h1_e_momCor1      ->Write();
-	h2_e_momMomCor    ->Write();
-	h2_e_momMomCor1   ->Write();
-	h2_e_vzVzCor      ->Write();
+	h2_e_thetaMom2    ->Write();	
 	h2_e_Ein_Eout0    ->Write();
 	h2_e_Ein_Eout1    ->Write();
 	h2_e_Ein_Eout2    ->Write();
@@ -1314,22 +819,8 @@ int main(int argc, char ** argv){
 	h2_e_phiTheta2    ->Write();
 	h1_e_vz0          ->Write();
 	h1_e_vz           ->Write();
-	h1_e_vz_sec10     ->Write();
-	h1_e_vz_sec1      ->Write();
-	h1_e_vz_sec20     ->Write();
-	h1_e_vz_sec2      ->Write();
-	h1_e_vz_sec30     ->Write();
-	h1_e_vz_sec3      ->Write();
-	h1_e_vz_sec40     ->Write();
-	h1_e_vz_sec4      ->Write();
-	h1_e_vz_sec53     ->Write();
-	h1_e_vz_sec5      ->Write();
-	h1_e_vz_sec60     ->Write();
-	h1_e_vz_sec6      ->Write();
-	h2_e_phiVz0       ->Write();
-	h2_e_phiVz        ->Write();
-	h2_e_thetaVz0     ->Write();
-	h2_e_thetaVz      ->Write();
+	h2_e_phiVz0       ->Write();	
+	h2_e_thetaVz0     ->Write();	
 	// ---
 	h2_pos_pBeta      ->Write();
 	h2_p_pBeta        ->Write();
@@ -1337,12 +828,8 @@ int main(int argc, char ** argv){
 	// ---
 	h1_p_mass         ->Write();
 	h2_p_pMass        ->Write();	
-	h2_p_p_momCor0    ->Write();
-	h2_p_vzVzCor      ->Write();
 	h2_p_phiVz0       ->Write(); 
-	h2_p_phiVz        ->Write();
-	h2_p_thetaVz0     ->Write();
-	h2_p_thetaVz      ->Write();
+	h2_p_thetaVz0     ->Write();	
 	h2_p_deltaTmom0   ->Write();
 	h2_p_deltaTmom1   ->Write();
 	h2_p_deltaTmom2   ->Write();

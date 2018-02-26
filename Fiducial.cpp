@@ -562,8 +562,8 @@ bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 	double prot_mom_lim;
 	double prot_min = 0.3; //GeV
 
-	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.70;
-	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.15;
+	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.;
+	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.;
 
 	if (mom > prot_mom_lim) mom = prot_mom_lim;
 	if (mom < prot_min    ) return false;

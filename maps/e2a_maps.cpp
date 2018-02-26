@@ -383,7 +383,7 @@ int main(int argc, char ** argv){
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
 		if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
-		if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+		if (!fid_params.CutUVW_e(e_ec_xyz)     ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
 
 		// ---------------------------------------------------------------------------------------
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
@@ -484,9 +484,7 @@ int main(int argc, char ** argv){
 					if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
 							(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
 					  ){
-						if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
-							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
-						else	p_mom_corrected=mom[i];	
+						p_mom_corrected=mom[i];	
 
 						corr_px = p_mom_corrected*u1.X();
 						corr_py = p_mom_corrected*u1.Y();

@@ -413,7 +413,7 @@ int main(int argc, char ** argv){
 	cout << "Mini   = " << tab_mini  << endl;
 	cout << "Target = " << tab_targ  << endl;
 
-	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
+	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);  // Create an instance of the Fiducial Class
 	Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
 
 	// Values for some cuts

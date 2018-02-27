@@ -9,7 +9,7 @@
 #include "TF1.h"
 #include "TFile.h"
 // ===================================================================================================================================
-Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
+Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target, bool data)
 {
 	// Initialize some variables
 	el_Ep_ratio_mean = NULL;
@@ -27,6 +27,7 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 	torus_current = torus;
 	mini_current = mini;
 	tar = target;
+	is_data = data;
 
 	homedir = std::string(getenv("HOME"));
 
@@ -446,7 +447,10 @@ bool Fiducial::read_e_pcor_params()
 bool Fiducial::read_e_pid_params()
 {
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d.root",homedir.c_str(),E1);
+
+	if(is_data) sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d.root"    ,homedir.c_str(),E1);
+	else        sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d_sim.root",homedir.c_str(),E1);
+
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);
 

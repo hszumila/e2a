@@ -11,6 +11,7 @@ project (e2a)
 # ADD SUBDIRECTORIES
 add_subdirectory(calibration_data)
 add_subdirectory(maps)
+add_subdirectory(auxiliary_scripts)
 add_subdirectory(Rey_neutrons)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})

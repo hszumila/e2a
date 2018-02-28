@@ -1,3 +1,7 @@
+// ======================================================
+// CODE TO DETERMINE PARAMETERS NEEDED FOR ELECTRON PID
+// CUTS IN THE CASE OF SIMULATIONS
+// ======================================================
 #include <fstream>
 #include <iostream>
 #include <cmath>

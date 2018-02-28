@@ -22,8 +22,10 @@ class Fiducial
 		bool CutUVW_e(TVector3 ecxyz);
 		bool CutUVW  (TVector3 ecuvw, double dist);
 		double vz_corr(TVector3 T3_mom);
+		double corrected_path_length( double uncorrected_path_length , double E_in , double E_out  );
 		TVector3 eMomentumCorrection(TVector3 V3el);
 		TVector3 FindUVW(TVector3 xyz);
+
 	private:
 		int E1;
 		int torus_current;

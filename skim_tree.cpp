@@ -33,14 +33,14 @@ int main(int argc, char ** argv){
 		cerr << "Wrong number of arguments. Instead try\n"
 			<< "\tskim_tree /path/to/input/file /path/to/output/file 00000000\n\n";
 		cout << "where the third argument must be an integer of 8 digits."    << endl;
-                cout << "1st digit: minimum number of protons  required in the event" << endl;
-                cout << "2nd digit: maximum number of protons  required in the event" << endl;
-                cout << "3rd digit: minimum number of neutrons required in the event" << endl;
-                cout << "4th digit: maximum number of neutrons required in the event" << endl;
-                cout << "5th digit: minimum number of pion+    required in the event" << endl;
-                cout << "6th digit: maximum number of pion+    required in the event" << endl;
-                cout << "7th digit: minimum number of pion-    required in the event" << endl;
-                cout << "8th digit: maximum number of pion-    required in the event" << endl;
+		cout << "1st digit: minimum number of protons  required in the event" << endl;
+		cout << "2nd digit: maximum number of protons  required in the event" << endl;
+		cout << "3rd digit: minimum number of neutrons required in the event" << endl;
+		cout << "4th digit: maximum number of neutrons required in the event" << endl;
+		cout << "5th digit: minimum number of pion+    required in the event" << endl;
+		cout << "6th digit: maximum number of pion+    required in the event" << endl;
+		cout << "7th digit: minimum number of pion-    required in the event" << endl;
+		cout << "8th digit: maximum number of pion-    required in the event" << endl;
 		return -1;	
 	}
 
@@ -49,13 +49,13 @@ int main(int argc, char ** argv){
 	istringstream iss (argv[3]);
 	int in_num_part;
 	iss >> in_num_part;
-	
+
 	if(strlen(argv[3]) != 8){
 		cout << endl << "Third argument must be an integer of 8 digits." << endl;
 		cout << "You have specified an integer of " << strlen(argv[3]) << " digits" << endl;
 		exit(1);
 	}
-	
+
 	int min_p   = (in_num_part/10000000)%10;
 	int max_p   = (in_num_part/1000000 )%10;
 	int min_n   = (in_num_part/100000  )%10;
@@ -315,9 +315,9 @@ int main(int argc, char ** argv){
 	double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
 	double EC_in_cut, el_EC_cut;
 	double e_t0,beta_assuming_proton,p_t0,delta_t,beta_assuming_pip,pip_t0,pip_delta_t;
-	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p;
+	double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p, EC_Path_corr, Beta_corr;
 
-	TVector3 e_ec_xyz, n_ec_uvw;
+	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
 
 	int nParticles;
@@ -509,8 +509,8 @@ int main(int argc, char ** argv){
 
 		// ---------------------------------------------------------------------------------------
 		// Electron Fiducial cuts
-		//if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
-		//if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+		if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
+		if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
 
 		// ---------------------------------------------------------------------------------------
 		// If electron passes all cuts, then momentum-correct it (only works for theta > 16 deg):
@@ -658,118 +658,118 @@ int main(int argc, char ** argv){
 				h2_pip_deltaTmom0 -> Fill(pip_delta_t,mom  [i]);
 
 				// Passing positive hadron fiducial cuts
-				//if(fid_params.pFiducialCut(T3_p_mom)){
+				if(fid_params.pFiducialCut(T3_p_mom)){
 
-				// Positive particle vertex (_z) correction
-				p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
+					// Positive particle vertex (_z) correction
+					p_vz_corrected = targetZ[i]+fid_params.vz_corr(T3_p_mom);
 
-				h1_p_mass         -> Fill(mass[i]);
-				h2_p_pMass        -> Fill(mom [i]    ,mass [i]);
-				h2_pos_pBeta      -> Fill(mom [i]    ,Beta [i]);
-				h2_p_phiTheta1    -> Fill(phi [i]    ,theta[i]);
-				h2_p_deltaTmom1   -> Fill(delta_t    ,mom  [i]);
-				h2_pip_deltaTmom1 -> Fill(pip_delta_t,mom  [i]);
-				// --------------------------------------------------------------------
-				// Look specifically for protons
-				if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
-						(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
-				  ){
-					if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
-						p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
-					else	p_mom_corrected=mom[i];	
+					h1_p_mass         -> Fill(mass[i]);
+					h2_p_pMass        -> Fill(mom [i]    ,mass [i]);
+					h2_pos_pBeta      -> Fill(mom [i]    ,Beta [i]);
+					h2_p_phiTheta1    -> Fill(phi [i]    ,theta[i]);
+					h2_p_deltaTmom1   -> Fill(delta_t    ,mom  [i]);
+					h2_pip_deltaTmom1 -> Fill(pip_delta_t,mom  [i]);
+					// --------------------------------------------------------------------
+					// Look specifically for protons
+					if((id_guess[i] == 2212 ) &&       // Guess at the particle ID is good for the proton candidate
+							(fid_params.in_p_deltaT(delta_t, mom[i], pdeltat_sig_cutrange)) // Proton PID (delta T vs p)
+					  ){
+						if(run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected) != -1)
+							p_mom_corrected=run_dependent_corrections.ProtonMomCorrection_He3_4Cell(T3_p_mom,p_vz_corrected);
+						else	p_mom_corrected=mom[i];	
 
-					corr_px = p_mom_corrected*u1.X();
-					corr_py = p_mom_corrected*u1.Y();
-					corr_pz = p_mom_corrected*u1.Z();
+						corr_px = p_mom_corrected*u1.X();
+						corr_py = p_mom_corrected*u1.Y();
+						corr_pz = p_mom_corrected*u1.Z();
 
-					T3_p_mom.SetXYZ(corr_px,corr_py,corr_pz);
+						T3_p_mom.SetXYZ(corr_px,corr_py,corr_pz);
 
-					Part_type[nParticles] = 2212;
-					e_deltat [nParticles] = delta_t;
-					mom_x    [nParticles] = T3_p_mom.X();
-					mom_y    [nParticles] = T3_p_mom.Y();
-					mom_z    [nParticles] = T3_p_mom.Z();
-					vtx_z_unc[nParticles] = targetZ  [i];	
-					vtx_z_cor[nParticles] = p_vz_corrected;
-					stat_sc  [nParticles] = StatSC [i];
-					stat_dc  [nParticles] = StatDC [i];
-					stat_ec  [nParticles] = StatEC [i];
-					sc_time  [nParticles] = SC_Time[i];
-					sc_path  [nParticles] = SC_Path[i];
-					ec_time  [nParticles] = EC_Time[i];
-					ec_path  [nParticles] = EC_Path[i];
-					ec_in    [nParticles] = EC_in  [i];
-					ec_out   [nParticles] = EC_out [i];
-					ec_tot   [nParticles] = EC_tot [i];
-					Mass     [nParticles] = mass   [i];
-					ec_x     [nParticles] = EC_X   [i];
-					ec_y     [nParticles] = EC_Y   [i];
-					ec_z     [nParticles] = EC_Z   [i];
-					ec_u     [nParticles] = EC_U   [i];
-					ec_v     [nParticles] = EC_V   [i];
-					ec_w     [nParticles] = EC_W   [i];
-					charge   [nParticles] = Charge [i];
-					beta     [nParticles] = Beta   [i];
+						Part_type[nParticles] = 2212;
+						e_deltat [nParticles] = delta_t;
+						mom_x    [nParticles] = T3_p_mom.X();
+						mom_y    [nParticles] = T3_p_mom.Y();
+						mom_z    [nParticles] = T3_p_mom.Z();
+						vtx_z_unc[nParticles] = targetZ  [i];	
+						vtx_z_cor[nParticles] = p_vz_corrected;
+						stat_sc  [nParticles] = StatSC [i];
+						stat_dc  [nParticles] = StatDC [i];
+						stat_ec  [nParticles] = StatEC [i];
+						sc_time  [nParticles] = SC_Time[i];
+						sc_path  [nParticles] = SC_Path[i];
+						ec_time  [nParticles] = EC_Time[i];
+						ec_path  [nParticles] = EC_Path[i];
+						ec_in    [nParticles] = EC_in  [i];
+						ec_out   [nParticles] = EC_out [i];
+						ec_tot   [nParticles] = EC_tot [i];
+						Mass     [nParticles] = mass   [i];
+						ec_x     [nParticles] = EC_X   [i];
+						ec_y     [nParticles] = EC_Y   [i];
+						ec_z     [nParticles] = EC_Z   [i];
+						ec_u     [nParticles] = EC_U   [i];
+						ec_v     [nParticles] = EC_V   [i];
+						ec_w     [nParticles] = EC_W   [i];
+						charge   [nParticles] = Charge [i];
+						beta     [nParticles] = Beta   [i];
 
-					h2_p_deltaTmom2-> Fill(delta_t   ,mom                   [i]);
-					h2_p_phiTheta2 -> Fill(phi    [i],theta                 [i]);
-					h2_p_vzVzCor   -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
-					h2_p_p_momCor0 -> Fill(mom    [i],mom [i]-p_mom_corrected  );
-					h2_p_p_momCor1 -> Fill(mom    [i],p_mom_corrected/mom   [i]);
-					h2_p_th_pCor0  -> Fill(theta  [i],mom [i]-p_mom_corrected  );
-					h2_p_th_pCor1  -> Fill(theta  [i],p_mom_corrected/mom   [i]);
-					h2_p_th_p_cor0 -> Fill(theta  [i],mom[i],mom[i]-p_mom_corrected);
-					h2_p_th_p_cor1 -> Fill(theta  [i],mom[i],p_mom_corrected/mom[i]);
-					h2_p_phiVz0    -> Fill(phi    [i],targetZ               [i]);
-					h2_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
-					h2_p_thetaVz0  -> Fill(theta  [i],targetZ               [i]);
-					h2_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	   );
-					h2_p_pBeta     -> Fill(mom    [i],Beta                  [i]);
+						h2_p_deltaTmom2-> Fill(delta_t   ,mom                   [i]);
+						h2_p_phiTheta2 -> Fill(phi    [i],theta                 [i]);
+						h2_p_vzVzCor   -> Fill(targetZ[i],p_vz_corrected-targetZ[i]);
+						h2_p_p_momCor0 -> Fill(mom    [i],mom [i]-p_mom_corrected  );
+						h2_p_p_momCor1 -> Fill(mom    [i],p_mom_corrected/mom   [i]);
+						h2_p_th_pCor0  -> Fill(theta  [i],mom [i]-p_mom_corrected  );
+						h2_p_th_pCor1  -> Fill(theta  [i],p_mom_corrected/mom   [i]);
+						h2_p_th_p_cor0 -> Fill(theta  [i],mom[i],mom[i]-p_mom_corrected);
+						h2_p_th_p_cor1 -> Fill(theta  [i],mom[i],p_mom_corrected/mom[i]);
+						h2_p_phiVz0    -> Fill(phi    [i],targetZ               [i]);
+						h2_p_phiVz     -> Fill(phi    [i],p_vz_corrected           );
+						h2_p_thetaVz0  -> Fill(theta  [i],targetZ               [i]);
+						h2_p_thetaVz   -> Fill(theta  [i],p_vz_corrected	   );
+						h2_p_pBeta     -> Fill(mom    [i],Beta                  [i]);
 
-					nProtons++;
-					nParticles++;
+						nProtons++;
+						nParticles++;
+					}
+					// --------------------------------------------------------------------
+					// Look specifically for pions +
+					else if((id_guess[i] == 211)&&       // Guess at the particle ID is good for the pion+ candidate
+							(fid_params.in_pip_deltaT(pip_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID
+					       ){
+						Part_type[nParticles] = 211;
+						e_deltat [nParticles] = pip_delta_t;
+						mom_x    [nParticles] = T3_p_mom.X();
+						mom_y    [nParticles] = T3_p_mom.Y();
+						mom_z    [nParticles] = T3_p_mom.Z();
+						vtx_z_unc[nParticles] = targetZ  [i];
+						vtx_z_cor[nParticles] = p_vz_corrected;
+						stat_sc  [nParticles] = StatSC [i];
+						stat_dc  [nParticles] = StatDC [i];
+						stat_ec  [nParticles] = StatEC [i];
+						sc_time  [nParticles] = SC_Time[i];
+						sc_path  [nParticles] = SC_Path[i];
+						ec_time  [nParticles] = EC_Time[i];
+						ec_path  [nParticles] = EC_Path[i];
+						ec_in    [nParticles] = EC_in  [i];
+						ec_out   [nParticles] = EC_out [i];
+						ec_tot   [nParticles] = EC_tot [i];
+						Mass     [nParticles] = mass   [i];
+						ec_x     [nParticles] = EC_X   [i];
+						ec_y     [nParticles] = EC_Y   [i];
+						ec_z     [nParticles] = EC_Z   [i];
+						ec_u     [nParticles] = EC_U   [i];
+						ec_v     [nParticles] = EC_V   [i];
+						ec_w     [nParticles] = EC_W   [i];
+						charge   [nParticles] = Charge [i];
+						beta     [nParticles] = Beta   [i];
+
+						h2_pip_pBeta      -> Fill(mom[i]          ,Beta [i]);	
+						h2_pip_deltaTmom2 -> Fill(pip_delta_t     ,mom  [i]);
+
+						nPiplus++;
+						nParticles++;
+					}
+
+					// --------------------------------------------------------------------
 				}
-				// --------------------------------------------------------------------
-				// Look specifically for pions +
-				else if((id_guess[i] == 211)&&       // Guess at the particle ID is good for the pion+ candidate
-						(fid_params.in_pip_deltaT(pip_delta_t, mom[i], pipdeltat_sig_cutrange)) // Pi+ PID
-				       ){
-					Part_type[nParticles] = 211;
-					e_deltat [nParticles] = pip_delta_t;
-					mom_x    [nParticles] = T3_p_mom.X();
-					mom_y    [nParticles] = T3_p_mom.Y();
-					mom_z    [nParticles] = T3_p_mom.Z();
-					vtx_z_unc[nParticles] = targetZ  [i];
-					vtx_z_cor[nParticles] = p_vz_corrected;
-					stat_sc  [nParticles] = StatSC [i];
-					stat_dc  [nParticles] = StatDC [i];
-					stat_ec  [nParticles] = StatEC [i];
-					sc_time  [nParticles] = SC_Time[i];
-					sc_path  [nParticles] = SC_Path[i];
-					ec_time  [nParticles] = EC_Time[i];
-					ec_path  [nParticles] = EC_Path[i];
-					ec_in    [nParticles] = EC_in  [i];
-					ec_out   [nParticles] = EC_out [i];
-					ec_tot   [nParticles] = EC_tot [i];
-					Mass     [nParticles] = mass   [i];
-					ec_x     [nParticles] = EC_X   [i];
-					ec_y     [nParticles] = EC_Y   [i];
-					ec_z     [nParticles] = EC_Z   [i];
-					ec_u     [nParticles] = EC_U   [i];
-					ec_v     [nParticles] = EC_V   [i];
-					ec_w     [nParticles] = EC_W   [i];
-					charge   [nParticles] = Charge [i];
-					beta     [nParticles] = Beta   [i];
-
-					h2_pip_pBeta      -> Fill(mom[i]          ,Beta [i]);	
-					h2_pip_deltaTmom2 -> Fill(pip_delta_t     ,mom  [i]);
-
-					nPiplus++;
-					nParticles++;
-				}
-
-				// --------------------------------------------------------------------
-				//}
 			}
 			// ------------------------------------------------------------------------------------------
 			// Test if negative particle
@@ -825,84 +825,84 @@ int main(int argc, char ** argv){
 
 			// ------------------------------------------------------------------------------------------
 			// Test if neutral particle
-			else if(        //StatEC[i] > 0 && // EC status is good for the positive candidate
-					//StatDC[i] <=0 && // DC status is good for the positive candidate
-					//StatSC[i] <=0 && // SC status is good for the positive candidate
+			else if(        StatEC[i] > 0 && // EC status is good for the positive candidate
+					StatDC[i] <=0 && // DC status is good for the positive candidate
+					StatSC[i] <=0 && // SC status is good for the positive candidate
 					Stat  [i] > 0 && // Global status is good for the positive candidate
 					Charge[i] ==0 && // Charge is neutral
 					Beta  [i] < 1
 			       )
 			{
+	
+				EC_Path_corr = fid_params.corrected_path_length( EC_Path[i] , EC_in[i] , EC_out[i] );
+				Beta_corr = EC_Path_corr / (c_cm_ns*(EC_Time[i]-t0));
 
-				h2_n_phiTheta0 -> Fill(phi[i],theta[i]);
-
-				h2_neu_pBeta   -> Fill(mom [i],Beta [i]);
-				h2_n_phiTheta1 -> Fill(phi [i],theta[i]);
-
-				// Need to correct Beta[i] before cutting on it
+				h2_n_phiTheta0 -> Fill(phi [i],theta[i] );
+                                h2_neu_pBeta   -> Fill(mom [i],Beta_corr);
+                                h2_n_phiTheta1 -> Fill(phi [i],theta[i] );
+	
 				// --------------------------------------------------------------------
 				// Look specifically for neutrons 
-				//if(             Beta[i] < 0.95 &&
+				if( Beta_corr < 0.95 )
 				// Don't use: id_guess[i] == 2112 -> Guess at the particle ID is good for the neutron candidate
-				//  )
-				//{
+				{
 
 				h1_u_0 -> Fill(EC_U[i]);
 				h1_v_0 -> Fill(EC_V[i]);
 				h1_w_0 -> Fill(EC_W[i]);
 
-				n_ec_uvw.SetXYZ(EC_U[i],EC_V[i],EC_W[i]);
-				//if(fid_params.CutUVW( n_ec_uvw ,10.)){ // Cut 10 cm from the edges of the EC
+				n_ec_xyz.SetXYZ(EC_X[i],EC_Y[i],EC_Z[i]);
+				if(fid_params.CutUVW( n_ec_xyz ,10.)){ // Cut 10 cm from the edges of the EC
 
-				h1_u_1 -> Fill(EC_U[i]);
-				h1_v_1 -> Fill(EC_V[i]);
-				h1_w_1 -> Fill(EC_W[i]);
+					h1_u_1 -> Fill(EC_U[i]);
+					h1_v_1 -> Fill(EC_V[i]);
+					h1_w_1 -> Fill(EC_W[i]);
 
-				n_p  = Beta[i]*mN/sqrt(1-Beta[i]*Beta[i]);
+					n_p  = Beta_corr*mN/sqrt(1-Beta_corr*Beta_corr);
 
-				n_px = n_p*u1.X();
-				n_py = n_p*u1.Y();
-				n_pz = n_p*u1.Z();
+					n_px = n_p*u1.X();
+					n_py = n_p*u1.Y();
+					n_pz = n_p*u1.Z();
 
-				Part_type[nParticles] = 2112;
-				e_deltat [nParticles] = pip_delta_t;
-				mom_x    [nParticles] = n_px;
-				mom_y    [nParticles] = n_py;
-				mom_z    [nParticles] = n_pz;
-				//mom_x    [nParticles] = T3_p_mom.X();
-				//mom_y    [nParticles] = T3_p_mom.Y();
-				//mom_z    [nParticles] = T3_p_mom.Z();
-				vtx_z_unc[nParticles] = targetZ  [i];
-				vtx_z_cor[nParticles] = p_vz_corrected;
-				stat_sc  [nParticles] = StatSC [i];
-				stat_dc  [nParticles] = StatDC [i];
-				stat_ec  [nParticles] = StatEC [i];
-				sc_time  [nParticles] = SC_Time[i];
-				sc_path  [nParticles] = SC_Path[i];
-				ec_time  [nParticles] = EC_Time[i];
-				ec_path  [nParticles] = EC_Path[i];
-				ec_in    [nParticles] = EC_in  [i];
-				ec_out   [nParticles] = EC_out [i];
-				ec_tot   [nParticles] = EC_tot [i];
-				Mass     [nParticles] = mass   [i];
-				ec_x     [nParticles] = EC_X   [i];
-				ec_y     [nParticles] = EC_Y   [i];
-				ec_z     [nParticles] = EC_Z   [i];
-				ec_u     [nParticles] = EC_U   [i];
-				ec_v     [nParticles] = EC_V   [i];
-				ec_w     [nParticles] = EC_W   [i];
-				charge   [nParticles] = Charge [i];
-				beta     [nParticles] = Beta   [i];
+					Part_type[nParticles] = 2112;
+					e_deltat [nParticles] = pip_delta_t;
+					mom_x    [nParticles] = n_px;
+					mom_y    [nParticles] = n_py;
+					mom_z    [nParticles] = n_pz;
+					//mom_x    [nParticles] = T3_p_mom.X();
+					//mom_y    [nParticles] = T3_p_mom.Y();
+					//mom_z    [nParticles] = T3_p_mom.Z();
+					vtx_z_unc[nParticles] = targetZ  [i];
+					vtx_z_cor[nParticles] = p_vz_corrected;
+					stat_sc  [nParticles] = StatSC [i];
+					stat_dc  [nParticles] = StatDC [i];
+					stat_ec  [nParticles] = StatEC [i];
+					sc_time  [nParticles] = SC_Time[i];
+					sc_path  [nParticles] = SC_Path[i];
+					ec_time  [nParticles] = EC_Time[i];
+					ec_path  [nParticles] = EC_Path[i];
+					ec_in    [nParticles] = EC_in  [i];
+					ec_out   [nParticles] = EC_out [i];
+					ec_tot   [nParticles] = EC_tot [i];
+					Mass     [nParticles] = mass   [i];
+					ec_x     [nParticles] = EC_X   [i];
+					ec_y     [nParticles] = EC_Y   [i];
+					ec_z     [nParticles] = EC_Z   [i];
+					ec_u     [nParticles] = EC_U   [i];
+					ec_v     [nParticles] = EC_V   [i];
+					ec_w     [nParticles] = EC_W   [i];
+					charge   [nParticles] = Charge [i];
+					beta     [nParticles] = Beta_corr ;
 
-				h2_n_phiTheta2 -> Fill(phi[i],theta[i]);
-				h2_n_pBeta     -> Fill(mom[i],Beta [i]);
+					h2_n_phiTheta2 -> Fill(phi[i],theta[i] );
+					h2_n_pBeta     -> Fill(mom[i],Beta_corr);
 
-				nNeutrons++;
-				nParticles++;
+					nNeutrons++;
+					nParticles++;
 
-				//}
+				}
 
-				//}
+				}
 
 			}
 

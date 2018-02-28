@@ -1,4 +1,4 @@
-# CMakeLists for e2a maps
+# CMakeLists for auxiliary scripts
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})
 

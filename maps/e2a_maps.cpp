@@ -158,17 +158,17 @@ int main(int argc, char ** argv){
 	TH2D * h2_e_xyEC_hit1= new TH2D("h2_e_xyEC_hit1","e- passing PID;ECx [cm];ECy [cm];Counts"           ,300,-400.,400.,300,-400.,400.);
 	TH2D * h2_e_xyEC_hit2= new TH2D("h2_e_xyEC_hit2","e- passing PID+fid;ECx [cm];ECy [cm];Counts"       ,300,-400.,400.,300,-400.,400.);
 
-	TH2D * h2_e_p_Etot0  = new TH2D("h2_e_p_Etot0"  ,"e- before cuts;p [GeV];E_tot/p;Counts"             ,300,   0.,  5.,300, 0.,0.7);
-	TH2D * h2_e_p_Etot1  = new TH2D("h2_e_p_Etot1"  ,"e- passing PID;p [GeV];E_tot/p;Counts"             ,300,   0.,  5.,300, 0.,0.7);
-	TH2D * h2_e_p_Etot2  = new TH2D("h2_e_p_Etot2"  ,"e- passing PID+fid;p [GeV];E_tot/p;Counts"         ,300,   0.,  5.,300, 0.,0.7);
+	TH2D * h2_e_p_Etot0  = new TH2D("h2_e_p_Etot0"  ,"e- before cuts;p [GeV];E_tot/p;Counts"             ,300,   0.,  7.,300, 0.,0.7);
+	TH2D * h2_e_p_Etot1  = new TH2D("h2_e_p_Etot1"  ,"e- passing PID;p [GeV];E_tot/p;Counts"             ,300,   0.,  7.,300, 0.,0.7);
+	TH2D * h2_e_p_Etot2  = new TH2D("h2_e_p_Etot2"  ,"e- passing PID+fid;p [GeV];E_tot/p;Counts"         ,300,   0.,  7.,300, 0.,0.7);
 
-	TH2D * h2_e_p_E0     = new TH2D("h2_e_p_E0"     ,"e- before cuts;p [GeV];E;Counts"                   ,300,   0.,  5.,300, 0.,2.);
-	TH2D * h2_e_p_E1     = new TH2D("h2_e_p_E1"     ,"e- passing PID;p [GeV];E;Counts"                   ,300,   0.,  5.,300, 0.,2.);
-	TH2D * h2_e_p_E2     = new TH2D("h2_e_p_E2"     ,"e- before PIF+fid;p [GeV];E;Counts"                ,300,   0.,  5.,300, 0.,2.);
+	TH2D * h2_e_p_E0     = new TH2D("h2_e_p_E0"     ,"e- before cuts;p [GeV];E;Counts"                   ,300,   0.,  7.,300, 0.,2.);
+	TH2D * h2_e_p_E1     = new TH2D("h2_e_p_E1"     ,"e- passing PID;p [GeV];E;Counts"                   ,300,   0.,  7.,300, 0.,2.);
+	TH2D * h2_e_p_E2     = new TH2D("h2_e_p_E2"     ,"e- before PIF+fid;p [GeV];E;Counts"                ,300,   0.,  7.,300, 0.,2.);
 
-	TH2D * h2_e_thetaMom0= new TH2D("e_thetaMom0"     ,"e- before cuts;#theta [deg];Mom [GeV];Counts"       ,300,  10., 50.,300, 0., 6.);
-	TH2D * h2_e_thetaMom1= new TH2D("e_thetaMom1"     ,"e- passing PID;#theta [deg];Mom [GeV];Counts"       ,300,  10., 50.,300, 0., 6.);
-	TH2D * h2_e_thetaMom2= new TH2D("e_thetaMom2"     ,"e- passing PID+fid;#theta [deg];Mom [GeV];Counts"   ,300,  10., 50.,300, 0., 6.);
+	TH2D * h2_e_thetaMom0= new TH2D("e_thetaMom0"   ,"e- before cuts;#theta [deg];Mom [GeV];Counts"       ,300,  10., 60.,300, 0., 6.);
+	TH2D * h2_e_thetaMom1= new TH2D("e_thetaMom1"   ,"e- passing PID;#theta [deg];Mom [GeV];Counts"       ,300,  10., 60.,300, 0., 6.);
+	TH2D * h2_e_thetaMom2= new TH2D("e_thetaMom2"   ,"e- passing PID+fid;#theta [deg];Mom [GeV];Counts"   ,300,  10., 60.,300, 0., 6.);
 
 	// ---
 	TH1D * h1_e_vz0      = new TH1D("h1_e_vz0"      ,"e- passing cuts, before vtx corr;electron vz [cm]; Counts"           ,300, -10., 10.);
@@ -188,12 +188,12 @@ int main(int argc, char ** argv){
 	TH2D * h2_p_phiTheta1= new TH2D("h2_p_phiTheta1","p passing fid;#phi [deg];#theta [deg];Counts"    ,300,-100.,380.,300,0.,55.);
 	TH2D * h2_p_phiTheta2= new TH2D("h2_p_phiTheta2","p passing fid+PID;#phi [deg];#theta [deg];Counts",300,-100.,380.,300,0.,55.);
 
-	TH2D * h2_p_deltaTmom0=new TH2D("h2_p_deltaTmom0","p before cuts;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 3.);
+	TH2D * h2_p_deltaTmom0=new TH2D("h2_p_deltaTmom0","p before cuts;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 6.);
+	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 6.);
+	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 6.);
 
 	TH2D * h2_p_phiVz0   = new TH2D("h2_p_phiVz0"   ,"p passing cuts, before vtx corr;#phi [deg];vz [cm];Counts",300,-100.,380.,300,-10,10 );
-	TH2D * h2_p_thetaVz0 = new TH2D("h2_p_thetaVz0" ,"p passing cuts, before vtx corr;#theta [deg];vz [cm];Counts",300, 0.,100.,300,-11,11 );
+	TH2D * h2_p_thetaVz0 = new TH2D("h2_p_thetaVz0" ,"p passing cuts, before vtx corr;#theta [deg];vz [cm];Counts",300, 0.,120.,300,-11,11 );
 
 	TH2D * h2_p_pBeta    = new TH2D("h2_p_pBeta"    ,"p passing fid. cuts;p [GeV];#beta;Counts"                 ,300,   0.,  4.,300, 0.,1.3);
 

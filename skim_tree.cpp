@@ -249,9 +249,9 @@ int main(int argc, char ** argv){
 	TH2D * h2_p_phiTheta1= new TH2D("h2_p_phiTheta1","p passing fid;#phi [deg];#theta [deg];Counts"    ,300,-100.,380.,300,0.,55.);
 	TH2D * h2_p_phiTheta2= new TH2D("h2_p_phiTheta2","p passing fid+PID;#phi [deg];#theta [deg];Counts",300,-100.,380.,300,0.,55.);
 
-	TH2D * h2_p_deltaTmom0=new TH2D("h2_p_deltaTmom0","p before cuts;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 3.);
+	TH2D * h2_p_deltaTmom0=new TH2D("h2_p_deltaTmom0","p before cuts;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 6.);
+	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 6.);
+	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 6.);
 
 	TH2D * h2_p_p_momCor0= new TH2D("h2_p_p_momCor0","p passing fid. cuts;p [GeV];p - p_corr [GeV];Counts"     ,100, 0., 2.5,100,-.06,.01);
 	TH2D * h2_p_p_momCor1= new TH2D("h2_p_p_momCor1","p passing fid. cuts;p [GeV];p_corr/p;Counts"             ,100, 0., 2.5,100,0.95,1.2);
@@ -312,7 +312,7 @@ int main(int argc, char ** argv){
 
 	// ---------------------------------------
 	// Diagnostic electron momentum correction
-	TH2D * h2_e_thetaMom3= new TH2D("e_thetaMom3"     ,"e- passing PID+fid;#theta [deg];Mom [GeV];p correction" ,300,  10., 50.,300, 0., 6.);
+	TH2D * h2_e_thetaMom3= new TH2D("e_thetaMom3","e- passing PID+fid (z axis: p_{corr}-p);#theta [deg];Mom [GeV];p correction" ,300,  10., 50.,300, 0., 6.);
 
 	// ---------------------------------------
 	// Setting up output tree and branches

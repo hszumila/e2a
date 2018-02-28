@@ -9,7 +9,7 @@
 #include "TF1.h"
 #include "TFile.h"
 // ===================================================================================================================================
-Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
+Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target, bool data)
 {
 	// Initialize some variables
 	el_Ep_ratio_mean = NULL;
@@ -27,6 +27,7 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target)
 	torus_current = torus;
 	mini_current = mini;
 	tar = target;
+	is_data = data;
 
 	homedir = std::string(getenv("HOME"));
 
@@ -377,7 +378,7 @@ bool Fiducial::read_vz_cor_params()
 {
 
 	std::string effective_tar;
-	if ((E1==4461)&&(tar=="3He")) effective_tar = "4He"; // Using 4He parameters for 3He in case of 4.4GeV data
+	if ((E1==4461)&&((tar=="3He"))) effective_tar = "4He"; // Using 4He parameters for 3He in case of 4.4GeV data
 	else effective_tar = tar;
 
 	char param_file_name[256];
@@ -446,7 +447,10 @@ bool Fiducial::read_e_pcor_params()
 bool Fiducial::read_e_pid_params()
 {
 	char param_file_name[256];
-	sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d.root",homedir.c_str(),E1);
+
+	if(is_data) sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d.root"    ,homedir.c_str(),E1);
+	else        sprintf(param_file_name,"%s/.e2a/el_Epratio_mom_%d_sim.root",homedir.c_str(),E1);
+
 	TFile * old_gfile = gFile;
 	TFile * cal_file = new TFile(param_file_name);
 
@@ -562,8 +566,8 @@ bool Fiducial::in_p_deltaT(double delta_t, double mom, double cut_sigma)
 	double prot_mom_lim;
 	double prot_min = 0.3; //GeV
 
-	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.70;
-	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.15;
+	if      ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.;
+	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.) prot_mom_lim=2.;
 
 	if (mom > prot_mom_lim) mom = prot_mom_lim;
 	if (mom < prot_min    ) return false;

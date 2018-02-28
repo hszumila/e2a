@@ -13,13 +13,9 @@
 #include "Fiducial.h"
 #include "Run_dependent.h"
 #include "constants.h"
+#include "global_variables.h"
 
 using namespace std;
-
-// Range of momentum for which we have good fits for PID
-const double epratio_sig_cutrange   =3.; // +/- sigma for electron PID cut
-const double pdeltat_sig_cutrange   =3.; // +/- sigma for proton   PID cut
-const double pipdeltat_sig_cutrange =2.; // +/- sigma for pion     PID cut
 
 // Difference between positive corrected z vertex and electron corrected z vertex
 const double pos_z_cut_min = -2;
@@ -209,7 +205,7 @@ int main(int argc, char ** argv){
 	TH1D * h1_e_vz_sec3  = new TH1D("h1_e_vz_sec3"  ,"e- passing cuts,  after vtx corr, sector 3;electron vz [cm]; Counts" ,300, -10., 10.);
 	TH1D * h1_e_vz_sec40 = new TH1D("h1_e_vz_sec40" ,"e- passing cuts, before vtx corr, sector 4;electron vz [cm]; Counts" ,300, -10., 10.);
 	TH1D * h1_e_vz_sec4  = new TH1D("h1_e_vz_sec4"  ,"e- passing cuts,  after vtx corr, sector 4;electron vz [cm]; Counts" ,300, -10., 10.);
-	TH1D * h1_e_vz_sec50 = new TH1D("h1_e_vz_sec50" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
+	TH1D * h1_e_vz_sec53 = new TH1D("h1_e_vz_sec53" ,"e- passing cuts, before vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
 	TH1D * h1_e_vz_sec5  = new TH1D("h1_e_vz_sec5"  ,"e- passing cuts,  after vtx corr, sector 5;electron vz [cm]; Counts" ,300, -10., 10.);
 	TH1D * h1_e_vz_sec60 = new TH1D("h1_e_vz_sec60" ,"e- passing cuts, before vtx corr, sector 6;electron vz [cm]; Counts" ,300, -10., 10.);
 	TH1D * h1_e_vz_sec6  = new TH1D("h1_e_vz_sec6"  ,"e- passing cuts,  after vtx corr, sector 6;electron vz [cm]; Counts" ,300, -10., 10.);
@@ -253,9 +249,9 @@ int main(int argc, char ** argv){
 	TH2D * h2_p_phiTheta1= new TH2D("h2_p_phiTheta1","p passing fid;#phi [deg];#theta [deg];Counts"    ,300,-100.,380.,300,0.,55.);
 	TH2D * h2_p_phiTheta2= new TH2D("h2_p_phiTheta2","p passing fid+PID;#phi [deg];#theta [deg];Counts",300,-100.,380.,300,0.,55.);
 
-	TH2D * h2_p_deltaTmom0=new TH2D("h2_p_deltaTmom0","p before cuts;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 3.);
-	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 3.);
+	TH2D * h2_p_deltaTmom0=new TH2D("h2_p_deltaTmom0","p before cuts;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 6.);
+	TH2D * h2_p_deltaTmom1=new TH2D("h2_p_deltaTmom1","p passing fid;#Delta t [ns];p [GeV];Counts"     ,300,  -7.,  7.,300, 0., 6.);
+	TH2D * h2_p_deltaTmom2=new TH2D("h2_p_deltaTmom2","p passing fid+PID;#Delta t [ns];p [GeV];Counts" ,300,  -7.,  7.,300, 0., 6.);
 
 	TH2D * h2_p_p_momCor0= new TH2D("h2_p_p_momCor0","p passing fid. cuts;p [GeV];p - p_corr [GeV];Counts"     ,100, 0., 2.5,100,-.06,.01);
 	TH2D * h2_p_p_momCor1= new TH2D("h2_p_p_momCor1","p passing fid. cuts;p [GeV];p_corr/p;Counts"             ,100, 0., 2.5,100,0.95,1.2);
@@ -290,12 +286,22 @@ int main(int argc, char ** argv){
 
 	TH2D * h2_n_pBeta    = new TH2D("h2_n_pBeta"    ,"n passing fid. cuts;p [GeV];#beta;Counts"         ,300,   0.,  4.,300, 0.,1.3);
 
-	TH1D * h1_u_0        = new TH1D("h1_u_0"        ,"n before u cut;EC_{u} [cm];Counts"                ,100,   0., 500.);
-	TH1D * h1_v_0        = new TH1D("h1_v_0"        ,"n before v cut;EC_{v} [cm];Counts"                ,100,   0., 500.);
-	TH1D * h1_w_0        = new TH1D("h1_w_0"        ,"n before w cut;EC_{w} [cm];Counts"                ,100,   0., 500.);
-	TH1D * h1_u_1        = new TH1D("h1_u_1"        ,"n after u cut;EC_{u} [cm];Counts"                 ,100,   0., 500.);
-	TH1D * h1_v_1        = new TH1D("h1_v_1"        ,"n after v cut;EC_{v} [cm];Counts"                 ,100,   0., 500.);
-	TH1D * h1_w_1        = new TH1D("h1_w_1"        ,"n after w cut;EC_{w} [cm];Counts"                 ,100,   0., 500.);
+	TH1D * h1_u_0        = new TH1D("h1_u_0"        ,"n before xyz cut;EC_{u} [cm];Counts"              ,100,   0., 500.);
+	TH1D * h1_v_0        = new TH1D("h1_v_0"        ,"n before xyz cut;EC_{v} [cm];Counts"              ,100,   0., 500.);
+	TH1D * h1_w_0        = new TH1D("h1_w_0"        ,"n before xyz cut;EC_{w} [cm];Counts"              ,100,   0., 500.);
+	TH1D * h1_u_1        = new TH1D("h1_u_1"        ,"n after xyz cut;EC_{u} [cm];Counts"               ,100,   0., 500.);
+	TH1D * h1_v_1        = new TH1D("h1_v_1"        ,"n after xyz cut;EC_{v} [cm];Counts"               ,100,   0., 500.);
+	TH1D * h1_w_1        = new TH1D("h1_w_1"        ,"n after xyz cut;EC_{w} [cm];Counts"               ,100,   0., 500.);
+	
+	TH1D * h1_x_0        = new TH1D("h1_x_0"        ,"n before xyz cut;EC_{x} [cm];Counts"              ,100, -500., 500.);
+        TH1D * h1_y_0        = new TH1D("h1_y_0"        ,"n before xyz cut;EC_{y} [cm];Counts"              ,100, -500., 500.);
+        TH1D * h1_z_0        = new TH1D("h1_z_0"        ,"n before xyz cut;EC_{z} [cm];Counts"              ,100,  300., 600.);
+        TH1D * h1_x_1        = new TH1D("h1_x_1"        ,"n after xyz cut;EC_{x} [cm];Counts"               ,100, -500., 500.);
+        TH1D * h1_y_1        = new TH1D("h1_y_1"        ,"n after xyz cut;EC_{y} [cm];Counts"               ,100, -500., 500.);
+        TH1D * h1_z_1        = new TH1D("h1_z_1"        ,"n after xyz cut;EC_{z} [cm];Counts"               ,100,  300., 600.);
+
+	TH2D * h2_n_ECxy_0   = new TH2D("h2_n_ECxy_0"   ,"n before xyz cut;EC_{x} [cm];EC_{y} [cm];Counts"  ,300, -500., 500., 300, -500., 500.);
+	TH2D * h2_n_ECxy_1   = new TH2D("h2_n_ECxy_1"   ,"n after xyz cut;EC_{x} [cm];EC_{y} [cm];Counts"   ,300, -500., 500., 300, -500., 500.);
 
 	// ---------------------------------------
 	// Diagnostic pi- histograms
@@ -306,7 +312,7 @@ int main(int argc, char ** argv){
 
 	// ---------------------------------------
 	// Diagnostic electron momentum correction
-	TH2D * h2_e_thetaMom3= new TH2D("e_thetaMom3"     ,"e- passing PID+fid;#theta [deg];Mom [GeV];p correction" ,300,  10., 50.,300, 0., 6.);
+	TH2D * h2_e_thetaMom3= new TH2D("e_thetaMom3","e- passing PID+fid (z axis: p_{corr}-p);#theta [deg];Mom [GeV];p correction" ,300,  10., 50.,300, 0., 6.);
 
 	// ---------------------------------------
 	// Setting up output tree and branches
@@ -320,7 +326,7 @@ int main(int argc, char ** argv){
 	TVector3 e_ec_xyz, n_ec_xyz;
 	TVector3 T3_e_mom, T3_e_mom_cor, T3_p_mom, u1;
 
-	int nParticles;
+	int nRun, nParticles;
 	int nProtons, nNeutrons, nPiplus, nPiminus, nPi0;
 	int Part_type    [maxPart];
 	double Nu, Q2, Xb, Nu_unc, Q2_unc, Xb_unc, t0;
@@ -346,6 +352,7 @@ int main(int argc, char ** argv){
 	   =========================
 	 */ 
 
+	outtree->Branch("nRun"      , &nRun      , "nRun/I"                  );
 	outtree->Branch("nParticles", &nParticles, "nParticles/I"            );
 	outtree->Branch("nProtons"  , &nProtons  , "nProtons/I"              );
 	outtree->Branch("nNeutrons" , &nNeutrons , "nNeutrons/I"             );
@@ -406,7 +413,7 @@ int main(int argc, char ** argv){
 	cout << "Mini   = " << tab_mini  << endl;
 	cout << "Target = " << tab_targ  << endl;
 
-	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ);  // Create an instance of the Fiducial Class
+	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);  // Create an instance of the Fiducial Class
 	Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
 
 	// Values for some cuts
@@ -429,6 +436,8 @@ int main(int argc, char ** argv){
 		if (event % 100000 == 0){cerr << "Working on event " << event << " out of " << nEvents << "\n";}
 
 		t->GetEvent(event);
+
+		nRun = NRun;
 
 		if (gPart <= 0) continue; // Ignore events that have no particle candidates
 
@@ -528,7 +537,7 @@ int main(int argc, char ** argv){
 		Q2_unc = 4.*tab_E1/1000.*T3_e_mom.Mag()*sin(T3_e_mom.Theta()/2.)*sin(T3_e_mom.Theta()/2.);      //4-momentum transfer^2
 		Xb_unc = Q2_unc / (2*mP*Nu_unc);    //Bjorken scaling variable
 
-		// With electron momentum correction (these are saved in th tree)
+		// With electron momentum correction (these are saved in the tree)
 		Nu = tab_E1/1000. - T3_e_mom_cor.Mag();	//Energy transfer
 		Q2 = 4.*tab_E1/1000.*T3_e_mom_cor.Mag()*sin(T3_e_mom_cor.Theta()/2.)*sin(T3_e_mom_cor.Theta()/2.);	//4-momentum transfer^2
 		Xb = Q2 / (2*mP*Nu);	//Bjorken scaling variable
@@ -612,7 +621,7 @@ int main(int argc, char ** argv){
 			h2_e_momMomCor_sec4 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
 		}
 		else if (e_sect==4) {
-			h1_e_vz_sec50       -> Fill(targetZ[0]);
+			h1_e_vz_sec53       -> Fill(targetZ[0]);
 			h1_e_vz_sec5        -> Fill(e_vz_corrected);
 			h1_e_momCor_sec5    -> Fill(T3_e_mom_cor.Mag()/T3_e_mom.Mag());
 			h2_e_momMomCor_sec5 -> Fill(T3_e_mom.Mag(),T3_e_mom_cor.Mag()/T3_e_mom.Mag());
@@ -851,12 +860,24 @@ int main(int argc, char ** argv){
 				h1_v_0 -> Fill(EC_V[i]);
 				h1_w_0 -> Fill(EC_W[i]);
 
+				h1_x_0 -> Fill(EC_X[i]);
+				h1_y_0 -> Fill(EC_Y[i]);
+				h1_z_0 -> Fill(EC_Z[i]);
+
+				h2_n_ECxy_0 -> Fill(EC_X[i],EC_Y[i]);
+
 				n_ec_xyz.SetXYZ(EC_X[i],EC_Y[i],EC_Z[i]);
 				if(fid_params.CutUVW( n_ec_xyz ,10.)){ // Cut 10 cm from the edges of the EC
 
 					h1_u_1 -> Fill(EC_U[i]);
 					h1_v_1 -> Fill(EC_V[i]);
 					h1_w_1 -> Fill(EC_W[i]);
+
+					h1_x_1 -> Fill(EC_X[i]);
+                                	h1_y_1 -> Fill(EC_Y[i]);
+                                	h1_z_1 -> Fill(EC_Z[i]);
+
+					h2_n_ECxy_1 -> Fill(EC_X[i],EC_Y[i]);
 
 					n_p  = Beta_corr*mN/sqrt(1-Beta_corr*Beta_corr);
 
@@ -895,7 +916,7 @@ int main(int argc, char ** argv){
 					beta     [nParticles] = Beta_corr ;
 
 					h2_n_phiTheta2 -> Fill(phi[i],theta[i] );
-					h2_n_pBeta     -> Fill(mom[i],Beta_corr);
+					h2_n_pBeta     -> Fill(n_p   ,Beta_corr);
 
 					nNeutrons++;
 					nParticles++;
@@ -1057,7 +1078,7 @@ int main(int argc, char ** argv){
 	c22 -> cd(2);	h1_e_vz_sec20 -> Draw();
 	c22 -> cd(3);	h1_e_vz_sec30 -> Draw();
 	c22 -> cd(4);	h1_e_vz_sec40 -> Draw();
-	c22 -> cd(5);	h1_e_vz_sec50 -> Draw();
+	c22 -> cd(5);	h1_e_vz_sec53 -> Draw();
 	c22 -> cd(6);	h1_e_vz_sec60 -> Draw();
 
 	TCanvas *c23 = new TCanvas("c23");
@@ -1170,12 +1191,27 @@ int main(int argc, char ** argv){
 	c49 -> cd(6);   h1_w_1 -> Draw();
 
 	TCanvas *c50 = new TCanvas("c50");
-	h2_pim_deltaTmom0 -> Draw("COLZ");
+        c50 -> Divide(3,2);
+        c50 -> cd(1);   h1_x_0 -> Draw();
+        c50 -> cd(2);   h1_y_0 -> Draw();
+        c50 -> cd(3);   h1_z_0 -> Draw();
+        c50 -> cd(4);   h1_x_1 -> Draw();
+        c50 -> cd(5);   h1_y_1 -> Draw();
+        c50 -> cd(6);   h1_z_1 -> Draw();
 
 	TCanvas *c51 = new TCanvas("c51");
-	h2_pim_deltaTmom1 -> Draw("COLZ");
+	h2_n_ECxy_0 -> Draw("COLZ");
 
 	TCanvas *c52 = new TCanvas("c52");
+	h2_n_ECxy_1 -> Draw("COLZ");
+
+	TCanvas *c53 = new TCanvas("c53");
+	h2_pim_deltaTmom0 -> Draw("COLZ");
+
+	TCanvas *c54 = new TCanvas("c54");
+	h2_pim_deltaTmom1 -> Draw("COLZ");
+
+	TCanvas *c55 = new TCanvas("c55");
 	h2_pim_deltaTmom2 -> Draw("COLZ");
 
 	// --------------------------------------------------------------------------------------------------
@@ -1232,7 +1268,10 @@ int main(int argc, char ** argv){
 	c49 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
 	c50 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
 	c51 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
-	c52 -> Print(Form("../plots/plots_%d.pdf)",tab_run),"pdf");
+	c52 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
+	c53 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
+	c54 -> Print(Form("../plots/plots_%d.pdf",tab_run) ,"pdf");
+	c55 -> Print(Form("../plots/plots_%d.pdf)",tab_run),"pdf");
 
 	// --------------------------------------------------------------------------------------------------
 	// Write the output file
@@ -1283,7 +1322,7 @@ int main(int argc, char ** argv){
 	h1_e_vz_sec3      ->Write();
 	h1_e_vz_sec40     ->Write();
 	h1_e_vz_sec4      ->Write();
-	h1_e_vz_sec50     ->Write();
+	h1_e_vz_sec53     ->Write();
 	h1_e_vz_sec5      ->Write();
 	h1_e_vz_sec60     ->Write();
 	h1_e_vz_sec6      ->Write();

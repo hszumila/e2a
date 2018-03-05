@@ -273,21 +273,21 @@ int main(int argc, char ** argv){
 
 	// --------------------------------------------------------------------------------------------------
 	// Print histograms on a pdf file
-	c1  -> Print(Form("./e2a_maps_%d.pdf(",tab_E1) ,"pdf");
-	c2  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c3  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c4  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c5  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");   
-	c6  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c7  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c8  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c9  -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c10 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c11 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c12 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c13 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c14 -> Print(Form("./e2a_maps_%d.pdf" ,tab_E1) ,"pdf");
-	c15 -> Print(Form("./e2a_maps_%d.pdf)",tab_E1) ,"pdf");
+	c1  -> Print(Form("./plots_%d.pdf(",tab_E1) ,"pdf");
+	c2  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c3  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c4  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c5  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");   
+	c6  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c7  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c8  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c9  -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c10 -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c11 -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c12 -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c13 -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c14 -> Print(Form("./plots_%d.pdf" ,tab_E1) ,"pdf");
+	c15 -> Print(Form("./plots_%d.pdf)",tab_E1) ,"pdf");
 	
 	// --------------------------------------------------------------------------------------------------
 

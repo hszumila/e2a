@@ -12,11 +12,18 @@ project (e2a)
 add_subdirectory(calibration_data)
 add_subdirectory(maps)
 add_subdirectory(auxiliary_scripts)
-add_subdirectory(write_tree)
 add_subdirectory(Rey_neutrons)
+
+# If on the farm, compile programs that require CLASTOOL
+option(Build_Farm "Builds programs that require ifarm libraries" OFF )
+
+if(Build_Farm)
+	add_subdirectory(write_tree)
+endif()
+
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})
 
-# Add executable for acceptance corrections
+# Add executable for making skim code
 add_executable(skim_tree skim_tree.cpp Fiducial.cpp Run_dependent.cpp)
 target_link_libraries(skim_tree ${ROOT_LIBRARIES})

@@ -9,6 +9,7 @@
 #include "TF1.h"
 #include "TCanvas.h"
 #include <TLegend.h>
+#include <cstdlib>
 
 #include "Fiducial.h"
 #include "Run_dependent.h"

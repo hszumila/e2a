@@ -13,6 +13,7 @@
 #include "TF1.h"
 #include "TCanvas.h"
 #include <TLegend.h>
+#include <cstdlib>
 
 #include <TGraphErrors.h>
 #include "Fiducial.h"

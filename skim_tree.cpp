@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <cstdlib>
 
 #include"TFile.h"
 #include "TTree.h"

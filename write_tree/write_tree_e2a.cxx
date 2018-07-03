@@ -196,8 +196,8 @@ void write_tree_e2a(int argc, char **argv)
       CC_Chi2[i] = t->Chi2CC(i);
       CC_Time[i] = t->TimeCC(i);
       CC_Path[i] = t->PathCC(i);
-      EC_Time[i] = t->TimeEC(i);
-      EC_Path[i] = t->PathEC(i);
+      EC_Time[i] = t->EC_time(i);
+      EC_Path[i] = t->EC_path(i);
       charge[i] = t->Charge(i);
       id[i] = t->Id(i);
       beta[i] = t->Betta(i);

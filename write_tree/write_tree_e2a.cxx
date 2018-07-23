@@ -9,16 +9,8 @@
 #endif
 
 
-void write_tree_e2a(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  // Create a tree to analyze physics variables
-  
-#if defined(__CINT__)
-  gROOT->Reset();
-  gSystem->Load("libClasTool.so");
-  gSystem->Load("libTIdentificator.so");
-#endif
-  
   TClasTool *input = new TClasTool();
   
   input->InitDSTReader("ROOTDSTR");
@@ -104,6 +96,16 @@ void write_tree_e2a(int argc, char **argv)
   Float_t Nu;
   Float_t Yb;
 
+  Int_t num_g;
+  Int_t id_g[50];
+  Float_t p_g[50];
+  Float_t px_g[50];
+  Float_t py_g[50];
+  Float_t pz_g[50];
+  Float_t theta_g[50];
+  Float_t phi_g[50];
+  Float_t z_g[50];
+
   //Reconstructed Branches
   tree->Branch("gPart",&gPart,"gPart/I");
   tree->Branch("CCPart",&CCPart,"CCPart/I");
@@ -154,13 +156,22 @@ void write_tree_e2a(int argc, char **argv)
   tree->Branch("W",&W,"W/F");
   tree->Branch("Nu",&Nu,"Nu/F");
   tree->Branch("Yb",&Yb,"Yb/F");
+  tree->Branch("Number_g",&num_g,"num_g/I");
+  tree->Branch("particle_g",&id_g,"id_g[num_g]/I");
+  tree->Branch("Momentum_g",p_g,"p_g[num_g]/F");
+  tree->Branch("Momentumx_g",px_g,"px_g[num_g]/F");
+  tree->Branch("Momentumy_g",py_g,"py_g[num_g]/F");
+  tree->Branch("Momentumz_g",pz_g,"pz_g[num_g]/F");
+  tree->Branch("Theta_g",theta_g,"theta_g[num_g]/F");
+  tree->Branch("Phi_g",phi_g,"phi_g[num_g]/F");
+  tree->Branch("TargetZ_g",z_g,"z_g[num_g]/F");
  
   Int_t nEntries = input->GetEntries();
   cout << "Total Entries = "<<nEntries<<endl;
   
-  for (Int_t k = 0; k < nEntries; k++) {
+  for (int event = 0; event < nEntries; event++) {
     
-    if(k%10000 == 0) cout << "Events Processed: "<< k << endl;
+    if(event%10000 == 0) cout << "Events Processed: "<< event << endl;
     input->Next();
 
     //Reconstucted Variables
@@ -169,60 +180,77 @@ void write_tree_e2a(int argc, char **argv)
     DCPart = t->DCPart();
     ECPart = t->ECPart();
     SCPart = t->SCPart();
+
+    // Fill once per event
+    if (gPart > 0)
+      {
+	NRun = t->NRun();
+	STT = t->STT();
+	Xb = t->Xb();
+	Q2 = t->Q2();
+	W = t->W();
+	Nu = t->Nu();
+	Yb = t->Yb();
+      }
+
+    // Loop over reconstructed particles
+    for (Int_t i = 0; i < TMath::Min(gPart, 50); i++)
+      {
+	Stat[i] = t->Status(i);
+	StatCC[i] = t->StatCC(i);
+	StatDC[i] = t->StatDC(i);
+	StatEC[i] = t->StatEC(i);
+	StatSC[i] = t->StatSC(i);
+	DC_Status[i] = t->DCStatus(i);
+	SC_Status[i] = t->SCStatus(i);
+	SC_Pad[i] = t->SCpdht(i);
+	
+	EC_in[i] = t->Ein(i);
+	EC_out[i] = t->Eout(i);
+	EC_tot[i] = t->Etot(i);
+	EC_U[i] = t->EC_U(i);
+	EC_V[i] = t->EC_V(i);
+	EC_W[i] = t->EC_W(i);
+	EC_X[i] = t->EC_X(i);
+	EC_Y[i] = t->EC_Y(i);
+	EC_Z[i] = t->EC_Z(i);
+	Nphe[i] = t->Nphe(i);
+	SC_Time[i] = t->TimeSC(i);
+	SC_Path[i] = t->PathSC(i);
+	CC_Chi2[i] = t->Chi2CC(i);
+	CC_Time[i] = t->TimeCC(i);
+	CC_Path[i] = t->PathCC(i);
+	EC_Time[i] = t->EC_time(i);
+	EC_Path[i] = t->EC_path(i);
+	charge[i] = t->Charge(i);
+	id[i] = t->Id(i);
+	beta[i] = t->Betta(i);
+	mass[i] = TMath::Sqrt(t->Mass2(i));
+	p[i] = t->Momentum(i);
+	px[i] = t->Px(i);
+	py[i] = t->Py(i);
+	pz[i] = t->Pz(i);
+	theta[i]= t->FidTheta(i);
+	phi[i]= t->FidPhi(i);
+	z[i] = t->Z(i);
+	theta_pq[i] = (TMath::ACos(t->CosThetaPQ(i)) * TMath::RadToDeg());
+      }
     
-    for (Int_t i = 0; i < TMath::Min(gPart, 50); i++) {
+    // Loop over simulated particles
+    num_g = input->GetNRows("GSIM");
+    for (int j=0 ; j<num_g ; j++)
+      {
+	id_g[j]=t->Id(j,1);
+	p_g[j]=t->Momentum(j,1);
+	px_g[j]=t->Px(j,1);
+	py_g[j]=t->Py(j,1);
+	pz_g[j]=t->Pz(j,1);
+	theta_g[j] = t->FidTheta(j,1);
+	phi_g[j] = t->FidPhi(j,1);
+	z_g[j] = t->Z(j,1);
+      }
 
-      Stat[i] = t->Status(i);
-      StatCC[i] = t->StatCC(i);
-      StatDC[i] = t->StatDC(i);
-      StatEC[i] = t->StatEC(i);
-      StatSC[i] = t->StatSC(i);
-      DC_Status[i] = t->DCStatus(i);
-      SC_Status[i] = t->SCStatus(i);
-      SC_Pad[i] = t->SCpdht(i);
-
-      EC_in[i] = t->Ein(i);
-      EC_out[i] = t->Eout(i);
-      EC_tot[i] = t->Etot(i);
-      EC_U[i] = t->EC_U(i);
-      EC_V[i] = t->EC_V(i);
-      EC_W[i] = t->EC_W(i);
-      EC_X[i] = t->EC_X(i);
-      EC_Y[i] = t->EC_Y(i);
-      EC_Z[i] = t->EC_Z(i);
-      Nphe[i] = t->Nphe(i);
-      SC_Time[i] = t->TimeSC(i);
-      SC_Path[i] = t->PathSC(i);
-      CC_Chi2[i] = t->Chi2CC(i);
-      CC_Time[i] = t->TimeCC(i);
-      CC_Path[i] = t->PathCC(i);
-      EC_Time[i] = t->EC_time(i);
-      EC_Path[i] = t->EC_path(i);
-      charge[i] = t->Charge(i);
-      id[i] = t->Id(i);
-      beta[i] = t->Betta(i);
-      mass[i] = TMath::Sqrt(t->Mass2(i));
-      p[i] = t->Momentum(i);
-      px[i] = t->Px(i);
-      py[i] = t->Py(i);
-      pz[i] = t->Pz(i);
-      theta[i]= t->FidTheta(i);
-      phi[i]= t->FidPhi(i);
-      z[i] = t->Z(i);
-      theta_pq[i] = (TMath::ACos(t->CosThetaPQ(i)) * TMath::RadToDeg());
-      
-    }
-    
-    if(gPart>0 && gPart<50){
-      NRun = t->NRun();
-      STT = t->STT();
-
-      Xb = t->Xb();
-      Q2 = t->Q2();
-      W = t->W();
-      Nu = t->Nu();
-      Yb = t->Yb();
-      
+    if(gPart>0 && gPart<50){      
       tree->Fill();
     }
   }
@@ -230,13 +258,6 @@ void write_tree_e2a(int argc, char **argv)
   output->Write();
   output->Close();
   cout << "Done." << endl;
-}
-
-
-#if !defined(__CINT__)
-int main(int argc, char **argv)
-{
-  write_tree_e2a(argc,argv);
+  
   return 0;
 }
-#endif

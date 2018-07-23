@@ -1,5 +1,4 @@
 #include "Riostream.h"
-#include "TApplication.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
@@ -16,12 +15,6 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-#ifdef WITHRINT
-  TRint *myapp = new TRint("RootSession",&argc,argv,NULL,0);
-#else
-  TApplication *myapp = new TApplication("myapp",0,0);
-#endif
-
   ofstream outfile;
   outfile.open ("./mctk_uniform.txt");
 
@@ -32,23 +25,16 @@ int main(int argc, char **argv){
   //Set number of particles to generate (order:e,p,pi+,pi-)
   Int_t top_num = 4;
 
-  //Make sure seeds are different when submitting multiple jobs
-  if(argc!=2){
-    cout<<"Will Not Sleep Before Running!"<<endl;
-    cout<<"Please Input a Single Number to Engage Sleep Function!"<<endl;
-  }
-  else{
-    Int_t time = atoi(argv[1]);
-    if(time>100)time-= 100; //Since Runs start at 101
-    time*=3;
-    cout<<"Sleeping for "<<time<<" seconds"<<endl;
-    gSystem->Exec(Form("sleep %d",time));
-  }
+  // Get seed from /dev/urandom
+  unsigned int seed;
+  FILE *f=fopen("/dev/urandom","r");
+  fread(&seed,sizeof(unsigned int),1,f);
+  fclose(f);
 
   //Get Random Number Generator
-  TRandom3 *gRandom = new TRandom3(0); //use time as a random seed
+  TRandom3 *myRandom = new TRandom3(seed); 
 
-  cout << "The Random Number seed is "<<gRandom->GetSeed()<<endl;
+  cout << "The Random Number seed is "<<myRandom->GetSeed()<<endl;
 
   //Set Variables
   Float_t cx[50],cy[50],cz[50],mom_tot[50];
@@ -73,13 +59,13 @@ int main(int argc, char **argv){
     if(i%100000==0) cout << " events processed = " << i << endl;
     
     //Get Info for the electron
-    mom_tot[0] = gRandom->Uniform(0,5);
+    mom_tot[0] = myRandom->Uniform(0,5);
     
     //To generate uniformly, we should do the following: "cos(theta) = 1 - 2*Uniform[0,1]"
     //This is the same as "cos(theta) = Uniform[-1,1]
     //For electrons restrict to forward hemisphere (0-71 degrees), since no electron detectors in back
-    cost = gRandom->Uniform(0.325,1);
-    phi =  gRandom->Uniform(0, 2*TMath::Pi());
+    cost = myRandom->Uniform(0.325,1);
+    phi =  myRandom->Uniform(0, 2*TMath::Pi());
 
     px = mom_tot[0] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
     py = mom_tot[0] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -89,9 +75,9 @@ int main(int argc, char **argv){
     pid[0] = pid_e; mass[0] = mass_e; charge[0] = charge_e;
     
     //Get Info for the proton
-    mom_tot[1] = gRandom->Uniform(0,3.5); //Hard cut at reconstructed momentum = 2.8
-    cost = gRandom->Uniform(-1,1);
-    phi =  gRandom->Uniform(0, 2*TMath::Pi());
+    mom_tot[1] = myRandom->Uniform(0,3.5); //Hard cut at reconstructed momentum = 2.8
+    cost = myRandom->Uniform(-1,1);
+    phi =  myRandom->Uniform(0, 2*TMath::Pi());
 
     px = mom_tot[1] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
     py = mom_tot[1] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -101,9 +87,9 @@ int main(int argc, char **argv){
     pid[1] = pid_p; mass[1] = mass_p; charge[1] = charge_p;
 
     //Get Info for the pi+
-    mom_tot[2] = gRandom->Uniform(0,4);
-    cost = gRandom->Uniform(-1,1);
-    phi =  gRandom->Uniform(0, 2*TMath::Pi());
+    mom_tot[2] = myRandom->Uniform(0,4);
+    cost = myRandom->Uniform(-1,1);
+    phi =  myRandom->Uniform(0, 2*TMath::Pi());
 
     px = mom_tot[2] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
     py = mom_tot[2] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -113,9 +99,9 @@ int main(int argc, char **argv){
     pid[2] = pid_pp; mass[2] = mass_pp; charge[2] = charge_pp;
 
     //Get Info for the pi-
-    mom_tot[3] = gRandom->Uniform(0,4);
-    cost = gRandom->Uniform(-1,1);
-    phi =  gRandom->Uniform(0, 2*TMath::Pi());
+    mom_tot[3] = myRandom->Uniform(0,4);
+    cost = myRandom->Uniform(-1,1);
+    phi =  myRandom->Uniform(0, 2*TMath::Pi());
 
     px = mom_tot[3] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
     py = mom_tot[3] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -137,7 +123,5 @@ int main(int argc, char **argv){
   }
   
   outfile.close();
-  
-  myapp->Run();
   return 0;
 }

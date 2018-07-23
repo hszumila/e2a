@@ -21,7 +21,6 @@ if(Build_Farm)
 	add_subdirectory(write_tree)
 endif()
 
-
 include_directories(${CMAKE_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})
 
 # Add executable for making skim code

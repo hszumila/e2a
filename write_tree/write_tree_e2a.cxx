@@ -1,4 +1,3 @@
-#if !defined(__CINT__)
 #include "TIdentificator.h"
 #include "TClasTool.h"
 #include "TH2F.h"
@@ -6,13 +5,10 @@
 #include "TTree.h"
 #include "Riostream.h"
 #include "TMath.h"
-#endif
-
 
 int main(int argc, char **argv)
 {
-  TClasTool *input = new TClasTool();
-  
+  TClasTool *input = new TClasTool();  
   input->InitDSTReader("ROOTDSTR");
     
   if(argc == 1) {
@@ -39,6 +35,7 @@ int main(int argc, char **argv)
   
   TFile *output = new TFile("particle_data.root", "RECREATE", "Data of the Tree");
   TTree *tree = new TTree("data", "Tree that holds the data");
+  bool sim_run = (input->GetTree("GSIM") !=0);
 
   //Reconstructed Variables
   //Write information for all events with at least 1 entry in EVNT Bank
@@ -156,16 +153,20 @@ int main(int argc, char **argv)
   tree->Branch("W",&W,"W/F");
   tree->Branch("Nu",&Nu,"Nu/F");
   tree->Branch("Yb",&Yb,"Yb/F");
-  tree->Branch("Number_g",&num_g,"num_g/I");
-  tree->Branch("particle_g",&id_g,"id_g[num_g]/I");
-  tree->Branch("Momentum_g",p_g,"p_g[num_g]/F");
-  tree->Branch("Momentumx_g",px_g,"px_g[num_g]/F");
-  tree->Branch("Momentumy_g",py_g,"py_g[num_g]/F");
-  tree->Branch("Momentumz_g",pz_g,"pz_g[num_g]/F");
-  tree->Branch("Theta_g",theta_g,"theta_g[num_g]/F");
-  tree->Branch("Phi_g",phi_g,"phi_g[num_g]/F");
-  tree->Branch("TargetZ_g",z_g,"z_g[num_g]/F");
- 
+
+  if (sim_run)
+    {
+      tree->Branch("Number_g",&num_g,"num_g/I");
+      tree->Branch("particle_g",&id_g,"id_g[num_g]/I");
+      tree->Branch("Momentum_g",p_g,"p_g[num_g]/F");
+      tree->Branch("Momentumx_g",px_g,"px_g[num_g]/F");
+      tree->Branch("Momentumy_g",py_g,"py_g[num_g]/F");
+      tree->Branch("Momentumz_g",pz_g,"pz_g[num_g]/F");
+      tree->Branch("Theta_g",theta_g,"theta_g[num_g]/F");
+      tree->Branch("Phi_g",phi_g,"phi_g[num_g]/F");
+      tree->Branch("TargetZ_g",z_g,"z_g[num_g]/F");
+    } 
+
   Int_t nEntries = input->GetEntries();
   cout << "Total Entries = "<<nEntries<<endl;
   
@@ -250,9 +251,8 @@ int main(int argc, char **argv)
 	z_g[j] = t->Z(j,1);
       }
 
-    if(gPart>0 && gPart<50){      
+    if ((sim_run && (num_g > 0)) || ((!sim_run) && (gPart>0) && (gPart<50)))
       tree->Fill();
-    }
   }
   
   output->Write();

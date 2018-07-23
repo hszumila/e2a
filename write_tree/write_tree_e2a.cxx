@@ -76,6 +76,11 @@ void write_tree_e2a(int argc, char **argv)
   Float_t Nphe[50];
   Float_t SC_Time[50];
   Float_t SC_Path[50];
+  Float_t CC_Time[50];
+  Float_t CC_Path[50];
+  Float_t CC_Chi2[50];
+  Float_t EC_Time[50];
+  Float_t EC_Path[50];
 
   Float_t charge[50];
   Int_t id[50]; //Id in EVNT bank
@@ -125,6 +130,11 @@ void write_tree_e2a(int argc, char **argv)
   tree->Branch("Nphe",Nphe,"Nphe[gPart]/F");
   tree->Branch("SC_Time",SC_Time,"SC_Time[gPart]/F");
   tree->Branch("SC_Path",SC_Path,"SC_Path[gPart]/F");
+  tree->Branch("EC_Time",EC_Time,"EC_Time[gPart]/F");
+  tree->Branch("EC_Path",EC_Path,"EC_Path[gPart]/F");
+  tree->Branch("CC_Time",CC_Time,"CC_Time[gPart]/F");
+  tree->Branch("CC_Path",CC_Path,"CC_Path[gPart]/F");
+  tree->Branch("CC_Chi2",CC_Chi2,"CC_Chi2[gPart]/F");
   tree->Branch("Charge",charge,"charge[gPart]/F");
   tree->Branch("particle",id, "id[gPart]/I");
   tree->Branch("Beta",beta,"beta[gPart]/F");
@@ -183,7 +193,11 @@ void write_tree_e2a(int argc, char **argv)
       Nphe[i] = t->Nphe(i);
       SC_Time[i] = t->TimeSC(i);
       SC_Path[i] = t->PathSC(i);
-
+      CC_Chi2[i] = t->Chi2CC(i);
+      CC_Time[i] = t->TimeCC(i);
+      CC_Path[i] = t->PathCC(i);
+      EC_Time[i] = t->EC_time(i);
+      EC_Path[i] = t->EC_path(i);
       charge[i] = t->Charge(i);
       id[i] = t->Id(i);
       beta[i] = t->Betta(i);

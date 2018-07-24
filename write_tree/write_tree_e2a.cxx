@@ -35,7 +35,6 @@ int main(int argc, char **argv)
   
   TFile *output = new TFile("particle_data.root", "RECREATE", "Data of the Tree");
   TTree *tree = new TTree("data", "Tree that holds the data");
-  bool sim_run = (input->GetTree("GSIM") !=0);
 
   //Reconstructed Variables
   //Write information for all events with at least 1 entry in EVNT Bank
@@ -103,6 +102,22 @@ int main(int argc, char **argv)
   Float_t phi_g[50];
   Float_t z_g[50];
 
+  // Load initial event
+  input->Next();
+  // This is crucial. Subsequent loading will occur in for loop increment
+
+  // Determine if this is a simulation run based on the number of generated particles in the first event
+  num_g = input->GetNRows("GSIM");
+  const bool sim_run = (num_g>0);
+  if (sim_run)
+    {
+      cout << "This is a simulation run. Generator branches will be saved.\n";
+    }
+  else
+    {
+      cout << "This is not a simulation run. No generator information.\n";
+    }
+
   //Reconstructed Branches
   tree->Branch("gPart",&gPart,"gPart/I");
   tree->Branch("CCPart",&CCPart,"CCPart/I");
@@ -169,11 +184,11 @@ int main(int argc, char **argv)
 
   Int_t nEntries = input->GetEntries();
   cout << "Total Entries = "<<nEntries<<endl;
-  
-  for (int event = 0; event < nEntries; event++) {
+
+  // Loop over events, loading each through Next() command
+  for (int event = 0; event < nEntries; event++, input->Next()) {
     
     if(event%10000 == 0) cout << "Events Processed: "<< event << endl;
-    input->Next();
 
     //Reconstucted Variables
     gPart = t->gPart();

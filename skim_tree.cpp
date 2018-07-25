@@ -28,7 +28,7 @@ const double sc_cc_dt_cut_sect[6]={-2,-5,-8,-8,-2,2};
 int main(int argc, char ** argv){
 	if (argc != 4){
 		cerr << "Wrong number of arguments. Instead try\n"
-			<< "\tskim_tree /path/to/input/file /path/to/output/file 00000000\n\n";
+         << "\tskim_tree /path/to/input/file /path/to/output/file 00000000\n\n";
 		cout << "where the third argument must be an integer of 8 digits."    << endl;
 		cout << "1st digit: minimum number of protons  required in the event" << endl;
 		cout << "2nd digit: maximum number of protons  required in the event" << endl;
@@ -414,7 +414,9 @@ int main(int argc, char ** argv){
 	cout << "Mini   = " << tab_mini  << endl;
 	cout << "Target = " << tab_targ  << endl;
 
+  cout << "Before fiducial class" << endl;
 	Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);  // Create an instance of the Fiducial Class
+  cout << "After fiducial class" << endl;
 	Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
 
 	// Values for some cuts
@@ -443,7 +445,7 @@ int main(int argc, char ** argv){
 		if (gPart <= 0) continue; // Ignore events that have no particle candidates
 
 		nParticles = 0;
-		nProtons   = 0;     
+		nProtons   = 0;
 		nNeutrons  = 0;
 		nPiplus    = 0;
 		nPiminus   = 0;

@@ -17,9 +17,9 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target, bool dat
 	prot_deltat_sig  = NULL;
 	prot_deltat_mean = NULL;
 	pip_deltat_sig   = NULL;
-        pip_deltat_mean  = NULL;
+  pip_deltat_mean  = NULL;
 	pim_deltat_sig   = NULL;
-        pim_deltat_mean  = NULL;
+  pim_deltat_mean  = NULL;
 	vz_corr_func     = NULL;
 
 	// Initialize the key run settings
@@ -31,18 +31,26 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target, bool dat
 
 	homedir = std::string(getenv("HOME"));
 
+
 	// Read in the various parameters
 	bool all_ok=true;
 	all_ok &= read_e_fid_params      (); // Electron fiducial regions
-	all_ok &= read_e_pcor_params     (); // Electron momentum corrections
+  all_ok &= read_e_pcor_params     (); // Electron momentum corrections
+  std::cout << "after e_pcor" << std::endl;
 	all_ok &= read_e_pid_params      (); // Electron E/p params
+  std::cout << "after e_pid" << std::endl;
 	all_ok &= read_p_pid_params      (); // Proton delta_t vs mom params
+  std::cout << "after p_pid" << std::endl;
 	all_ok &= read_pip_pid_params    (); // Pi+ delta_t vs mom params
+  std::cout << "after pip_pid" << std::endl;
 	all_ok &= read_pim_pid_params    (); // Pi- delta_t vs mom params
+  std::cout << "after pim_pid" << std::endl;
 	all_ok &= read_vz_cor_params     (); // vz corrections
+  std::cout << "after vz_cor" << std::endl;
 	all_ok &= read_p_fid_params      (); // Proton fiducial regions
+  std::cout << "after p_fid" << std::endl;
 	all_ok &= read_n_pathlength_corr (); // Neutron pathlength correction params
-
+  std::cout << "after n_path" << std::endl;
 	if (all_ok)
 		std::cerr << "Successfully read in the various parameters...\n";
 	else
@@ -394,15 +402,22 @@ bool Fiducial::read_vz_cor_params()
 
 	// If we previously set these, we should clean up their memory
 	if (vz_corr_func)
-		delete vz_corr_func;
-
+    {
+      std::cout << "in loop" << std::endl;
+      delete vz_corr_func;
+    }
+  std::cout << cal_file << " " << vz_corr_func << std::endl;
 	// Pull from file
-	vz_corr_func=(TF1*)cal_file->Get("f_vz")->Clone();
+  TF1 * temp = (TF1*)cal_file->Get("f_vz");
+  std::cout << temp << "\n";
+	vz_corr_func=(TF1*)temp->Clone();
+
+  std::cout << cal_file << " " << vz_corr_func << std::endl;
 
 	// Put the root global file pointer back to where it was. I hate ROOT. (me too) 
 	cal_file->Close();
 	gFile = old_gfile;	
-
+  std::cout << "after gFile" << std::endl;
 	// Test that the histograms were pulled successfully
 	if (!vz_corr_func)
 		return false;

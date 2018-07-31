@@ -29,8 +29,8 @@ const double sc_cc_dt_cut_sect[6]={-2,-5,-8,-8,-2,2};
 int main(int argc, char ** argv){
   if (argc < 5){
     cerr << "Wrong number of arguments. Instead try\n"
-         << "\tskim_tree 00000000 00000 /path/to/output/file /path/to/input1 [optional: /path/to/input2 ...]\n\n"
-	 << "Argument 1 must be an 8 digit number:\n"
+         << "\tskim_tree /path/to/output/file 00000000 00000 /path/to/input1 [optional: /path/to/input2 ...]\n\n"
+	 << "Argument 2 must be an 8 digit number:\n"
 	 << "\t1st digit: minimum number of protons required in the event (0-9)\n"
 	 << "\t2nd digit: maximum number of protons required in the event (0-9)\n"
 	 << "\t3rd digit: minimum number of neutrons required in the event (0-9)\n"
@@ -39,7 +39,7 @@ int main(int argc, char ** argv){
 	 << "\t6th digit: maximum number of pi+ required in the event (0-9)\n"
 	 << "\t7th digit: minimum number of pi- required in the event (0-9)\n"
 	 << "\t8th digit: maximum number of pi- required in the event (0-9)\n\n"
- 	 << "Argument 2 must be a 5 digit sequence of 1,0:\n"
+ 	 << "Argument 3 must be a 5 digit sequence of 1,0:\n"
 	 << "\t1st digit: fiducial cut status for electrons (0 = off, 1 = on)\n"
 	 << "\t2nd digit: fiducial cut status for protons   (0 = off, 1 = on)\n"
      	 << "\t3rd digit: fiducial cut status for neutrons  (0 = off, 1 = on)\n"
@@ -50,19 +50,19 @@ int main(int argc, char ** argv){
   
   // --------------------------------------------------------------------------------------------------
   // Specifying the conditions for the output file
-  if(strlen(argv[1]) != 8){
+  if(strlen(argv[2]) != 8){
     cout << endl << "First argument must be an integer of 8 digits." << endl;
-    cout << "You have specified an integer of " << strlen(argv[1]) << " digits" << endl;
+    cout << "You have specified an integer of " << strlen(argv[2]) << " digits" << endl;
     return -2;
   }
 
-  if(strlen(argv[2]) != 5){
+  if(strlen(argv[3]) != 5){
     cout << endl << "Second argument must be an integer of 5 digits." << endl;
-    cout << "You have specified an integer of " << strlen(argv[2]) << " digits" << endl;
+    cout << "You have specified an integer of " << strlen(argv[3]) << " digits" << endl;
     return -3;
   }
 
-  int in_num_part = atoi(argv[1]); 
+  int in_num_part = atoi(argv[2]); 
   const int min_p   = (in_num_part/10000000)%10;
   const int max_p   = (in_num_part/1000000 )%10;
   const int min_n   = (in_num_part/100000  )%10;
@@ -72,7 +72,7 @@ int main(int argc, char ** argv){
   const int min_pim = (in_num_part/10      )%10;
   const int max_pim = (in_num_part/1       )%10;
 
-  int fid_settings = atoi(argv[2]);
+  int fid_settings = atoi(argv[3]);
   const bool do_fid_e   = fid_settings/10000 & 1;
   const bool do_fid_p   = fid_settings/1000 & 1;
   const bool do_fid_n   = fid_settings/100 & 1;
@@ -177,7 +177,7 @@ int main(int argc, char ** argv){
 
   // --------------------------------------------------------------------------------------------------
   // Open up the output file
-  TFile * outfile = new TFile(argv[3],"RECREATE");
+  TFile * outfile = new TFile(argv[1],"RECREATE");
   TDirectory * dir_diag = outfile->mkdir("diagnostics");
   dir_diag->cd();
 

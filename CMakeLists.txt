@@ -13,6 +13,7 @@ add_subdirectory(calibration_data)
 add_subdirectory(maps)
 add_subdirectory(auxiliary_scripts)
 add_subdirectory(Rey_neutrons)
+add_subdirectory(fiducial)
 
 # If on the farm, compile programs that require CLASTOOL
 option(Build_Farm "Builds programs that require ifarm libraries" OFF )

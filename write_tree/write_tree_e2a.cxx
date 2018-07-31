@@ -1,4 +1,3 @@
-#if !defined(__CINT__)
 #include "TIdentificator.h"
 #include "TClasTool.h"
 #include "TH2F.h"
@@ -6,13 +5,10 @@
 #include "TTree.h"
 #include "Riostream.h"
 #include "TMath.h"
-#endif
-
 
 int main(int argc, char **argv)
 {
-  TClasTool *input = new TClasTool();
-  
+  TClasTool *input = new TClasTool();  
   input->InitDSTReader("ROOTDSTR");
     
   if(argc == 1) {
@@ -106,6 +102,22 @@ int main(int argc, char **argv)
   Float_t phi_g[50];
   Float_t z_g[50];
 
+  // Load initial event
+  input->Next();
+  // This is crucial. Subsequent loading will occur in for loop increment
+
+  // Determine if this is a simulation run based on the number of generated particles in the first event
+  num_g = input->GetNRows("GSIM");
+  const bool sim_run = (num_g>0);
+  if (sim_run)
+    {
+      cout << "This is a simulation run. Generator branches will be saved.\n";
+    }
+  else
+    {
+      cout << "This is not a simulation run. No generator information.\n";
+    }
+
   //Reconstructed Branches
   tree->Branch("gPart",&gPart,"gPart/I");
   tree->Branch("CCPart",&CCPart,"CCPart/I");
@@ -156,23 +168,27 @@ int main(int argc, char **argv)
   tree->Branch("W",&W,"W/F");
   tree->Branch("Nu",&Nu,"Nu/F");
   tree->Branch("Yb",&Yb,"Yb/F");
-  tree->Branch("Number_g",&num_g,"num_g/I");
-  tree->Branch("particle_g",&id_g,"id_g[num_g]/I");
-  tree->Branch("Momentum_g",p_g,"p_g[num_g]/F");
-  tree->Branch("Momentumx_g",px_g,"px_g[num_g]/F");
-  tree->Branch("Momentumy_g",py_g,"py_g[num_g]/F");
-  tree->Branch("Momentumz_g",pz_g,"pz_g[num_g]/F");
-  tree->Branch("Theta_g",theta_g,"theta_g[num_g]/F");
-  tree->Branch("Phi_g",phi_g,"phi_g[num_g]/F");
-  tree->Branch("TargetZ_g",z_g,"z_g[num_g]/F");
- 
+
+  if (sim_run)
+    {
+      tree->Branch("Number_g",&num_g,"num_g/I");
+      tree->Branch("particle_g",&id_g,"id_g[num_g]/I");
+      tree->Branch("Momentum_g",p_g,"p_g[num_g]/F");
+      tree->Branch("Momentumx_g",px_g,"px_g[num_g]/F");
+      tree->Branch("Momentumy_g",py_g,"py_g[num_g]/F");
+      tree->Branch("Momentumz_g",pz_g,"pz_g[num_g]/F");
+      tree->Branch("Theta_g",theta_g,"theta_g[num_g]/F");
+      tree->Branch("Phi_g",phi_g,"phi_g[num_g]/F");
+      tree->Branch("TargetZ_g",z_g,"z_g[num_g]/F");
+    } 
+
   Int_t nEntries = input->GetEntries();
   cout << "Total Entries = "<<nEntries<<endl;
-  
-  for (int event = 0; event < nEntries; event++) {
+
+  // Loop over events, loading each through Next() command
+  for (int event = 0; event < nEntries; event++, input->Next()) {
     
     if(event%10000 == 0) cout << "Events Processed: "<< event << endl;
-    input->Next();
 
     //Reconstucted Variables
     gPart = t->gPart();
@@ -250,9 +266,8 @@ int main(int argc, char **argv)
 	z_g[j] = t->Z(j,1);
       }
 
-    if(gPart>0 && gPart<50){      
+    if ((sim_run && (num_g > 0)) || ((!sim_run) && (gPart>0) && (gPart<50)))
       tree->Fill();
-    }
   }
   
   output->Write();

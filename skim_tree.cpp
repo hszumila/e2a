@@ -637,7 +637,6 @@ int main(int argc, char ** argv){
 		h2_e_thetaMom3-> Fill(theta[0],mom[0],T3_e_mom_cor.Mag()-T3_e_mom.Mag());
 		// --------------------------------------------------------------------------------------------------
 		// Loop over events looking for other particles
-
 		for (int i=1 ; i<gPart ; i++)
 		{
 			Part_type[i] = 0;

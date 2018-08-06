@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <cmath>
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1.h"

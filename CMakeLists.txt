@@ -14,6 +14,7 @@ add_subdirectory(maps)
 add_subdirectory(auxiliary_scripts)
 add_subdirectory(Rey_neutrons)
 add_subdirectory(fiducial)
+add_subdirectory(Axel_analysis)
 
 # If on the farm, compile programs that require CLASTOOL
 option(Build_Farm "Builds programs that require ifarm libraries" OFF )

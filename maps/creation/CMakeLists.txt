@@ -11,3 +11,6 @@ link_directories( ${ANALYZER}/slib ${CLASTOOL}/slib/${OSNAME} )
 
 add_executable(convert_uniform convert_uniform.cxx)
 target_link_libraries(convert_uniform ${ROOT_LIBRARIES})
+
+add_executable(mapmaker mapmaker.cpp ../../Fiducial.cpp)
+target_link_libraries(mapmaker ${ROOT_LIBRARIES})

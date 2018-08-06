@@ -23,18 +23,21 @@ using namespace std;
 int main(int argc, char ** argv)
 {
   gSystem->Load("libTree");
-	if (argc < 3)
+	if (argc < 4)
     {
       cerr << "Wrong number of arguments. Instead try\n"
-           << "\tcount /path/to/input/file n or p (looking for which particle)\n\n";
+           << "\tcount /path/to/input/file /path/to/output/file n or p (looking for which particle)\n\n";
     }
 
   int no_cut = 0;
   int part_cut = 0;
   int Xb_cut = 0;
-  int miss_mom_cut = 0;
+  int miss_mom_lower_cut = 0;
+  int miss_mom_upper_cut = 0;
   int theta_pq_cut = 0;
-
+  int pq_lower_cut = 0;
+  int pq_upper_cut = 0;
+  int p_fiducial_cut = 0;
   char type = *argv[argc-1];
 
   if (type != 'n' && type != 'p')
@@ -43,17 +46,27 @@ int main(int argc, char ** argv)
            << "\t (n or p looking for which particle)\n";
       return -2;
     }
-  int numfiles = argc-2;
+
+  int numfiles = argc-3;
   TFile * infile[numfiles];
+  TH1D * vertex[numfiles];
+  double mid[numfiles];
+  TFile * outfile = new TFile(argv[numfiles+1],"RECREATE");
 
   for (int file = 0;file<numfiles;file++)
     {
+      if(file ==44)
+        continue;
       // ---------------------------------------
       // Setting up output tree and branches
       infile[file] = new TFile(argv[file+1]);
       TTree * intree = (TTree*)infile[file]->Get("T");
 
       int nevents = intree->GetEntries();
+
+      char temp[256];
+      sprintf(temp,"file_%d",file+1);
+      vertex[file] = new TH1D(temp,temp,100,4,7);
 
       double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
       double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
@@ -105,7 +118,7 @@ int main(int argc, char ** argv)
       //intree->SetBranchAddress("beta"      ,  beta      );
       intree->SetBranchAddress("Part_type" ,  Part_type );
       //intree->SetBranchAddress("vtx_z_unc" ,  vtx_z_unc );
-      //intree->SetBranchAddress("vtx_z_cor" ,  vtx_z_cor );
+      intree->SetBranchAddress("vtx_z_cor" ,  vtx_z_cor );
       intree->SetBranchAddress("mom_x"     ,  mom_x     );
       intree->SetBranchAddress("mom_y"     ,  mom_y     );
       intree->SetBranchAddress("mom_z"     ,  mom_z     );
@@ -132,13 +145,32 @@ int main(int argc, char ** argv)
       int elec_index = 0;
       double beam_energy = 4.461;
       TVector3 q,elec_mom,miss_mom,part_mom;
+      double tab_E1 = 4461;
+      double tab_torus = 2250;
+      double tab_mini = 5996;
+      string tab_targ = "12C";
+      cout << "Before fiducial class" << endl;
+      Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);
+      // Create an instance of the Fiducial Class
+
+      cout << "After fiducial class" << endl;
 
       for (int event = 0; event < nevents; event++)
         {
+          bool no_cut_bool = false;
+          bool part_cut_bool = false;
+          bool Xb_cut_bool = false;
+          bool miss_mom_lower_cut_bool = false;
+          bool miss_mom_upper_cut_bool = false;
+          bool theta_pq_cut_bool = false;
+          bool pq_lower_cut_bool = false;
+          bool pq_upper_cut_bool = false;
+          bool p_fiducial_cut_bool = false;
           //if (event%100000==0)
           //cout << "Running through event " << event << endl;
 
           intree->GetEntry(event);
+
           TVector3 elec_mom(mom_x[elec_index],mom_y[elec_index],mom_z[elec_index]);
           TVector3 q = (TVector3(0,0,beam_energy) - elec_mom);
           double omega = beam_energy - elec_mom.Mag();
@@ -148,55 +180,114 @@ int main(int argc, char ** argv)
 
           for (int part = 0; part<nParticles;part++)
             {
-              no_cut++;
               if (type == 'n')
-                if (Part_type[part] != 2112)
-                  {
-                    continue;
-                  }
+                {
+                  if (Part_type[part] != 2112)
+                    {
+                      continue;
+                    }
+                }
 
               if (type == 'p')
-                if (Part_type[part] != 2212)
-                  {
-                    continue;
-                  }
-
+                {
+                  if (Part_type[part] != 2212)
+                    {
+                      continue;
+                    }
+                }
+              vertex[file]->Fill(vtx_z_cor[part]);
               TVector3 part_mom(mom_x[part],mom_y[part],mom_z[part]);
               TVector3 miss_mom = part_mom-q;
-              
               double miss_mom_mag = miss_mom.Mag();
 
-              part_cut++;
+              part_cut_bool = true;
 
               if (xb < 1.2)
                 continue;
 
-              Xb_cut++;
-
-              if (miss_mom_mag < .3)
-                continue;
-
-              miss_mom_cut++;
+              Xb_cut_bool = true;
 
               double theta_pq = q.Angle(part_mom)*(180./3.141592);
 
               if (theta_pq > 25.)
                 continue;
 
-              theta_pq_cut++;
+              theta_pq_cut_bool = true;
 
-              cout << "The particle is a " << Part_type[part] << endl;
+
+              if(part_mom.Mag()/q.Mag() < .62)
+                continue;
+
+              pq_lower_cut_bool = true;
+
+              if(part_mom.Mag()/q.Mag() > .96)
+                continue;
+
+              pq_upper_cut_bool = true;
+
+
+              if (miss_mom_mag < .3)
+                continue;
+
+              miss_mom_lower_cut_bool = true;
+
+              if (miss_mom_mag > 1.0)
+                continue;
+
+              miss_mom_upper_cut_bool = true;
+
+              // Passing positive hadron fiducial cuts
+              if(!fid_params.pFiducialCut(part_mom))
+                continue;
+
+              p_fiducial_cut_bool = true;
+              /*cout << "The particle is a " << Part_type[part] << endl;
               cout << "Xb is " << xb << endl;
               cout << "The missing momentum is " << miss_mom_mag << endl;
-              cout << "The angle between the particle and q is " << theta_pq << endl;
+              cout << "The angle between the particle and q is " << theta_pq << endl;8*/
             }
+          if (part_cut_bool == true)
+            part_cut++;
+
+          if (Xb_cut_bool == true)
+            Xb_cut++;
+
+          if (miss_mom_lower_cut_bool == true)
+            miss_mom_lower_cut++;
+
+          if (miss_mom_upper_cut_bool == true)
+            miss_mom_upper_cut++;
+
+          if (theta_pq_cut_bool == true)
+            theta_pq_cut++;
+
+          if (pq_lower_cut_bool == true)
+            pq_lower_cut++;
+
+          if (pq_upper_cut_bool == true)
+            pq_upper_cut++;
+
+          if (p_fiducial_cut_bool == true)
+            p_fiducial_cut++;
         }
       cout << " " << endl;
-      cout << "The total number of particles is " << no_cut << endl;
       cout << "The total number of " << type << " is " << part_cut << endl;
       cout << "The total number passing Xb cuts is " << Xb_cut << endl;
-      cout << "The total number passing missing momentum cuts is " << miss_mom_cut << endl;
-      cout << "The total number passing angle cuts is " << theta_pq_cut << endl;
+      cout << "after thetapq " << theta_pq_cut << endl;
+      cout << "after p/q lower " << pq_lower_cut << endl;
+      cout << "after p/q upper " << pq_upper_cut << endl;
+      cout << "The total number passing lower missing momentum cuts is " << miss_mom_lower_cut << endl;
+      cout << "The total number passing upper missing momentum cuts is " << miss_mom_upper_cut << endl;
+      cout << "The total number passing proton fiducial cuts " << p_fiducial_cut << endl;
+      outfile->cd();
+      vertex[file]->Fit("gaus");
+      vertex[file]->Write();
+      mid[file] = vertex[file]->GetFunction("gaus")->GetParameter(1);
+      delete vertex[file];
       infile[file]->Close();
     }
+  for(int i=0;i<numfiles;i++)
+    cout << i+1 << " " << mid[i] << endl;
+
+  outfile->Close();
 }

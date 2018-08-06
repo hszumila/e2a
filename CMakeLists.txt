@@ -9,12 +9,13 @@ find_package(ROOT REQUIRED)
 project (e2a)
 
 # ADD SUBDIRECTORIES
+add_subdirectory(cut_library)
 add_subdirectory(calibration_data)
 add_subdirectory(maps)
-add_subdirectory(auxiliary_scripts)
-add_subdirectory(Rey_neutrons)
-add_subdirectory(fiducial)
+add_subdirectory(cut_production)
+add_subdirectory(Adin_analysis)
 add_subdirectory(Axel_analysis)
+add_subdirectory(Rey_neutrons)
 
 # If on the farm, compile programs that require CLASTOOL
 option(Build_Farm "Builds programs that require ifarm libraries" OFF )
@@ -26,5 +27,5 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/include ${ROOT_INCLUDE_DIR})
 
 # Add executable for making skim code
-add_executable(skim_tree skim_tree.cpp Fiducial.cpp Run_dependent.cpp)
-target_link_libraries(skim_tree ${ROOT_LIBRARIES})
+add_executable(skim_tree skim_tree.cpp) 
+target_link_libraries(skim_tree ${ROOT_LIBRARIES} e2aCuts)

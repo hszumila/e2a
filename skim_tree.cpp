@@ -428,31 +428,22 @@ int main(int argc, char ** argv){
   // --------------------------------------------------------------------------------------------------
   // Obtaining run number and other important parameters
   t.GetEvent(0);
-  int tab_run, tab_E1, tab_torus, tab_mini;
-  
+  int tab_run, tab_E1, tab_torus, tab_mini;  
   string tab_targ;
-  char param_file_name[256];
-  string homedir = string(getenv("HOME"));
-  sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
-  ifstream run_table;
-  run_table.open(param_file_name);
-  
-  do{
-    run_table >> tab_run  ;
-    run_table >> tab_E1   ;
-    run_table >> tab_torus;
-    run_table >> tab_mini ;
-    run_table >> tab_targ ;
-  } while(tab_run != NRun);
-  
+
+  tab_run=NRun;
+  Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
+  tab_E1    = run_dependent_corrections.get_E1();
+  tab_torus = run_dependent_corrections.get_torus();
+  tab_mini  = run_dependent_corrections.get_mini();
+  tab_targ  = run_dependent_corrections.get_targ();
+
   cout << "Run    = " << tab_run   << endl;
   cout << "Ebeam  = " << tab_E1    << endl;
   cout << "Torus  = " << tab_torus << endl;
   cout << "Mini   = " << tab_mini  << endl;
-  cout << "Target = " << tab_targ  << endl;
-  
+  cout << "Target = " << tab_targ  << endl;  
   Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);  // Create an instance of the Fiducial Class
-  Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
 
   // Values for some cuts
   if      (tab_E1 == 4461){

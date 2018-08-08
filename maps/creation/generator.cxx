@@ -1,14 +1,12 @@
-#include "Riostream.h"
-#include "TApplication.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
 #include "TStyle.h"
-#include "TRint.h"
 #include "TMath.h"
 #include "TRandom3.h"
-#include "TSystem.h"
 
+#include <iostream>
+#include <fstream>
 #include <cstdio>
 #include <cstdlib>
 
@@ -16,11 +14,13 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-#ifdef WITHRINT
-  TRint *myapp = new TRint("RootSession",&argc,argv,NULL,0);
-#else
-  TApplication *myapp = new TApplication("myapp",0,0);
-#endif
+  if (argc != 2)
+    {
+      cerr << "generator is a progem that produces a file 'mctk_uniform.txt'\n"
+	   << "  for use with gsim. You must supply a phi angle (1-360).\n\n"
+	   << "  generator [phi]\n\n";
+      return -1;
+    }
 
   ofstream outfile;
   outfile.open ("./mctk_uniform.txt");
@@ -146,11 +146,9 @@ int main(int argc, char **argv){
   }  
   //------------------------------------------------------------------------
     
-  
-  
+   
   outfile.close();
-  
-  myapp->Run();
+
   return 0;
 }
   

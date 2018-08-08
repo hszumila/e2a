@@ -11,3 +11,6 @@ link_directories( ${ANALYZER}/slib ${CLASTOOL}/slib/${OSNAME} )
 
 add_executable(convert_uniform convert_uniform.cxx)
 target_link_libraries(convert_uniform ${ROOT_LIBRARIES})
+
+add_executable(generator generator.cxx)
+target_link_libraries(generator ${ROOT_LIBRARIES})

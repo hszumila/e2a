@@ -14,14 +14,18 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-  if (argc != 2)
+  /*  if (argc != 2)
     {
-      cerr << "generator is a progem that produces a file 'mctk_uniform.txt'\n"
+      cerr << "generator is a program that produces a file 'mctk_uniform.txt'\n"
 	   << "  for use with gsim. You must supply a phi angle (1-360).\n\n"
 	   << "  generator [phi]\n\n";
       return -1;
     }
-
+  else
+    {
+      cerr << "You have called the generator with phi = " << argv[1] << "\n";
+    }
+  */
   ofstream outfile;
   outfile.open ("./mctk_uniform.txt");
 

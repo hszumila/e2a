@@ -429,14 +429,13 @@ int main(int argc, char ** argv){
   // Obtaining run number and other important parameters
   t.GetEvent(0);
   int tab_run, tab_E1, tab_torus, tab_mini;
-  
   string tab_targ;
   char param_file_name[256];
   string homedir = string(getenv("HOME"));
   sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
   ifstream run_table;
   run_table.open(param_file_name);
-  
+
   do{
     run_table >> tab_run  ;
     run_table >> tab_E1   ;

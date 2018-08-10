@@ -23,10 +23,10 @@ using namespace std;
 int main(int argc, char ** argv)
 {
   gSystem->Load("libTree");
-	if (argc < 4)
+	if (argc < 5)
     {
       cerr << "Wrong number of arguments. Instead try\n"
-           << "\tcount /path/to/input/file /path/to/output/file n or p (looking for which particle)\n\n";
+           << "\tcount /path/to/input/file /path/to/output/root /path/to/output/text n or p (looking for which particle)\n\n";
     }
 
   int no_cut = 0;
@@ -47,12 +47,12 @@ int main(int argc, char ** argv)
       return -2;
     }
 
-  int numfiles = argc-3;
+  int numfiles = argc-4;
   TFile * infile[numfiles];
   TH1D * vertex[numfiles];
   double mid[numfiles];
+  ofstream outtext(argv[numfiles+2]);
   TFile * outfile = new TFile(argv[numfiles+1],"RECREATE");
-
   for (int file = 0;file<numfiles;file++)
     {
       if(file ==44)
@@ -142,13 +142,34 @@ int main(int argc, char ** argv)
       intree->SetBranchAddress("Mass"      ,  Mass      );
       */// --------------------------------------------------------------------------------------------------
 
+      intree->GetEvent(0);
+      int tab_run, tab_E1, tab_torus, tab_mini;
+      string tab_targ;
+      char param_file_name[256];
+      string homedir = string(getenv("HOME"));
+      sprintf(param_file_name,"%s/.e2a/run_table.dat",homedir.c_str());
+      ifstream run_table;
+      run_table.open(param_file_name);
+
+      do{
+        run_table >> tab_run  ;
+        run_table >> tab_E1   ;
+        run_table >> tab_torus;
+        run_table >> tab_mini ;
+        run_table >> tab_targ ;
+      } while(tab_run != nRun);
+
+      cout << "Run    = " << tab_run   << endl;
+      cout << "Ebeam  = " << tab_E1    << endl;
+      cout << "Torus  = " << tab_torus << endl;
+      cout << "Mini   = " << tab_mini  << endl;
+      cout << "Target = " << tab_targ  << endl;
+
+
       int elec_index = 0;
-      double beam_energy = 4.461;
+      double beam_energy = tab_E1/1000.;
       TVector3 q,elec_mom,miss_mom,part_mom;
-      double tab_E1 = 4461;
-      double tab_torus = 2250;
-      double tab_mini = 5996;
-      string tab_targ = "12C";
+
       cout << "Before fiducial class" << endl;
       Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);
       // Create an instance of the Fiducial Class
@@ -279,15 +300,18 @@ int main(int argc, char ** argv)
       cout << "The total number passing lower missing momentum cuts is " << miss_mom_lower_cut << endl;
       cout << "The total number passing upper missing momentum cuts is " << miss_mom_upper_cut << endl;
       cout << "The total number passing proton fiducial cuts " << p_fiducial_cut << endl;
+      TF1 * fit1 = new TF1("tot","[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*exp(-((x-[6])*(x-[6]))/(2*[7]*[7]))", -100, 100);
+      fit1->SetParameters(200,50,2,.5,.5,vertex[file]->GetMaximum(),5,.04);
+
+      vertex[file]->Fit("tot","","",4,7);
+      mid[file] = vertex[file]->GetFunction("tot")->GetParameter(6);
+      outtext << tab_run << " " << mid[file] << endl;
       outfile->cd();
-      vertex[file]->Fit("gaus");
       vertex[file]->Write();
-      mid[file] = vertex[file]->GetFunction("gaus")->GetParameter(1);
       delete vertex[file];
       infile[file]->Close();
     }
-  for(int i=0;i<numfiles;i++)
-    cout << i+1 << " " << mid[i] << endl;
 
+  outtext.close();
   outfile->Close();
 }

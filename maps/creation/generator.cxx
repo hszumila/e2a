@@ -1,14 +1,12 @@
-#include "Riostream.h"
-#include "TApplication.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
 #include "TStyle.h"
-#include "TRint.h"
 #include "TMath.h"
 #include "TRandom3.h"
-#include "TSystem.h"
 
+#include <iostream>
+#include <fstream>
 #include <cstdio>
 #include <cstdlib>
 
@@ -16,42 +14,43 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-#ifdef WITHRINT
-  TRint *myapp = new TRint("RootSession",&argc,argv,NULL,0);
-#else
-  TApplication *myapp = new TApplication("myapp",0,0);
-#endif
-
+  /*  if (argc != 2)
+    {
+      cerr << "generator is a program that produces a file 'mctk_uniform.txt'\n"
+	   << "  for use with gsim. You must supply a phi angle (1-360).\n\n"
+	   << "  generator [phi]\n\n";
+      return -1;
+    }
+  else
+    {
+      cerr << "You have called the generator with phi = " << argv[1] << "\n";
+    }
+  */
   ofstream outfile;
   outfile.open ("./mctk_uniform.txt");
+
+  Int_t run_number = atoi(argv[1]);
 
   //Number of Events to Generate
   Int_t num_p_bins = 100;
   Int_t num_cost_bins = 100;
-  Int_t num_generated = 1;
+  Int_t num_generated = 10;
   Int_t nEntries = num_p_bins*num_cost_bins*num_generated;
   cout << "Total Number of Entries = " << nEntries << endl;
   
   //Set number of particles to generate (order:e,p,pi+,pi-)
-  Int_t top_num = 2;
+  Int_t top_num = 1;
 
-  //Make sure seeds are different when submitting multiple jobs
-  if(argc!=2){
-    cout<<"Will Not Sleep Before Running!"<<endl;
-    cout<<"Please Input a Single Number to Engage Sleep Function!"<<endl;
-  }
-  else{
-    Int_t time = atoi(argv[1]);
-    if(time>100)time-= 100; //Since Runs start at 101
-    time*=3;
-    cout<<"Sleeping for "<<time<<" seconds"<<endl;
-    gSystem->Exec(Form("sleep %d",time));
-  }
-  Int_t run_number = atoi(argv[1]);
-  //Get Random Number Generator
-  TRandom3 *gRandom = new TRandom3(0); //use time as a random seed
+  // Get seed from /dev/urandom                                                                   
+  unsigned int seed;
+  FILE *f=fopen("/dev/urandom","r");
+  fread(&seed,sizeof(unsigned int),1,f);
+  fclose(f);
 
-  cout << "The Random Number seed is "<<gRandom->GetSeed()<<endl;
+  //Get Random Number Generator                                                                    
+  TRandom3 *myRandom = new TRandom3(seed);
+
+  cout << "The Random Number seed is "<<myRandom->GetSeed()<<endl;
 
   //Set Variables
   Float_t cx[50],cy[50],cz[50],mom_tot[50];
@@ -62,7 +61,7 @@ int main(int argc, char **argv){
   Int_t pid_p = 2212; Float_t mass_p = 0.9383; Int_t charge_p = 1; //proton
   Int_t pid_pp = 211; Float_t mass_pp = 0.1396; Int_t charge_pp = 1; //piplus
   Int_t pid_pm = -211; Float_t mass_pm = 0.1396; Int_t charge_pm = -1; //piminums
-  Float_t x = 0.000, y = 0.000, z = 0.000 ;
+  Float_t x = 0.000, y = 0.000, z = -0.400 ;
   Float_t t_off = 0.000;
   Int_t flag = 0;
 
@@ -77,12 +76,12 @@ int main(int argc, char **argv){
 	if (cost_bin >= 67)
 	  {
 	    //Get Info for the electron
-	    mom_tot[0] = gRandom->Uniform(.05*p_bin, .05*p_bin + .05);
+	    mom_tot[0] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
 	    //To generate uniformly, we should do the following: "cos(theta) = 1 - 2*Uniform[0,1]"
 	    //This is the same as "cos(theta) = Uniform[-1,1]
 	    //For electrons restrict to forward hemisphere (0-71 degrees), since no electron detectors in back
-	    cost = gRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
-	    phi =  gRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
+	    cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+	    phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
 	    px = mom_tot[0] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
 	    py = mom_tot[0] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -92,9 +91,9 @@ int main(int argc, char **argv){
 	    pid[0] = pid_e; mass[0] = mass_e; charge[0] = charge_e;
 	  }
 	//Get Info for the proton
-        mom_tot[1] = gRandom->Uniform(.05*p_bin, .05*p_bin + .05);
-        cost = gRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
-        phi =  gRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
+        mom_tot[1] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
+        cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+        phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
         px = mom_tot[1] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
         py = mom_tot[1] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -104,9 +103,9 @@ int main(int argc, char **argv){
         pid[1] = pid_p; mass[1] = mass_p; charge[1] = charge_p;
 
         //Get Info for the pi+
-        mom_tot[2] = gRandom->Uniform(.05*p_bin, .05*p_bin + .05);
-        cost = gRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
-        phi =  gRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
+        mom_tot[2] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
+        cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+        phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
         px = mom_tot[2] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
         py = mom_tot[2] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -116,9 +115,9 @@ int main(int argc, char **argv){
         pid[2] = pid_pp; mass[2] = mass_pp; charge[2] = charge_pp;
 
         //Get Info for the pi-
-        mom_tot[3] = gRandom->Uniform(.05*p_bin, .05*p_bin + .05);
-        cost = gRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
-        phi =  gRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
+        mom_tot[3] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
+        cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+        phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
         px = mom_tot[3] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
         py = mom_tot[3] * TMath::Sin( TMath::ACos(cost) ) * TMath::Sin( phi );
@@ -151,11 +150,9 @@ int main(int argc, char **argv){
   }  
   //------------------------------------------------------------------------
     
-  
-  
+   
   outfile.close();
-  
-  myapp->Run();
+
   return 0;
 }
   

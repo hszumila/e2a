@@ -19,6 +19,7 @@ Run_dependent::Run_dependent(int run_number)
 	// Read in the various parameters
 	bool all_ok=true;
 
+	all_ok &= read_run_table();
 	all_ok &= read_p_pcor_params(); // proton momentum corrections
 
 	if (all_ok)
@@ -35,6 +36,39 @@ Run_dependent::~Run_dependent()
 	// Memory clean up
 }
 // ===================================================================================================================================
+bool Run_dependent::read_run_table()
+{
+  if (run < 10000)
+    {
+      std::cerr << "This is a simulated run. Making up numbers!!!\n";
+      E1=4461;
+      torus=2250;
+      mini=5996;
+      targ="12C";
+    }
+  else{
+    int this_run;
+    // Open up the run_table
+    ifstream run_table((homedir + std::string("/.e2a/run_table.dat")).c_str());
+    while (run_table >> this_run)
+      {
+	run_table >> E1   ;
+	run_table >> torus;
+	run_table >> mini ;
+	run_table >> targ ;
+	if (this_run == run)
+	  break;
+      } 
+    
+    if (run != this_run)
+      {
+	std::cerr << "You've selected a run that can't be found on the run table.\n";
+	return false;
+      }
+  }
+  return true;
+}
+
 bool Run_dependent::read_p_pcor_params() // Proton correction parameters
 {
 	char param_file_name[256];
@@ -86,4 +120,22 @@ float Run_dependent::ProtonMomCorrection_He3_4Cell(TVector3 V3Pr, float vertex_p
 
 }
 
+int Run_dependent::get_E1()
+{
+  return E1;
+}
 
+int Run_dependent::get_torus()
+{
+  return torus;
+}
+
+int Run_dependent::get_mini()
+{
+  return mini;
+}
+
+std::string Run_dependent::get_targ()
+{
+  return targ;
+}

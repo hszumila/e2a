@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-  /*  if (argc != 2)
+  if (argc != 2)
     {
       cerr << "generator is a program that produces a file 'mctk_uniform.txt'\n"
 	   << "  for use with gsim. You must supply a phi angle (1-360).\n\n"
@@ -25,7 +25,7 @@ int main(int argc, char **argv){
     {
       cerr << "You have called the generator with phi = " << argv[1] << "\n";
     }
-  */
+
   ofstream outfile;
   outfile.open ("./mctk_uniform.txt");
 
@@ -33,12 +33,14 @@ int main(int argc, char **argv){
 
   //Number of Events to Generate
   Int_t num_p_bins = 100;
-  Int_t num_cost_bins = 100;
+  Int_t num_cost_bins = 200;
   Int_t num_generated = 10;
   Int_t nEntries = num_p_bins*num_cost_bins*num_generated;
   cout << "Total Number of Entries = " << nEntries << endl;
   
   //Set number of particles to generate (order:e,p,pi+,pi-)
+  const Int_t minCosTBin = (Int_t)((1.+TMath::Cos(71.*TMath::DegToRad()))/2. * ((double)num_cost_bins));
+
   Int_t top_num = 1;
 
   // Get seed from /dev/urandom                                                                   
@@ -73,14 +75,15 @@ int main(int argc, char **argv){
   for(Int_t p_bin=0;p_bin<num_p_bins;p_bin++){
     for(Int_t cost_bin=0;cost_bin<num_cost_bins;cost_bin++){
       for(Int_t gen=0;gen<num_generated;gen++){
-	if (cost_bin >= 67)
+	if (cost_bin >= minCosTBin)
 	  {
 	    //Get Info for the electron
 	    mom_tot[0] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
 	    //To generate uniformly, we should do the following: "cos(theta) = 1 - 2*Uniform[0,1]"
 	    //This is the same as "cos(theta) = Uniform[-1,1]
 	    //For electrons restrict to forward hemisphere (0-71 degrees), since no electron detectors in back
-	    cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+	    
+	    cost = myRandom->Uniform(-1+.01*cost_bin, -.99+.01*cost_bin);
 	    phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
 	    px = mom_tot[0] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
@@ -92,7 +95,7 @@ int main(int argc, char **argv){
 	  }
 	//Get Info for the proton
         mom_tot[1] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
-        cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+        cost = myRandom->Uniform(-1+.01*cost_bin, -.99+.01*cost_bin);
         phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
         px = mom_tot[1] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
@@ -104,7 +107,7 @@ int main(int argc, char **argv){
 
         //Get Info for the pi+
         mom_tot[2] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
-        cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+        cost = myRandom->Uniform(-1+.01*cost_bin, -.99+.01*cost_bin);
         phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
         px = mom_tot[2] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
@@ -116,7 +119,7 @@ int main(int argc, char **argv){
 
         //Get Info for the pi-
         mom_tot[3] = myRandom->Uniform(.05*p_bin, .05*p_bin + .05);
-        cost = myRandom->Uniform(-1+.02*cost_bin, -.98+.02*cost_bin);
+        cost = myRandom->Uniform(-1+.01*cost_bin, -.99+.01*cost_bin);
         phi =  myRandom->Uniform(2*TMath::Pi()*(run_number-1)/360., (2*TMath::Pi()*run_number)/360.);
 
         px = mom_tot[3] * TMath::Sin( TMath::ACos(cost) ) * TMath::Cos( phi );
@@ -127,7 +130,7 @@ int main(int argc, char **argv){
         pid[3] = pid_pm; mass[3] = mass_pm; charge[3] = charge_pm;
   
         //------------------------------------------------------------------------
-	if (cost_bin >= 67)
+	if (cost_bin >= minCosTBin)
 	  {
 	    for(Int_t k=0;k<top_num;k++){      
 	      if(k==0) {outfile << top_num << endl;}

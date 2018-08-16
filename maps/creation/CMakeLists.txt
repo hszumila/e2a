@@ -12,10 +12,8 @@ link_directories( ${ANALYZER}/slib ${CLASTOOL}/slib/${OSNAME} )
 add_executable(convert_uniform convert_uniform.cxx)
 target_link_libraries(convert_uniform ${ROOT_LIBRARIES})
 
-<<<<<<< HEAD
 add_executable(mapmaker mapmaker.cpp)
 target_link_libraries(mapmaker ${ROOT_LIBRARIES} e2aCuts)
-=======
+
 add_executable(generator generator.cxx)
 target_link_libraries(generator ${ROOT_LIBRARIES})
->>>>>>> 3d5698f00a7b769385b2827c634a3bedfb9ed6f9

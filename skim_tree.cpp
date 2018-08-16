@@ -428,7 +428,7 @@ int main(int argc, char ** argv){
   // --------------------------------------------------------------------------------------------------
   // Obtaining run number and other important parameters
   t.GetEvent(0);
-<<<<<<< HEAD
+
   int tab_run, tab_E1, tab_torus, tab_mini;
   string tab_targ;
   char param_file_name[256];
@@ -445,10 +445,6 @@ int main(int argc, char ** argv){
     run_table >> tab_targ ;
   } while(tab_run != NRun);
   
-=======
-  int tab_run, tab_E1, tab_torus, tab_mini;  
-  string tab_targ;
-
   tab_run=NRun;
   Run_dependent run_dependent_corrections(NRun);       // Create an instance of the Run_dependent Class
   tab_E1    = run_dependent_corrections.get_E1();
@@ -456,7 +452,6 @@ int main(int argc, char ** argv){
   tab_mini  = run_dependent_corrections.get_mini();
   tab_targ  = run_dependent_corrections.get_targ();
 
->>>>>>> 3d5698f00a7b769385b2827c634a3bedfb9ed6f9
   cout << "Run    = " << tab_run   << endl;
   cout << "Ebeam  = " << tab_E1    << endl;
   cout << "Torus  = " << tab_torus << endl;

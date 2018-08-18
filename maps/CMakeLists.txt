@@ -7,4 +7,4 @@ add_executable(e2a_maps e2a_maps.cpp )
 target_link_libraries(e2a_maps ${ROOT_LIBRARIES} e2aCuts)
 
 add_subdirectory(creation)
-
+add_subdirectory(diagnostics)

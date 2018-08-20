@@ -18,10 +18,10 @@
 
 using namespace std;
 
-double sector_middle[6] = {-120,-60,0,60,120,180};
-double p_middle[100];
-double phi_middle[6][100];
-double theta_middle[100];
+//double sector_middle[6] = {-120,-60,0,60,120,180};
+//double p_middle[100];
+//double phi_middle[6][100];
+//double theta_middle[100];
 
 int which_sector(double phi);
 int which_phi(double phi);

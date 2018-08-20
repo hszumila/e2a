@@ -11,9 +11,9 @@ const double pi = 3.14159;
 const double ns_to_s = 1.0E-09;
 
 const double sector_middle[6] = {-120,-60,0,60,120,180};
-//const double p_middle[100];
-//const double phi_middle[6][100];
-//const double theta_middle[100];
+//double p_middle[100];
+//double phi_middle[6][100];
+//double theta_middle[100];
 
 const int p_bins = 13;
 const int sectors = 6;

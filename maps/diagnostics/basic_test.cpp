@@ -57,16 +57,30 @@ int main(int argc, char ** argv)
   
   gen->GetXaxis()->SetRange(1,1);
   acc->GetXaxis()->SetRange(1,1);
-  TH2D * gen_P0 = (TH2D*) gen->Project3D("zy");
-  TH2D * acc_P0 = (TH2D*) acc->Project3D("zy");
+  TH2D * gen_P0 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p0"));
+  TH2D * acc_P0 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p0"));
+
+  gen->GetXaxis()->SetRange(20,20);
+  acc->GetXaxis()->SetRange(20,20);
+  TH2D * gen_P1 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p1"));
+  TH2D * acc_P1 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p1"));
+
+  gen->GetXaxis()->SetRange(40,40);
+  acc->GetXaxis()->SetRange(40,40);
+  TH2D * gen_P2 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p2"));
+  TH2D * acc_P2 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p2"));
 
   gen->GetXaxis()->SetRange(100,100);
   acc->GetXaxis()->SetRange(100,100);
-  TH2D * gen_P5 = (TH2D*) gen->Project3D("zy");
-  TH2D * acc_P5 = (TH2D*) acc->Project3D("zy");
+  TH2D * gen_P5 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p5"));
+  TH2D * acc_P5 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p5"));
 
   gen_P0->Write();
   acc_P0->Write();
+  gen_P1->Write();
+  acc_P1->Write();
+  gen_P2->Write();
+  acc_P2->Write();
   gen_P5->Write();
   acc_P5->Write();
   badbins->Write();

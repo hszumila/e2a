@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "e2a_constants.h"
+
 using namespace std;
 
 int which_sector(double phi);

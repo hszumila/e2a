@@ -6,7 +6,7 @@ set (CLASTOOL /u/home/baraks/packages/ClasTool)
 set (ANALYZER /u/home/baraks/packages/Analyser/analysis_lib )
 set (OSNAME Linux64RHEL7 )
 
-include_directories( ${CLASTOOL}/include ${ANALYZER}/include ${ROOT_INCLUDE_DIR} )
+include_directories(${CMAKE_SOURCE_DIR}/include ${CLASTOOL}/include ${ANALYZER}/include ${ROOT_INCLUDE_DIR} )
 link_directories( ${ANALYZER}/slib ${CLASTOOL}/slib/${OSNAME} )
 
 add_executable(convert_uniform convert_uniform.cxx)

@@ -50,6 +50,9 @@ int main(int argc, char ** argv)
 
   cout << "Before fiducial class" << endl;
   Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);  // Create an instance of the Fiducial Class
+  const double EC_in_cut = fid_params.EC_in_cut();
+  const double el_EC_cut = fid_params.el_EC_cut();
+
   cout << "After fiducial class" << endl;
 
   TFile * outfile = new TFile(argv[numfiles+1],"RECREATE");
@@ -133,8 +136,6 @@ int main(int argc, char ** argv)
           //cout << phi_g[0] << endl;
           //cout << theta_g[0] << endl;
 
-          double EC_in_cut = 0.055; //GeV (Values for Energy deposited in EC inner layer cut)
-          double el_EC_cut = 0.330; //GeV (Values for Enough total energy in the EC cut)
           double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]); // Define the electron candidate energy in the EC
 
           //Electron particle Identification

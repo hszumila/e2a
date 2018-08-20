@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 
   TH3D * gen = (TH3D*) infile->Get("Generated Particles");
   TH3D * acc = (TH3D*) infile->Get("Accepted Particles");
-
+  TH1D * badbins = new TH1D("bins_under_10","bins_under_10",12,-1.5,10.5);
   // Tests
   // Double check axis ranges and bins
   // All bins have 10 generated
@@ -48,8 +48,11 @@ int main(int argc, char ** argv)
 	{
 	  int bin = gen->GetBin(pBin,cBin,fBin);
 	  if (gen->GetBinContent(bin) <10.)
+      {
 	    bad_bins.push_back(bin);
-	}
+      badbins->Fill(gen->GetBinContent(bin));
+      }
+  }
   cout << "\n\t There are " << bad_bins.size() << " bins with fewer than 10 generated events\n";
   
   gen->GetXaxis()->SetRange(1,1);
@@ -66,7 +69,7 @@ int main(int argc, char ** argv)
   acc_P0->Write();
   gen_P5->Write();
   acc_P5->Write();
-      
+  badbins->Write();
   outfile->Close();
 
   return 0;

@@ -18,17 +18,10 @@
 
 using namespace std;
 
-double sector_middle[6] = {-120,-60,0,60,120,180};
-double p_middle[100];
-double phi_middle[6][100];
-double theta_middle[100];
-
 int which_sector(double phi);
 int which_phi(double phi);
 int which_theta(double theta);
 int which_mom(double mom);
-
-int p_bins, sectors,theta_bins,phi_bins;
 
 int main(int argc, char** argv)
 {
@@ -55,33 +48,12 @@ int main(int argc, char** argv)
 
   TFile * outputFile = new TFile(argv[numfiles + 1], "RECREATE");
 
-  p_bins = 13;
-  sectors = 6;
-  theta_bins = 30;
-  phi_bins = 30;
-  for (int i = 0; i<p_bins ;i++)
-    {
-      p_middle[i] = 1.05+.2*i;
-    }
-  for (int i = 0;i<theta_bins;i++)
-    {
-      theta_middle[i] = 1.0+2.0*i;
-    }
-  for (int i = 0;i<sectors;i++)
-    {
-      for (int j =-15;j<15+phi_bins;j++)
-        {
-          phi_middle[i][j+15] = sector_middle[i]+j*2;
-        }
-    }
-
   const unsigned int nevents = intree.GetEntries();
 
   int maxPart = 50;
 	int nRun;
   int nParticles;
 	/*int nProtons, nNeutrons, nPiplus, nPiminus, nPi0;
-	
 	double Nu, Q2, Xb, Nu_unc, Q2_unc, Xb_unc, t0;
 	double vtx_z_unc [maxPart], vtx_z_cor[maxPart], Mass[maxPart];
 

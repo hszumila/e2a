@@ -153,11 +153,11 @@ int main(int argc, char ** argv)
           accepted->Fill(mom_g[0],cost_g,phi_g[0]);
         }
     }
-  for (int p = 0; p<pbins;p++)
+  for (int p = 1; p<=pbins;p++)
     {
-      for (int phi = 0; phi<phibins; phi++)
+      for (int phi = 1; phi<=phibins; phi++)
         {
-          for (int cost = 0; cost<costbins; cost++)
+          for (int cost = 1; cost<=costbins; cost++)
             {
               if (generated->GetBinContent(p,cost,phi)==0)
                 generated->SetBinContent(p, cost, phi, 10);

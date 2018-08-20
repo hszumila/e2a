@@ -43,7 +43,7 @@ int main(int argc, char ** argv)
       infile[i] = new TFile(argv[i+1]);
     }
 
-  double tab_E1 = 4461;
+  double tab_E1 = 2261;
   double tab_torus = 2250;
   double tab_mini = 5996;
   string tab_targ = "12C";

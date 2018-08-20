@@ -160,7 +160,7 @@ int main(int argc, char ** argv)
           for (int cost = 0; cost<costbins; cost++)
             {
               if (generated->GetBinContent(p,cost,phi)==0)
-                cout << p << " " << cost << " " << phi << endl;
+                generated->SetBinContent(p, cost, phi, 10);
             }
         }
     }

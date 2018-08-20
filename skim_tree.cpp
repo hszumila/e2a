@@ -359,7 +359,6 @@ int main(int argc, char ** argv){
   TTree * outtree = new TTree("T","Skimmed tree");
   double e_vz, e_vz_corrected, e_mom[3], e_phi_mod;
   double p_vz, p_vz_corrected, p_mom_corrected, p_phi_mod;
-  double EC_in_cut, el_EC_cut;
   double e_t0,beta_assuming_proton,p_t0,delta_t,beta_assuming_pip,pip_t0,pip_delta_t;
   double corr_px, corr_py, corr_pz, n_px, n_py, n_pz, n_p, EC_Path_corr, Beta_corr;
   
@@ -460,23 +459,8 @@ int main(int argc, char ** argv){
   Fiducial fid_params(tab_E1,tab_torus,tab_mini,tab_targ, true);  // Create an instance of the Fiducial Class
 
   // Values for some cuts
-  if      (tab_E1 == 4461){
-    EC_in_cut = 0.055; //GeV (Values for Energy deposited in EC inner layer cut)
-    el_EC_cut = 0.330; //GeV (Values for Enough total energy in the EC cut)
-  }
-  else if (tab_E1 == 2261){
-    EC_in_cut = 0.060; //GeV (Values for Energy deposited in EC inner layer cut)
-    el_EC_cut = -999.; // No cut in this case (Values for Enough total energy in the EC cut)
-  }
-  //Placeholder
-  else if (tab_E1 == 1161){
-    EC_in_cut = -999; //GeV (Values for Energy deposited in EC inner layer cut)
-    el_EC_cut = -999.; // No cut in this case (Values for Enough total energy in the EC cut)
-  }
-  else {
-    cout << "Error: Check skim_tree and add parameters for Ebeam = " << tab_E1 << endl;
-    exit(-2);
-  }
+  const double EC_in_cut = fid_params.EC_in_cut();
+  const double el_EC_cut = fid_params.el_EC_cut();
   
 // --------------------------------------------------------------------------------------------------
   // Loop over events

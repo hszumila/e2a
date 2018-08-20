@@ -70,6 +70,16 @@ int main(int argc, char ** argv)
   TH2D * gen_P2 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p2"));
   TH2D * acc_P2 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p2"));
 
+  gen->GetXaxis()->SetRange(60,60);
+  acc->GetXaxis()->SetRange(60,60);
+  TH2D * gen_P3 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p3"));
+  TH2D * acc_P3 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p3"));
+
+  gen->GetXaxis()->SetRange(80,80);
+  acc->GetXaxis()->SetRange(80,80);
+  TH2D * gen_P4 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p4"));
+  TH2D * acc_P4 = (TH2D*) (acc->Project3D("zy")->Clone("acc_p4"));
+
   gen->GetXaxis()->SetRange(100,100);
   acc->GetXaxis()->SetRange(100,100);
   TH2D * gen_P5 = (TH2D*) (gen->Project3D("zy")->Clone("gen_p5"));
@@ -81,6 +91,10 @@ int main(int argc, char ** argv)
   acc_P1->Write();
   gen_P2->Write();
   acc_P2->Write();
+  gen_P3->Write();
+  acc_P3->Write();
+  gen_P4->Write();
+  acc_P4->Write();
   gen_P5->Write();
   acc_P5->Write();
   badbins->Write();

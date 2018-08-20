@@ -1055,6 +1055,25 @@ double Fiducial::corrected_path_length( double uncorrected_path_length , double 
 
 }
 
+double Fiducial::EC_in_cut()
+{
+  if (E1 == 4461)
+    return 0.055;
+  if (E1 == 2261)
+    return 0.060;
+  if (E1 == 1161)
+    return -999.;
+  return -999.;
+}
 
+double Fiducial::el_EC_cut()
+{
+  if (E1==4461)
+    return 0.330;
+  if (E1==2261)
+    return -999.;
+  if (E1==1161)
+    return -999.;
+  return -999.;
+}
 
- 

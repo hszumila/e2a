@@ -25,6 +25,8 @@ class Fiducial
 		double corrected_path_length( double uncorrected_path_length , double E_in , double E_out  );
 		TVector3 eMomentumCorrection(TVector3 V3el);
 		TVector3 FindUVW(TVector3 xyz);
+		double EC_in_cut();
+		double el_EC_cut();		  
 
 	private:
 		int E1;

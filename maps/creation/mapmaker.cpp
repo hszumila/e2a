@@ -22,7 +22,7 @@
 using namespace std;
 
 const int pbins = 100;
-const int costbins = 100;
+const int costbins = 200;
 const int phibins = 360;
 
 TH3D * generated;
@@ -119,6 +119,9 @@ int main(int argc, char ** argv)
           if (event%100000==0)
             cout << "File " << file+1 << " and event " << event << " out of " << intree->GetEntries() << endl;
 
+          double cost_g = TMath::Cos(theta_g[0]*M_PI/180);
+          //double cost = TMath::Cos(theta[0]*180/3.141592);
+          generated->Fill(mom_g[0],cost_g,phi_g[0]);
 
           if (!(			(StatEC[0] > 0) && // EC status is good for the electron candidate
                       (StatDC[0] > 0) && // DC status is good for the electron candidate
@@ -129,10 +132,7 @@ int main(int argc, char ** argv)
             {continue;}
           //cout << phi_g[0] << endl;
           //cout << theta_g[0] << endl;
-          double cost_g = TMath::Cos(theta_g[0]*3.1415926535/180);
-          //double cost = TMath::Cos(theta[0]*180/3.141592);
-          generated->Fill(mom_g[0],cost_g,phi_g[0]);
-          
+
           double EC_in_cut = 0.055; //GeV (Values for Energy deposited in EC inner layer cut)
           double el_EC_cut = 0.330; //GeV (Values for Enough total energy in the EC cut)
           double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]); // Define the electron candidate energy in the EC
@@ -151,6 +151,17 @@ int main(int argc, char ** argv)
           if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
 
           accepted->Fill(mom_g[0],cost_g,phi_g[0]);
+        }
+    }
+  for (int p = 0; p<pbins;p++)
+    {
+      for (int phi = 0; phi<phibins; phi++)
+        {
+          for (int cost = 0; cost<costbins; cost++)
+            {
+              if (generated->GetBinContent(p,cost,phi)==0)
+                cout << p << " " << cost << " " << phi << endl;
+            }
         }
     }
   generated->Write();

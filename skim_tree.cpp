@@ -525,16 +525,16 @@ int main(int argc, char ** argv){
                               (fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) // Electron PID (E/p)
                               ))
         {continue;}
-
+      
       // ---------------------------------------
       // Additional cut for 2GeV data:
       double el_sccc_dt = SC_Time[0] - CC_Time[0] - (SC_Path[0] - CC_Path[0])/(c_m_s*ns_to_s*100.);
-
+      
       if(			(tab_E1==2261)&&(	
-                               CC_Chi2[0]>=0.1 ||
-                               el_sccc_dt < sc_cc_dt_cut_sect[e_sect] ||
-                               sqrt(mom[0]*mom[0]+me*me)>tab_E1/1000.
-                                ))
+						 CC_Chi2[0]>=0.1 ||
+						 el_sccc_dt < sc_cc_dt_cut_sect[e_sect] ||
+						 sqrt(mom[0]*mom[0]+me*me)>tab_E1/1000.
+				))
         {continue;}	
 
       // ---------------------------------------------------------------------------------------

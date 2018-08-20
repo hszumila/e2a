@@ -140,6 +140,10 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	// Cut for Ebeam = 2.2GeV and 2250A data.
 
 	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
+
+	  // Sanitize momentum                                                                                                                          
+	  if (mom_e > 1.8) mom_e = 1.8;
+
 		bool status = true;
 		phi_deg -= sector*60;
 		Float_t par[6];               // six parameters to determine the outline of Theta vs Phi

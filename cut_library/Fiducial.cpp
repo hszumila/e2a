@@ -143,7 +143,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	else if ( E1 > 2000 && E1 < 3000 && torus_current > 2240. && torus_current < 2260.){
 
 	  // Sanitize momentum                                                                                                                          
-	  if (mom_e > 1.8) mom_e = 1.8;
+	  if (mom_e > 2.0) mom_e = 2.0;
 
 		bool status = true;
 		phi_deg -= sector*60;

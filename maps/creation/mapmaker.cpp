@@ -143,7 +143,7 @@ int main(int argc, char ** argv)
                                   (el_cand_EC > el_EC_cut) &&     // Enough total energy in the EC
                                   (fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) // Electron PID (E/p)
                                   ))
-            {continue;}
+                                  {continue;}
 
           TVector3 T3_e_mom(px[0],py[0],pz[0]);
           TVector3 e_ec_xyz(EC_X[0],EC_Y[0],EC_Z[0]);

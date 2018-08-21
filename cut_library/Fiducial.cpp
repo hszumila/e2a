@@ -35,22 +35,22 @@ Fiducial::Fiducial(int E_beam, int torus, int mini, std::string target, bool dat
 	// Read in the various parameters
 	bool all_ok=true;
 	all_ok &= read_e_fid_params      (); // Electron fiducial regions
-  all_ok &= read_e_pcor_params     (); // Electron momentum corrections
-  std::cout << "after e_pcor" << std::endl;
+	all_ok &= read_e_pcor_params     (); // Electron momentum corrections
+	std::cerr << "after e_pcor" << std::endl;
 	all_ok &= read_e_pid_params      (); // Electron E/p params
-  std::cout << "after e_pid" << std::endl;
+	std::cerr << "after e_pid" << std::endl;
 	all_ok &= read_p_pid_params      (); // Proton delta_t vs mom params
-  std::cout << "after p_pid" << std::endl;
+	std::cerr << "after p_pid" << std::endl;
 	all_ok &= read_pip_pid_params    (); // Pi+ delta_t vs mom params
-  std::cout << "after pip_pid" << std::endl;
+	std::cerr << "after pip_pid" << std::endl;
 	all_ok &= read_pim_pid_params    (); // Pi- delta_t vs mom params
-  std::cout << "after pim_pid" << std::endl;
+	std::cerr << "after pim_pid" << std::endl;
 	all_ok &= read_vz_cor_params     (); // vz corrections
-  std::cout << "after vz_cor" << std::endl;
+	std::cerr << "after vz_cor" << std::endl;
 	all_ok &= read_p_fid_params      (); // Proton fiducial regions
-  std::cout << "after p_fid" << std::endl;
+	std::cerr << "after p_fid" << std::endl;
 	all_ok &= read_n_pathlength_corr (); // Neutron pathlength correction params
-  std::cout << "after n_path" << std::endl;
+	std::cerr << "after n_path" << std::endl;
 	if (all_ok)
 		std::cerr << "Successfully read in the various parameters...\n";
 	else
@@ -80,6 +80,7 @@ bool Fiducial::e_inFidRegion(TVector3 mom)
 	double phi = mom.Phi();
 	if (phi < -M_PI/6.) phi+= 2.*M_PI;
 	int sector = (phi+M_PI/6.)/(M_PI/3.);
+	sector = sector%6;
 	double phi_deg = phi * 180./M_PI;
 
 	double theta = mom.Theta();
@@ -220,7 +221,7 @@ bool Fiducial::read_n_pathlength_corr()
         char param_file_name[256];
         sprintf(param_file_name,"%s/.e2a/n_pathlength_corr_%d.dat",homedir.c_str(),E1);
         std::ifstream param_file(param_file_name);
-        std::cout<<param_file_name<<std::endl;
+        std::cerr<<param_file_name<<std::endl;
        
 	param_file >> pl_corr_in  ;
 	param_file >> pl_corr_out ;
@@ -229,7 +230,7 @@ bool Fiducial::read_n_pathlength_corr()
 	param_file.close();
 
 	if(pl_corr_in==0&&pl_corr_out==0&&pl_corr_both==0)
-		std::cout << "*** WARNING *** Won't be correcting neutron path length since there are no available parameters!" << std::endl;
+		std::cerr << "*** WARNING *** Won't be correcting neutron path length since there are no available parameters!" << std::endl;
 
         return true;
 }
@@ -242,7 +243,7 @@ bool Fiducial::read_p_fid_params()
 	char param_file_name[256];
 	sprintf(param_file_name,"%s/.e2a/PFID_%d_%d.dat",homedir.c_str(),E1,torus_current);
 	std::ifstream param_file(param_file_name);
-	std::cout<<param_file_name<<std::endl;	
+	std::cerr<<param_file_name<<std::endl;	
 	if ( E1 > 4000 && E1 < 5000 && torus_current > 2240. && torus_current < 2260.){
 		for(int i = 0 ; i < 6 ; i++){
 			for(int j = 0 ; j < 6 ; j++){
@@ -407,21 +408,21 @@ bool Fiducial::read_vz_cor_params()
 	// If we previously set these, we should clean up their memory
 	if (vz_corr_func)
     {
-      std::cout << "in loop" << std::endl;
+      std::cerr << "in loop" << std::endl;
       delete vz_corr_func;
     }
-  std::cout << cal_file << " " << vz_corr_func << std::endl;
+  std::cerr << cal_file << " " << vz_corr_func << std::endl;
 	// Pull from file
   TF1 * temp = (TF1*)cal_file->Get("f_vz");
-  std::cout << temp << "\n";
+  std::cerr << temp << "\n";
 	vz_corr_func=(TF1*)temp->Clone();
 
-  std::cout << cal_file << " " << vz_corr_func << std::endl;
+  std::cerr << cal_file << " " << vz_corr_func << std::endl;
 
 	// Put the root global file pointer back to where it was. I hate ROOT. (me too) 
 	cal_file->Close();
 	gFile = old_gfile;	
-  std::cout << "after gFile" << std::endl;
+  std::cerr << "after gFile" << std::endl;
 	// Test that the histograms were pulled successfully
 	if (!vz_corr_func)
 		return false;
@@ -1055,7 +1056,7 @@ double Fiducial::corrected_path_length( double uncorrected_path_length , double 
         if      (E_in > 0  && E_out == 0)       return uncorrected_path_length + pl_corr_in  ;
         else if (E_in == 0 && E_out > 0 )       return uncorrected_path_length + pl_corr_out ;
         else if (E_in > 0  && E_out > 0 )       return uncorrected_path_length + pl_corr_both;
-        else{   std::cout << "There's something wrong in corrected_path_length" << std::endl;   exit(3);}
+        else{   std::cerr << "There's something wrong in corrected_path_length" << std::endl;   exit(3);}
 
 }
 

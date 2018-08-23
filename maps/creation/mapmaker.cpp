@@ -114,7 +114,6 @@ int main(int argc, char ** argv)
       intree->SetBranchAddress("Momentumx_g",px_g);
       intree->SetBranchAddress("Momentumy_g",py_g);
       intree->SetBranchAddress("Momentumz_g",pz_g);
-     
 
       for(int event = 0; event<intree->GetEntries();event++)
         {
@@ -122,17 +121,16 @@ int main(int argc, char ** argv)
           if (event%100000==0)
             cout << "File " << file+1 << " and event " << event << " out of " << intree->GetEntries() << endl;
 
-          double cost_g = TMath::Cos(theta_g[0]*M_PI/180);
+          /*double cost_g = TMath::Cos(theta_g[0]*M_PI/180);
           //double cost = TMath::Cos(theta[0]*180/3.141592);
           generated->Fill(mom_g[0],cost_g,phi_g[0]);
-
           if (!(			(StatEC[0] > 0) && // EC status is good for the electron candidate
                       (StatDC[0] > 0) && // DC status is good for the electron candidate
                       (StatCC[0] > 0) && // CC status is good for the electron candidate
                       (StatSC[0] > 0) && // SC status is good for the electron candidate
                       (charge[0] < 0)    // Electron candidate curvature direction is negative
                       ))
-            {continue;}
+                      {continue;}
           //cout << phi_g[0] << endl;
           //cout << theta_g[0] << endl;
 
@@ -145,13 +143,34 @@ int main(int argc, char ** argv)
                                   ))
                                   {continue;}
 
-          TVector3 T3_e_mom(px[0],py[0],pz[0]);
-          TVector3 e_ec_xyz(EC_X[0],EC_Y[0],EC_Z[0]);
+                                  TVector3 T3_e_mom(px[0],py[0],pz[0]);
+                                  TVector3 e_ec_xyz(EC_X[0],EC_Y[0],EC_Z[0]);
           // Electron Fiducial cuts
           if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
           if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
 
-          accepted->Fill(mom_g[0],cost_g,phi_g[0]);
+          accepted->Fill(mom_g[0],cost_g,phi_g[0]);*/
+
+          double cost_g = TMath::Cos(theta_g[1]*M_PI/180);
+          generated->Fill(mom_g[1],cost_g,phi_g[1]);
+
+          //Positive particle test
+          if (!(           StatSC[1] > 0) && 		// SC status is good for the positive candidate
+              (StatDC[1] > 0) &&              // DC status is good for the positive candidate
+              (Stat  [1] > 0) &&		// Global status is good for the positive candidate
+              (charge[1] > 0) 		// Charge is positive
+              )
+            {continue;}
+
+          TVector3 T3_p_mom(px[1],py[1],pz[1]);
+          double e_t0 = SC_Time[0] - SC_Path[0]/c_cm_ns;
+          double beta_assuming_proton = mom[1]/sqrt(mom[1]*mom[1] + mP*mP);
+          double p_t0 = SC_Time[1] - SC_Path[1]/(beta_assuming_proton * c_cm_ns);
+          double delta_t = p_t0 - e_t0;
+
+          if (!fid_params.in_p_deltaT(delta_t, mom[1], pdeltat_sig_cutrange)) continue; // Proton PID (delta T vs p)
+          if (!fid_params.pFiducialCut(T3_p_mom)) continue;
+          accepted->Fill(mom_g[1],cost_g,phi_g[1]);
         }
     }
   for (int p = 1; p<=pbins;p++)

@@ -151,6 +151,32 @@ int main(int argc, char ** argv)
 
           accepted->Fill(mom_g[0],cost_g,phi_g[0]);*/
 
+          if (!(			(StatEC[0] > 0) && // EC status is good for the electron candidate
+                      (StatDC[0] > 0) && // DC status is good for the electron candidate
+                      (StatCC[0] > 0) && // CC status is good for the electron candidate
+                      (StatSC[0] > 0) && // SC status is good for the electron candidate
+                      (charge[0] < 0)    // Electron candidate curvature direction is negative
+                      ))
+            {continue;}
+          //cout << phi_g[0] << endl;
+          //cout << theta_g[0] << endl;
+
+          double el_cand_EC = TMath::Max(EC_in[0] + EC_out[0], EC_tot[0]); // Define the electron candidate energy in the EC
+
+          //Electron particle Identification
+          if (!(                  (EC_in [0] > EC_in_cut) &&      // Electron candidate has enough energy deposit in inner layer of EC
+                                  (el_cand_EC > el_EC_cut) &&     // Enough total energy in the EC
+                                  (fid_params.in_e_EoverP(el_cand_EC/mom[0],mom[0],epratio_sig_cutrange)) // Electron PID (E/p)
+                                  ))
+            {continue;}
+
+          TVector3 T3_e_mom(px[0],py[0],pz[0]);
+          TVector3 e_ec_xyz(EC_X[0],EC_Y[0],EC_Z[0]);
+          // Electron Fiducial cuts
+          if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
+          if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+
+
           double cost_g = TMath::Cos(theta_g[1]*M_PI/180);
           generated->Fill(mom_g[1],cost_g,phi_g[1]);
 
@@ -168,8 +194,9 @@ int main(int argc, char ** argv)
           double p_t0 = SC_Time[1] - SC_Path[1]/(beta_assuming_proton * c_cm_ns);
           double delta_t = p_t0 - e_t0;
 
-          if (!fid_params.in_p_deltaT(delta_t, mom[1], pdeltat_sig_cutrange)) continue; // Proton PID (delta T vs p)
-          if (!fid_params.pFiducialCut(T3_p_mom)) continue;
+          if (!fid_params.in_p_deltaT(delta_t, mom[1], pdeltat_sig_cutrange)) {continue;} // Proton PID (delta T vs p)
+          if (!fid_params.pFiducialCut(T3_p_mom)) {continue;}
+
           accepted->Fill(mom_g[1],cost_g,phi_g[1]);
         }
     }

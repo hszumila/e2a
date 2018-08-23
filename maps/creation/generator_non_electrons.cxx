@@ -44,10 +44,12 @@ int main(int argc, char **argv){
   //Set number of particles to generate (order:e,p,pi+,pi-)
   //1 for only electrons. 2,3, or 4 for electrons and ONE of the top particles.
   Int_t top_num = atoi(argv[2]);
-  if (top_num != 2 || top_num != 3 || top_num != 4)
+
+  if ((top_num != 2) && (top_num != 3) && (top_num != 4))
     {
       cout << "Wrong choice for particle, please rather use \n\n"
 	   << "2 = proton, 3 = pi+, 4 = pi-\n\n";
+      return -2;
     }
 
   // Get seed from /dev/urandom                                                                   
@@ -86,15 +88,15 @@ int main(int argc, char **argv){
 	  for(Int_t gen=0;gen<num_generated;gen++)
 	    {
 	      //Get Info for the electron
-	      if (run_number =< 240 && run_number >= 180)
+	      if (run_number <= 240 && run_number >= 180)
 		{
 		  cost = myRandom->Uniform(.68, .69);
-		  phi =  myRandom->Uniform(31,32);
+		  phi =  myRandom->Uniform((2*TMath::Pi()*31.)/360.,(2*TMath::Pi()*32.)/360.);
 		}
 	      else
 		{
 		  cost = myRandom->Uniform(.7, .71);
-		  phi =  myRandom->Uniform(205,206);
+		  phi =  myRandom->Uniform((2*TMath::Pi()*205.)/360.,(2*TMath::Pi()*206.)/360.);
 		}
 	      mom_tot[0] = myRandom->Uniform(.95, 1.0);
 	      //To generate uniformly, we should do the following: "cos(theta) = 1 - 2*Uniform[0,1]"
@@ -152,15 +154,17 @@ int main(int argc, char **argv){
 		  cx[1] = px/mom_tot[1]; cy[1] = py/mom_tot[1]; cz[1] = pz/mom_tot[1];
 		  pid[1] = pid_pm; mass[1] = mass_pm; charge[1] = charge_pm;
 		}
+	      for(Int_t k=0;k<2;k++){      
+		if(k==0) {outfile << 2 << endl;}
+		outfile << pid[k] <<" "<< cx[k] <<" "<< cy[k] <<" "<< cz[k] <<" "<< mom_tot[k] <<endl;
+		outfile << mass[k] <<" "<< charge[k] << endl;
+		outfile << x <<" "<< y <<" "<< z <<" "<< t_off <<" "<< flag <<endl;
+	      }
 	    }
 	}
     }
-  for(Int_t k=0;k<2;k++){      
-    if(k==0) {outfile << top_num << endl;}
-    outfile << pid[k] <<" "<< cx[k] <<" "<< cy[k] <<" "<< cz[k] <<" "<< mom_tot[k] <<endl;
-    outfile << mass[k] <<" "<< charge[k] << endl;
-    outfile << x <<" "<< y <<" "<< z <<" "<< t_off <<" "<< flag <<endl;
-    //------------------------------------------------------------------------
+//------------------------------------------------------------------------
+  
   outfile.close();
   
   return 0;

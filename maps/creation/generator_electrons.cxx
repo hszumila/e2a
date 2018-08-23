@@ -99,7 +99,7 @@ int main(int argc, char **argv){
 	      if (cost_bin >= minCosTBin)
 		{
 		  for(Int_t k=0;k<1;k++){      
-		    if(k==0) {outfile << top_num << endl;}
+		    if(k==0) {outfile << "1" << endl;}
 		    outfile << pid[k] <<" "<< cx[k] <<" "<< cy[k] <<" "<< cz[k] <<" "<< mom_tot[k] <<endl;
 		    outfile << mass[k] <<" "<< charge[k] << endl;
 		    outfile << x <<" "<< y <<" "<< z <<" "<< t_off <<" "<< flag <<endl;

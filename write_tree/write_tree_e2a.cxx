@@ -33,7 +33,7 @@ int main(int argc, char **argv)
   
   TIdentificator *t = new TIdentificator(input);
   
-  TFile *output = new TFile("particle_data.root", "RECREATE", "Data of the Tree");
+  TFile *output = new TFile("/volatile/clas/clase2/ahrnjic/outfiles/simulation/full_generation_protons.root", "RECREATE", "Data of the Tree");
   TTree *tree = new TTree("data", "Tree that holds the data");
 
   //Reconstructed Variables

@@ -15,5 +15,8 @@ target_link_libraries(convert_uniform ${ROOT_LIBRARIES})
 add_executable(mapmaker mapmaker.cpp)
 target_link_libraries(mapmaker ${ROOT_LIBRARIES} e2aCuts)
 
-add_executable(generator generator.cxx)
-target_link_libraries(generator ${ROOT_LIBRARIES})
+add_executable(generator_non_electrons generator_non_electrons.cxx)
+target_link_libraries(generator_non_electrons ${ROOT_LIBRARIES})
+
+add_executable(generator_electrons generator_electrons.cxx)
+target_link_libraries(generator_electrons ${ROOT_LIBRARIES})

@@ -151,7 +151,7 @@ int main(int argc, char ** argv)
 
           accepted->Fill(mom_g[0],cost_g,phi_g[0]);*/
 
-          if (!(			(StatEC[0] > 0) && // EC status is good for the electron candidate
+          /*if (!(			(StatEC[0] > 0) && // EC status is good for the electron candidate
                       (StatDC[0] > 0) && // DC status is good for the electron candidate
                       (StatCC[0] > 0) && // CC status is good for the electron candidate
                       (StatSC[0] > 0) && // SC status is good for the electron candidate
@@ -175,7 +175,10 @@ int main(int argc, char ** argv)
           // Electron Fiducial cuts
           if (!fid_params.e_inFidRegion(T3_e_mom)) continue; // Electron theta-phi cut
           if (!fid_params.CutUVW_e(e_ec_xyz)       ) continue; // Cuts on edges of calorimeter (u>60, v<360, w<400);
+          */
 
+          if (particle_g[0]==11)
+            continue;
 
           double cost_g = TMath::Cos(theta_g[1]*M_PI/180);
           generated->Fill(mom_g[1],cost_g,phi_g[1]);
